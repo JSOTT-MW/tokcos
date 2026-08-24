@@ -1,0 +1,59 @@
+=== renderAdminShell (line ~713) ===
+'function renderAdminShell(){\n  const isManager = adminProfile.role===\'manager\';\n  document.getElementById(\'adminTitle\').textContent = isManager ? "Espace propriétaire — TOK\'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||\'\'}`;\n  document.getElementById(\'adminLogoutBtn\').classList.remove(\'admin-logout-btn-hidden\');\n  const tabsEl = document.getElementById(\'adminTabs\');\n  tabsEl.classList.remove(\'admin-tabs-hidden\');\n  const tabs = isManager\n    ? [[\'caisse\',\'Caisse\'],[\'produits\',\'Produits\'],[\'points\',\'Points de vente\'],[\'stock\',\'Stock\'],[\'ventes\',\'Carnet de vente\'],[\'utilisateurs\',\'Utilisateurs\'],[\'assistance\',\'Assistance\']]\n    : [[\'caisse\',\'Caisse\'],[\'stock\',\'Stock\'],[\'ventes\',\'Carnet de vente\'],[\'assistance\',\'Assistance\']];\n  tabsEl.innerHTML = tabs.map(([ke'
+
+=== money function (line ~515) ===
+"function money(n){ return (n||0).toLocaleString('fr-FR') + ' FCFA'; }\nfunction toggleMobileMenu(){ document.getElementById('mobileMenu').classList.add('open'); }\nfunction closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); }\n\n/* ---------- CHARGEMENT ---------- */\nasync function loadAll(){ await Promise.all([loadProducts(), loadPoints(), loadStock()]); renderMenu(); "
+
+=== adminLogoutBtn usage (line ~680) ===
+'document.getElementById(\'adminLogoutBtn\').classList.add(\'admin-logout-btn-hidden\');\n  document.body.classList.remove(\'admin-mode\');\n  removeSidebar();\n  document.getElementById(\'adminBody\').innerHTML = `\n    <div class="admin-login">\n      <p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Connexion</p>\n      <div class="field" style="max-width:280px;margin:16px auto;text-align:l'
+
+=== adminTabs usage (line ~717) ===
+"const tabsEl = document.getElementById('adminTabs');\n  tabsEl.classList.remove('admin-tabs-hidden');\n  const tabs = isManager\n    ? [['caisse','Caisse'],['produits','Produits'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]\n    : [['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['assistance"
+
+=== cartTotal (line ~575) ===
+'function cartTotal(){ return cart.reduce((s,c)=>{const p=PRODUCTS.find(pp=>pp.id===c.id);return s+p.price*c.qty;},0); }\n\nfunction renderDrawer(){\n  const body=document.getElementById(\'drawerBody\'), foot=document.getElementById(\'drawerFoot\');\n  document.getElementById(\'drawerTitle\').textContent = checkoutStep===\'cart\'?\'Votre panier\':\'Finaliser la commande\';\n  if(checkoutStep===\'cart\'){\n    if(cart.length===0){ body.innerHTML=\'<div class="empty-cart">Votre panier est vide.<br>Ajoutez des produits '
+
+=== caisseCart.map (line ~979) ===
+'caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id);\n    return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(110,59,30,0.1);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${p.name}</div><div style="font-size:12px;color:#8A7660;">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div></div><div style="display:flex;align-items:center;gap:4px;"><button onclick="changeCaisseQty(\'${c.id}\',-1)" style="width:22px;height:22px;border-rad'
+
+=== renderChatMessages (line ~1088) ===
+'renderChatMessages(data); }\nfunction renderChatMessages(list){\n  const container=document.getElementById(\'chatMessages\'); if(!container) return;\n  if(!list||list.length===0){ container.innerHTML=\'<div class="chat-empty">Aucun message. Démarrez la conversation.</div>\'; return; }\n  container.innerHTML = list.map(m=>{ const mine=m.sender_role===adminProfile.role; return `<div class="chat-bubble ${mine?\'mine\':\'theirs\'}">${m.body}<div class="chat-meta">${m.sender_name||(m.sender_role===\'manager\'?\'Pro'
+
+=== insertAdjacentHTML (line ~1106) ===
+'insertAdjacentHTML(\'beforeend\', `<div class="chat-bubble ${mine?\'mine\':\'theirs\'}">${m.body}<div class="chat-meta">${m.sender_name||\'\'} · ${new Date(m.created_at).toLocaleString(\'fr-FR\')}</div></div>`);\n    container.scrollTop = container.scrollHeight;\n  }).subscribe();\n}\nfunction unsubscribeChat(){ if(chatChannel){ sb.removeChannel(chatChannel); chatChannel=null; } }\n\nloadAll();\n</script>\n</body>\n</html>'
+
+=== CACHED_PENDING_ORDERS.map (line ~950) ===
+'CACHED_PENDING_ORDERS.map(o=>`<div class="pending-order-card"><div class="order-info"><div class="order-client">${o.client_name}</div><div class="order-detail">${o.sale_items.map(i=>i.product_name+\' x\'+i.qty).join(\', \')}</div><div class="order-time">${new Date(o.created_at).toLocaleString(\'fr-FR\')}</div></div><div class="order-right"><div class="order-total">${money(o.total)}</div><button class="import-btn" onclick="markOrderFulfilled(\'${o.id}\')">✓ Remise au client</button></div></div>`).join(\'\''
+
+=== product.description (line ~768) ===
+'product.description||\'\'):\'\'}</textarea></div>\n    <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?\'Enregistrer\':\'Ajouter le produit\'}</button>${product?\'<button class="btn-ghost" onclick="renderProductForm()">Annuler</button>\':\'\'}</div>\n  </div>`;\n}\nasync function saveProductForm(){\n  const name=document.getElementById(\'pfName\').value.trim(), '
+
+=== point.phone1 (line ~810) ===
+'point.phone1||\'\'):\'\'}"></div>\n    <div class="field"><label>Téléphone 2</label><input id="ptPhone2" value="${point?(point.phone2||\'\'):\'\'}"></div>\n    <div class="field full"><label>Recherche Google Maps</label><div class="map-search-container"><input id="ptMapQuery" value="${point?(point.map_query||\'\'):\'\'}" placeholder="Nom+Quartier+Dakar"><button type="button" class="map-search-btn" onclick="open'
+
+=== openAdmin (line ~666) ===
+"async function openAdmin(){\n  document.getElementById('adminOverlay').classList.add('open');\n  const {data:{session}} = await sb.auth.getSession();\n  if(session){ adminSession=session; await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }\n}\nfunction closeAdmin(){\n  document.getElementById('adminOverlay').classList.remove('open');\n  document.body.classList.remove('admin-mode');\n  removeSidebar();\n  unsubscribeChat();\n}\nfunction renderAdminLogin(){\n  document.getElementById('adminTitle').textContent = 'Espace gérant';\n  docu"
+
+=== adminLogout (line ~707) ===
+'async function adminLogout(){\n  await sb.auth.signOut(); adminSession=null; adminProfile=null; unsubscribeChat();\n  document.body.classList.remove(\'admin-mode\'); removeSidebar();\n  closeAdmin();\n}\n\nfunction renderAdminShell(){\n  const isManager = adminProfile.role===\'manager\';\n  document.getElementById(\'adminTitle\').textContent = isManager ? "Espace propriétaire — TOK\'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||\'\'}`;\n  document.getElementById(\'adminLogoutBtn\').c'
+
+=== switchAdminTab (line ~728) ===
+"function switchAdminTab(tab){\n  adminActiveTab = tab; unsubscribeChat();\n  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));\n  document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));\n  if(tab==='produits') renderAdminProducts();\n  if(tab==='points') renderAdminPoints();\n  if(tab==='stock') renderAdminStock();\n  if(tab==='ventes') renderAdminSales();\n  if(tab==='caisse') renderAdmin"
+
+=== importOrderToCaisse: NOT FOUND ===
+=== file input: NOT FOUND ===
+=== sidebar toggle: NOT FOUND ===
+=== cart lines (line ~613) ===
+'const lines = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });\n  for(const l of lines){ const avail=stockFor(pointId,l.id); if(l.qty>avail){ alert(`Stock insuffisant pour "${l.name}" (disponible : ${avail}).`); return; } }\n  submitting=true; const btn=document.getElementById(\'submitOrderBtn\'); if(btn){btn.disabled=tr'
+
+=== caisseCart lines (line ~991) ===
+'const lines = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });\n  const total = lines.reduce((s,l)=>s+l.sub,0);\n  if(!confirm(`Valider la vente de ${money(total)} ?`)) return;\n  try{\n    for(const l of lines){ const row=STOCK.find(s=>s.point_id===caisseSelectedPoint && s.product_id===l.id); const newQty=row.quan'
+
+=== product.name.replace (line ~764) ===
+'product.name.replace(/"/g,\'"\'):\'\'}" placeholder="Ex : Café Touba"></div>\n    <div class="field"><label>Catégorie</label><select id="pfCat"><option value="cafe" ${product&&product.cat===\'cafe\'?\'selected\':\'\'}>Café</option><option value="wass" ${product&&product.cat===\'wass\'?\'selected\':\'\'}>Wass / Boiss'
+
+=== point.name.replace (line ~808) ===
+'point.name.replace(/"/g,\'"\'):\'\'}" placeholder="Ex : Plateau"></div>\n    <div class="field"><label>Adresse / repère</label><input id="ptAddress" value="${point?point.address.replace(/"/g,\'"\'):\'\'}"></div>\n    <div class="field"><label>Téléphone 1</label><input id="ptPhone1" value="${point?(point.phone'
+
+=== point.address.replace (line ~809) ===
+'point.address.replace(/"/g,\'"\'):\'\'}"></div>\n    <div class="field"><label>Téléphone 1</label><input id="ptPhone1" value="${point?(point.phone1||\'\'):\'\'}"></div>\n    <div class="field"><label>Téléphone 2</label><input id="ptPhone2" value="${point?(point.phone2||\'\'):\'\'}"></div>\n    <div class="field fu'

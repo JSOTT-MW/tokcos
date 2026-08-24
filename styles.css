@@ -1,0 +1,856 @@
+/* =======================================================
+   INLINE STYLES EXTERNALISÉS
+   ======================================================= */
+
+/* Hide elements that start hidden and are shown via JS */
+.admin-logout-btn-hidden {
+  display: none !important;
+}
+
+.admin-tabs-hidden {
+  display: none !important;
+}
+
+/* Admin header layout */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Admin head spacing */
+.admin-head {
+  gap: 16px;
+}
+
+.admin-head h3 {
+  flex: 1;
+  text-align: center;
+}
+
+/* Disconnect button styling */
+.admin-logout-btn {
+  font-size: 12px;
+  width: auto;
+  padding: 0 18px;
+  height: 36px;
+  border-radius: 18px;
+  color: var(--white);
+  background: var(--rust);
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-logout-btn:hover {
+  background: #8C3220;
+  transform: translateY(-1px);
+}
+
+/* Hide non-active admin tabs */
+.admin-tab {
+  display: none;
+}
+
+.admin-tab.active {
+  display: inline-block;
+}
+
+/* Modal personnalisé */
+.modal-small {
+  max-width: 300px;
+}
+
+.modal-body-compact {
+  padding: 22px;
+}
+
+.modal-title-small {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.modal-buttons-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Admin login form */
+.admin-login-form {
+  max-width: 280px;
+  margin: 16px auto;
+  text-align: left;
+}
+
+.admin-login-form-narrow {
+  max-width: 280px;
+  margin: 0 auto 16px;
+  text-align: left;
+}
+
+.admin-login-btn {
+  display: inline-block;
+  padding: 11px 26px;
+}
+
+.admin-login-title {
+  font-weight: 700;
+  color: var(--coffee-black);
+  font-size: 15px;
+}
+
+/* Admin form buttons */
+.admin-form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-form-actions .btn-primary {
+  flex: 0 0 auto;
+  padding: 11px 24px;
+}
+
+/* Stock field in product form */
+.stock-field-disabled {
+  color: #8A7660;
+}
+
+/* Admin toolbar field */
+.admin-toolbar-field {
+  margin-bottom: 0;
+  min-width: 220px;
+}
+
+.admin-toolbar-field-narrow {
+  margin-bottom: 0;
+  min-width: 200px;
+}
+
+/* Sales stats container */
+.sales-stats-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Sales table phone number */
+.sales-phone {
+  color: #8A7660;
+  font-size: 11.5px;
+}
+
+/* Sales total */
+.sales-total {
+  font-weight: 700;
+}
+
+/* Product thumbnail placeholder */
+.product-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Stock thumbnail placeholder */
+.stock-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Hidden file inputs */
+#cameraInput,
+#galleryInput {
+  position: absolute !important;
+  left: -9999px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 28px;
+  transition: all 0.3s ease;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--rust);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.toggle-switch:hover .toggle-slider {
+  opacity: 0.9;
+}
+
+/* Google Maps button */
+.map-search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold);
+  color: var(--coffee-black);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.map-search-btn:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+}
+
+.map-search-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.map-search-container {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.map-search-container input {
+  flex: 1;
+}
+
+/* =======================================================
+   NOUVELLES FONCTIONNALITÉS - CHAT & ASSISTANCE
+   ======================================================= */
+
+/* Call button */
+.call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2E7D46;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+
+.call-btn:hover {
+  background: #256238;
+}
+
+/* Chat container */
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 60vh;
+  max-height: 520px;
+  border: 1px solid rgba(110, 59, 30, 0.15);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  background: var(--cream-light);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.chat-bubble .chat-meta {
+  font-size: 10.5px;
+  opacity: 0.65;
+  margin-top: 4px;
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  background: var(--coffee-brown);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.theirs {
+  align-self: flex-start;
+  background: var(--white);
+  color: var(--ink);
+  border: 1px solid rgba(110, 59, 30, 0.15);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-empty {
+  text-align: center;
+  color: #8A7660;
+  font-size: 13px;
+  margin: auto;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid rgba(110, 59, 30, 0.12);
+  background: var(--white);
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(110, 59, 30, 0.25);
+  font-family: inherit;
+  font-size: 13.5px;
+}
+
+.chat-input-row button {
+  background: var(--rust);
+  color: #fff;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* =======================================================
+   MODE PLEIN ÉCRAN ADMIN/GERANT
+   ======================================================= */
+
+/* Cache les sections client quand un admin/gerant est connecté */
+body.admin-mode .hero,
+body.admin-mode .section#menu,
+body.admin-mode .section#points,
+body.admin-mode .section#avis {
+  display: none !important;
+}
+
+/* Garde header et footer visibles en mode admin */
+body.admin-mode header,
+body.admin-mode footer {
+  display: block !important;
+}
+
+/* Ajuste le main pour occuper l'espace */
+body.admin-mode {
+  background: var(--cream-light);
+}
+
+/* Override de l'overlay admin pour mode plein écran */
+body.admin-mode .admin-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--cream-light);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+  overflow-y: auto;
+}
+
+body.admin-mode .admin-panel {
+  max-width: 100%;
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+
+/* Cache le bouton admin dans le footer en mode admin */
+body.admin-mode .admin-trigger {
+  display: none;
+}
+
+/* Pleine hauteur pour le corps admin */
+body.admin-mode .admin-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+}
+
+/* Sidebar dropdown pour manager */
+body.admin-mode .admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg, var(--coffee-black) 0%, var(--coffee-brown) 100%);
+  z-index: 201;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  padding: 80px 20px 20px;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+}
+
+body.admin-mode .admin-sidebar.open {
+  transform: translateX(0);
+}
+
+body.admin-mode .admin-sidebar-toggle {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 202;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--coffee-brown);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  border: 1px solid rgba(221,165,63,0.3);
+  transition: all 0.2s;
+}
+
+body.admin-mode .admin-sidebar-toggle:hover {
+  background: var(--coffee-black);
+  transform: scale(1.05);
+}
+
+body.admin-mode .admin-sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+body.admin-mode .admin-sidebar-menu li {
+  margin-bottom: 8px;
+}
+
+body.admin-mode .admin-sidebar-menu button {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.08);
+  color: var(--white);
+  border: 1px solid rgba(221,165,63,0.2);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body.admin-mode .admin-sidebar-menu button:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--gold);
+}
+
+body.admin-mode .admin-sidebar-menu button.active {
+  background: var(--rust);
+  border-color: var(--rust);
+  color: var(--white);
+}
+
+body.admin-mode .admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.admin-mode .admin-sidebar-overlay.open {
+  display: block;
+  opacity: 1;
+}
+
+/* Ajustement du contenu admin pour la sidebar */
+body.admin-mode .admin-panel {
+  padding-left: 0;
+  transition: padding-left 0.3s ease;
+}
+
+body.admin-mode .admin-panel.sidebar-open {
+  padding-left: 260px;
+}
+
+/* Responsive */
+/* =======================================================
+   NOUVEAU LAYOUT CAISSE - Panier fixe à droite
+   ======================================================= */
+
+/* Container principal de la caisse : flex row */
+.caisse-layout {
+  display: flex;
+  height: 100%;
+  gap: 0;
+  position: relative;
+}
+
+/* Partie gauche : produits + commandes, scrollable */
+.caisse-left {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 24px;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Partie droite : panier/caisse fixe, COMPLÈTEMENT SANS scroll */
+.caisse-right {
+  width: 380px;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 210;
+  background: var(--cream);
+  border-left: 2px solid rgba(110,59,30,0.15);
+  padding: 16px;
+  overflow: hidden;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Le corps du panier SANS scroll */
+.caisse-right .caisse-cart-body {
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* Ajustement du admin-body quand la caisse est active */
+body.admin-mode .admin-body.caisse-active {
+  overflow: hidden;
+  max-height: calc(100vh - 120px);
+  padding-right: 400px; /* espace pour le panier fixe */
+}
+
+/* En-tête du panier */
+.caisse-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(110,59,30,0.15);
+}
+
+.caisse-cart-header h4 {
+  font-size: 16px;
+  color: var(--coffee-black);
+  font-weight: 700;
+}
+
+.caisse-cart-header .cart-badge {
+  background: var(--rust);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* Pied du panier (total + boutons) */
+.caisse-cart-footer {
+  border-top: 1px solid rgba(110,59,30,0.15);
+  padding-top: 12px;
+  flex-shrink: 0;
+}
+
+/* === COMMANDES EN ATTENTE === */
+.pending-orders-section {
+  margin-bottom: 28px;
+}
+
+.pending-orders-section .section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--coffee-black);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending-orders-section .section-title .count-badge {
+  background: var(--gold);
+  color: var(--coffee-black);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.pending-order-card {
+  background: var(--white);
+  border: 1px solid rgba(110,59,30,0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.pending-order-card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  transform: translateX(4px);
+}
+
+.pending-order-card .order-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pending-order-card .order-info .order-client {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--coffee-black);
+}
+
+.pending-order-card .order-info .order-detail {
+  font-size: 12px;
+  color: #8A7660;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pending-order-card .order-info .order-time {
+  font-size: 11px;
+  color: #8A7660;
+  margin-top: 2px;
+}
+
+.pending-order-card .order-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pending-order-card .order-total {
+  font-weight: 700;
+  color: var(--rust);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.pending-order-card .import-btn {
+  background: var(--gold);
+  color: var(--coffee-black);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pending-order-card .import-btn:hover {
+  background: var(--gold-light);
+  transform: scale(1.05);
+}
+
+.pending-order-card .imported-check {
+  color: #2E7D46;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* Message aucun produit */
+.caisse-empty-products {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8A7660;
+  font-size: 13px;
+  background: var(--cream);
+  border-radius: 14px;
+}
+
+/* =======================================================
+   MOBILE : produits en ligne, caisse en bas fixe
+   ======================================================= */
+@media (max-width: 768px) {
+  body.admin-mode .admin-body.caisse-active {
+    padding-right: 0;
+    padding-bottom: 50vh;
+  }
+
+  .caisse-layout {
+    flex-direction: column;
+  }
+
+  .caisse-left {
+    padding-right: 0;
+    overflow-y: visible;
+  }
+
+  /* Produits en ligne (scroll horizontal) */
+  .caisse-left .card-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    padding-bottom: 8px !important;
+    touch-action: pan-x;
+  }
+
+  .caisse-left .card-grid .menu-card {
+    min-width: 150px;
+    max-width: 180px;
+    flex-shrink: 0;
+  }
+
+  .caisse-left .card-grid .menu-card .card-photo {
+    height: 60px;
+  }
+
+  .caisse-left .card-grid .menu-card .card-name {
+    font-size: 12px;
+  }
+
+  .caisse-left .card-grid .menu-card .card-price {
+    font-size: 11px;
+  }
+
+  .caisse-left .card-grid .menu-card .card-add {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  /* Panier fixe en bas - OPTIMISE MOBILE */
+  .caisse-right {
+    position: fixed !important;
+    bottom: 0 !important;
+    top: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 38vh !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(110,59,30,0.15) !important;
+    z-index: 210 !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08) !important;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 6px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .caisse-right .caisse-cart-body {
+    max-height: 8vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    margin-bottom: 6px !important;
+  }
+
+  .caisse-cart-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+
+  .caisse-cart-header h4 {
+    font-size: 14px;
+  }
+
+  .caisse-cart-footer {
+    padding-top: 8px;
+  }
+
+  /* Commandes en attente sur mobile */
+  .pending-order-card {
+    padding: 10px 12px;
+  }
+
+  .pending-order-card .order-info .order-client {
+    font-size: 13px;
+  }
+
+  .pending-order-card .order-info .order-detail {
+    font-size: 11px;
+  }
+
+  .pending-order-card .order-total {
+    font-size: 12px;
+  }
+
+  .pending-order-card .import-btn {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.admin-mode .admin-sidebar {
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  body.admin-mode .admin-panel.sidebar-open {
+    padding-left: 0;
+  }
+}

@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOK'COS — Touba Kawsara Coffee Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --coffee-black:#1E0F07; --coffee-brown:#5C3018; --coffee-tan:#B9814A;
+    --gold:#DDA53F; --gold-light:#F2D189; --rust:#A6402A; --blush:#D98A73;
+    --cream:#F4E9D6; --cream-light:#FBF5EA; --ink:#2A1B10; --white:#FFFFFF;
+    --flag-stripe: repeating-linear-gradient(90deg,#00853F 0px,#00853F 24px,#FDEF42 24px,#FDEF42 48px,#E31B23 48px,#E31B23 72px,#FFFFFF 72px,#FFFFFF 96px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;background:var(--coffee-black);}
+  body{font-family:'Inter',sans-serif;background:var(--cream-light);color:var(--ink);line-height:1.5;}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:700;letter-spacing:-0.01em;}
+  a{text-decoration:none;color:inherit;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+  .on-dark, .on-dark h1, .on-dark h2, .on-dark h3, .on-dark p, .on-dark span, .on-dark div{color:var(--white);}
+
+  header{position:sticky;top:0;z-index:50;background:linear-gradient(120deg,var(--coffee-black) 0%,var(--coffee-brown) 100%);}
+  header::after{content:"";display:block;height:4px;background:var(--flag-stripe);}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:16px;}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--white);}
+  .brand-mark{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 200deg, var(--gold), var(--rust), var(--coffee-brown), var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:14px;color:var(--coffee-black);flex-shrink:0;}
+  .brand-name{font-size:17px;font-weight:600;color:var(--white);}
+  .brand-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-light);}
+  .nav-links{display:flex;gap:26px;font-size:14px;color:var(--white);}
+  .nav-links a{opacity:0.9;transition:opacity .2s;}
+  .nav-links a:hover{opacity:1;color:var(--gold-light);}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .btn-wa{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--coffee-black);padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;}
+  .btn-wa:hover{background:var(--gold-light);}
+  .btn-wa svg{width:16px;height:16px;}
+  .cart-btn{position:relative;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(221,165,63,0.4);}
+  .cart-btn svg{width:19px;height:19px;color:var(--white);}
+  .cart-count{position:absolute;top:-4px;right:-4px;background:var(--rust);color:var(--white);font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .cart-hidden{display:none !important;}
+  .hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(221,165,63,0.4);color:var(--white);font-size:20px;flex-shrink:0;}
+  @media(max-width:760px){ .nav-links{display:none;} .hamburger{display:flex;} }
+  .mobile-menu{position:fixed;inset:0;z-index:200;background:rgba(20,10,5,0.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu-inner{background:linear-gradient(135deg,var(--coffee-black),var(--coffee-brown));border-radius:20px;padding:40px 32px;max-width:320px;width:100%;text-align:center;border:1px solid rgba(221,165,63,0.3);}
+  .mobile-menu-inner a{display:block;color:var(--white);font-size:18px;font-weight:600;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .mobile-menu-inner a:last-child{border-bottom:none;}
+  .mobile-menu-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);color:var(--white);font-size:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(221,165,63,0.3);}
+
+  .hero{position:relative;background:linear-gradient(135deg,var(--coffee-black) 0%,var(--coffee-brown) 55%,var(--coffee-tan) 100%);overflow:hidden;}
+  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;align-items:stretch;min-height:520px;}
+  @media(max-width:900px){ .hero-grid{grid-template-columns:1fr;} }
+  .hero-copy{padding:64px 24px 56px;display:flex;flex-direction:column;justify-content:center;max-width:560px;}
+  .hero-copy h1{color:var(--white);font-size:clamp(32px,5vw,50px);line-height:1.08;margin-bottom:18px;}
+  .hero-copy h1 em{font-style:italic;color:var(--gold-light);}
+  .hero-copy p{color:rgba(255,255,255,0.88);font-size:16px;max-width:440px;margin-bottom:28px;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn-outline{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.4);color:var(--white);padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;}
+  .btn-outline:hover{border-color:var(--gold);background:rgba(221,165,63,0.12);}
+  .hero-photo{position:relative;background-image:url('devanture.jpeg');background-size:cover;background-position:center 30%;min-height:300px;}
+  .hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg, var(--coffee-black) 0%, rgba(30,15,7,0.1) 30%, rgba(30,15,7,0) 60%);}
+  @media(max-width:900px){ .hero-photo::after{background:linear-gradient(180deg, rgba(30,15,7,0) 40%, var(--coffee-black) 100%);} }
+  .hero-tag{position:absolute;bottom:20px;left:20px;background:rgba(30,15,7,0.8);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);color:var(--white);font-size:11px;padding:8px 14px;border-radius:8px;border:1px solid rgba(221,165,63,0.35);}
+
+  .section{padding:72px 0;}
+  .section-head{max-width:600px;margin-bottom:44px;}
+  .section-eyebrow{color:var(--rust);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .section-eyebrow::before{content:"";width:24px;height:1px;background:var(--rust);}
+  .section-head h2{font-size:clamp(24px,3.6vw,34px);color:var(--coffee-black);}
+  .section-head p{color:#6B5A47;font-size:14.5px;margin-top:10px;}
+  .points .section-eyebrow{color:var(--gold-light);}
+  .points .section-eyebrow::before{background:var(--gold-light);}
+  .points .section-head h2{color:var(--white);}
+
+  .menu-cols{display:grid;grid-template-columns:1fr;gap:28px;}
+  .menu-col{background:var(--white);border-radius:20px;padding:28px;border:1px solid rgba(110,59,30,0.12);box-shadow:0 2px 8px rgba(30,15,7,0.06);}
+  .menu-col-title{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid rgba(110,59,30,0.1);}
+  .menu-col-title .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-gold{background:var(--gold);} .dot-rust{background:var(--rust);}
+  .menu-col-title h3{font-size:19px;color:var(--coffee-black);}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:14px;}
+  @media(max-width:600px){ .card-grid{grid-template-columns:1fr;} }
+  .menu-card{background:var(--white);border-radius:16px;padding:18px;border:1px solid rgba(110,59,30,0.12);box-shadow:0 2px 8px rgba(30,15,7,0.06);transition:transform .25s ease, box-shadow .25s ease;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;}
+  .menu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, var(--gold-light), var(--gold));}
+  .menu-card.cafe::before{background:linear-gradient(90deg, var(--coffee-tan), var(--gold));}
+  .menu-card.wass::before{background:linear-gradient(90deg, var(--blush), var(--rust));}
+  .menu-card:hover{transform:translateY(-6px);box-shadow:0 12px 24px rgba(30,15,7,0.15);}
+  .menu-card .card-icon{font-size:34px;margin-bottom:8px;}
+  .menu-card .card-photo{width:100%;height:80px;border-radius:10px;object-fit:cover;margin-bottom:8px;}
+  .menu-card .card-name{font-size:13.5px;font-weight:700;color:var(--coffee-black);margin-bottom:5px;line-height:1.3;}
+  .menu-card .card-price{font-size:12.5px;font-weight:700;color:var(--rust);margin-bottom:9px;}
+  .menu-card .card-add{font-size:11px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg, var(--coffee-brown), var(--coffee-black));color:var(--white);font-weight:700;}
+  .menu-card.wass .card-add{background:linear-gradient(135deg, var(--rust), #6E2418);}
+  .menu-card .card-add:hover{transform:scale(1.05);filter:brightness(1.15);}
+  .menu-card.out-of-stock{opacity:0.55;cursor:not-allowed;}
+  .menu-card .stock-flag{position:absolute;top:8px;right:8px;background:var(--rust);color:var(--white);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;}
+
+  .points{background:linear-gradient(135deg,var(--coffee-black) 0%,var(--coffee-brown) 100%);color:var(--white);}
+  .point-cards{display:grid;grid-template-columns:repeat(2, 1fr);gap:22px;max-width:1100px;margin:0 auto;align-items:start;}
+  @media(max-width:860px){ .point-cards{grid-template-columns:1fr;max-width:500px;margin:0 auto;} }
+  .points .flip-card-front a, .points .flip-card-back a{font-size:13px;color:var(--gold) !important;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
+  .points .flip-card-front a:hover, .points .flip-card-back a:hover{color:var(--gold-light) !important;transform:translateX(4px);}
+  .flip-card{perspective:1200px;width:100%;height:220px;}
+  .flip-card-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(0.175,.885,.32,1.275);transform-style:preserve-3d;}
+  .flip-card.flipped .flip-card-inner{transform:rotateY(180deg);}
+  .flip-card-front,.flip-card-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1px solid rgba(221,165,63,0.3);background:rgba(255,255,255,0.04);padding:24px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .flip-card-back{transform:rotateY(180deg);padding:20px 24px;background:rgba(30,15,7,0.96);align-items:center;text-align:center;}
+  .contact-info{color:var(--white);text-align:center;width:100%;}
+  .contact-info h5{font-size:14px;color:var(--gold-light);margin-bottom:8px;font-weight:600;}
+  .contact-info p{font-size:12.5px;color:rgba(255,255,255,0.85);margin-bottom:5px;line-height:1.4;}
+  .contact-info .phone{color:var(--gold-light);font-weight:700;font-size:12.5px;margin-bottom:4px;}
+  .map-btn{display:inline-flex;align-items:center;gap:7px;background:var(--gold);color:var(--coffee-black);padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:700;margin-top:10px;}
+  .map-btn:hover{background:var(--gold-light);}
+  .map-btn svg{width:15px;height:15px;}
+  .close-btn{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:rgba(221,165,63,0.2);color:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid rgba(221,165,63,0.4);z-index:10;}
+
+  .review{background:var(--cream);text-align:center;}
+  .review-box{max-width:640px;margin:0 auto;padding:52px 32px;border-radius:20px;background:var(--cream-light);border:1px solid rgba(110,59,30,0.15);}
+  .review-box h2{font-size:clamp(22px,3vw,30px);color:var(--coffee-black);margin-bottom:12px;}
+  .review-box p{color:#6B5A47;font-size:14.5px;margin-bottom:26px;max-width:460px;margin-inline:auto;}
+  .btn-wa-lg{display:inline-flex;align-items:center;gap:10px;background:var(--rust);color:var(--white);padding:15px 30px;border-radius:999px;font-size:15px;font-weight:700;}
+  .btn-wa-lg:hover{background:#8C3220;}
+
+  footer{background:var(--coffee-black);color:rgba(255,255,255,0.75);padding:0 0 40px;font-size:13px;}
+  .footer-stripe{height:4px;background:var(--flag-stripe);}
+  .footer-inner{padding-top:36px;}
+  .foot-main{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;padding-bottom:26px;border-bottom:1px solid rgba(221,165,63,0.2);margin-bottom:18px;}
+  .foot-brand{display:flex;align-items:center;gap:10px;}
+  .foot-contact{display:flex;flex-direction:column;gap:7px;}
+  .foot-location{color:rgba(255,255,255,0.85);font-weight:600;font-size:12.5px;}
+  .foot-phone{color:var(--gold-light);font-weight:700;font-size:13px;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:rgba(255,255,255,0.55);padding-right:70px;}
+  .foot-bottom a{color:var(--gold-light);}
+  .admin-trigger{color:rgba(255,255,255,0.3);font-size:11px;}
+  .admin-trigger:hover{color:var(--gold-light);}
+  @media(max-width:600px){ .foot-main{flex-direction:column;gap:18px;} .foot-bottom{flex-direction:column;align-items:flex-start;padding-right:0;padding-bottom:70px;} }
+
+  .float-wa{position:fixed;bottom:22px;right:22px;z-index:60;width:56px;height:56px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,0.28);}
+  .float-wa:hover{transform:scale(1.08);}
+  .float-wa svg{width:28px;height:28px;}
+
+  .overlay{position:fixed;inset:0;background:rgba(20,10,5,0.6);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--cream-light);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.4);max-height:90vh;overflow-y:auto;}
+  .modal.modal-small{max-width:300px;}
+  .modal-visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--white);overflow:hidden;}
+  .modal-visual img{width:100%;height:100%;object-fit:cover;}
+  .modal-visual.cafe{background:linear-gradient(155deg,var(--coffee-brown),var(--coffee-black));}
+  .modal-visual.wass{background:linear-gradient(155deg,var(--rust),#6E2418);}
+  .modal-body{padding:26px 26px 28px;}
+  .modal-body.modal-body-compact{padding:22px;}
+  .modal-body h3{font-size:21px;color:var(--coffee-black);margin-bottom:8px;}
+  .modal-title-small{font-size:16px;margin-bottom:16px;}
+  .modal-body p{font-size:14px;color:#6B5A47;margin-bottom:18px;}
+  .modal-price{font-size:16px;font-weight:700;color:var(--rust);margin-bottom:20px;}
+  .qty-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .qty-stepper{display:flex;align-items:center;gap:14px;border:1px solid rgba(110,59,30,0.25);border-radius:999px;padding:6px 8px;}
+  .qty-stepper button{width:28px;height:28px;border-radius:50%;background:var(--cream);font-size:16px;font-weight:700;color:var(--coffee-black);}
+  .qty-stepper button:hover{background:var(--gold-light);}
+  .qty-stepper span{min-width:20px;text-align:center;font-weight:700;}
+  .modal-actions{display:flex;gap:10px;}
+  .modal-buttons-vertical{display:flex;flex-direction:column;gap:10px;}
+  .btn-primary{flex:1;background:var(--rust);color:var(--white);padding:13px;border-radius:999px;font-weight:700;font-size:14px;text-align:center;}
+  .btn-primary:hover{background:#8C3220;}
+  .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+  .btn-ghost{padding:13px 18px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink);border:1px solid rgba(110,59,30,0.25);}
+  .modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink);}
+  .modal-relative{position:relative;}
+  .qty-label{font-size:13px;font-weight:600;}
+
+  .drawer-overlay{position:fixed;inset:0;background:rgba(20,10,5,0.5);z-index:110;display:none;}
+  .drawer-overlay.open{display:block;}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--cream-light);z-index:111;transform:translateX(100%);transition:transform .3s ease;display:flex;flex-direction:column;}
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{padding:22px 24px;border-bottom:1px solid rgba(110,59,30,0.15);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(120deg,var(--coffee-black),var(--coffee-brown));}
+  .drawer-head h3{color:var(--white);font-size:18px;}
+  .drawer-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);color:var(--white);font-size:16px;}
+  .drawer-body{flex:1;overflow-y:auto;padding:20px 24px;}
+  .cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(110,59,30,0.1);}
+  .cart-item .ci-icon{width:44px;height:44px;border-radius:10px;background:var(--coffee-brown);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;}
+  .cart-item .ci-icon img{width:100%;height:100%;object-fit:cover;}
+  .cart-item .ci-info{flex:1;}
+  .cart-item h4{font-size:14px;margin-bottom:4px;}
+  .cart-item .ci-price{font-size:12.5px;color:#8A7660;}
+  .cart-item .ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .cart-item .ci-qty button{width:22px;height:22px;border-radius:50%;background:var(--cream);font-size:13px;font-weight:700;}
+  .cart-item .ci-remove{font-size:11px;color:var(--rust);margin-top:6px;font-weight:600;}
+  .empty-cart{text-align:center;padding:60px 10px;color:#8A7660;font-size:14px;}
+  .drawer-foot{padding:20px 24px;border-top:1px solid rgba(110,59,30,0.15);}
+  .drawer-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:16px;color:var(--ink);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field input, .field select, .field textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(110,59,30,0.25);font-family:inherit;font-size:13.5px;background:var(--white);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;}
+  .seg button{flex:1;padding:9px 6px;border-radius:10px;border:1px solid rgba(110,59,30,0.25);font-size:12px;font-weight:700;color:var(--ink);background:var(--white);min-width:90px;}
+  .seg button.active{background:var(--coffee-black);color:var(--white);border-color:var(--coffee-black);}
+  .checkout-note{font-size:11.5px;color:#8A7660;margin-top:10px;line-height:1.4;}
+  .checkout-actions{display:flex;gap:10px;}
+  .checkout-actions .btn-ghost{flex:1;} .checkout-actions .btn-primary{flex:2;}
+  .btn-full-width{width:100%;}
+
+  /* ---------- ADMIN ---------- */
+  .admin-overlay{position:fixed;inset:0;background:rgba(20,10,5,0.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;}
+  .admin-overlay.open{display:flex;}
+  .admin-panel{background:var(--cream-light);border-radius:18px;max-width:1000px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);margin-bottom:24px;display:flex;flex-direction:column;max-height:calc(100vh - 48px);}
+  .admin-body{flex:1;padding:24px 26px;background:var(--white);overflow-y:auto;}
+  @media(max-width:760px){ .admin-overlay{padding:0;align-items:stretch;} .admin-panel{max-width:100%;width:100%;height:100dvh;max-height:none;border-radius:0;margin-bottom:0;} }
+
+  .admin-header-actions{display:flex;align-items:center;gap:10px;}
+  .admin-head{background:linear-gradient(120deg,var(--coffee-black),var(--coffee-brown));padding:20px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .admin-head h3{color:var(--white);font-size:18px;flex:1;text-align:center;}
+  .admin-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);color:var(--white);font-size:16px;}
+  .admin-logout-btn{font-size:12px;width:auto;padding:0 18px;height:36px;border-radius:18px;color:var(--white);background:var(--rust);font-weight:600;display:inline-flex;align-items:center;justify-content:center;}
+  .admin-logout-btn:hover{background:#8C3220;}
+  .admin-logout-btn-hidden, .admin-tabs-hidden{display:none !important;}
+  .admin-tabs{display:flex;gap:4px;padding:14px 26px 0;background:var(--white);border-bottom:1px solid rgba(110,59,30,0.12);flex-wrap:wrap;}
+  .admin-tab{padding:10px 16px;font-size:13px;font-weight:700;color:#8A7660;border-radius:10px 10px 0 0;border-bottom:2px solid transparent;}
+  .admin-tab.active{color:var(--rust);border-bottom:2px solid var(--rust);background:var(--cream-light);}
+  .admin-point-bar{padding:12px 26px;background:var(--cream);border-bottom:1px solid rgba(110,59,30,0.12);}
+
+  .admin-login{padding:60px 26px;text-align:center;}
+  .admin-login p{color:#6B5A47;font-size:13px;margin-top:14px;}
+
+  .admin-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .admin-stat{background:var(--cream);border-radius:12px;padding:12px 16px;font-size:12.5px;color:var(--ink);}
+  .admin-stat b{display:block;font-size:18px;font-family:'Fraunces',serif;color:var(--rust);}
+
+  .admin-product-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--cream);border-radius:14px;padding:20px;margin-bottom:22px;}
+  @media(max-width:640px){ .admin-product-form{grid-template-columns:1fr;} }
+  .admin-product-form .full{grid-column:1/-1;}
+  .admin-form-actions{display:flex;gap:10px;}
+  .admin-photo-zone{display:flex;align-items:center;gap:14px;}
+  .admin-photo-preview{width:64px;height:64px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
+  .admin-photo-preview img{width:100%;height:100%;object-fit:cover;}
+  .admin-photo-btn{font-size:12px;font-weight:700;color:var(--rust);border:1px solid var(--rust);padding:9px 16px;border-radius:999px;}
+  .stock-field-disabled{color:#8A7660;}
+
+  .admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .admin-table th{text-align:left;color:#8A7660;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;padding:8px 10px;border-bottom:2px solid rgba(110,59,30,0.1);}
+  .admin-table td{padding:10px;border-bottom:1px solid rgba(110,59,30,0.08);vertical-align:middle;}
+  .admin-table .p-thumb, .product-thumb-placeholder, .stock-thumb-placeholder{width:36px;height:36px;border-radius:8px;object-fit:cover;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .admin-row-actions{display:flex;gap:8px;}
+  .admin-icon-btn{width:28px;height:28px;border-radius:50%;background:var(--cream);font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .admin-icon-btn:hover{background:var(--gold-light);}
+  .admin-icon-btn.danger:hover{background:var(--rust);color:var(--white);}
+
+  .admin-toolbar-field{margin-bottom:0;min-width:220px;}
+  .admin-toolbar-field-narrow{margin-bottom:0;min-width:200px;}
+  .sales-stats-container{display:flex;gap:10px;flex-wrap:wrap;}
+  .sales-phone{color:#8A7660;font-size:11.5px;}
+  .sales-total{font-weight:700;}
+
+  .stock-input{width:60px;padding:6px 8px;border-radius:8px;border:1px solid rgba(110,59,30,0.25);text-align:center;font-size:13px;}
+  .stock-low{color:var(--rust);font-weight:700;}
+  .stock-adjust{display:flex;align-items:center;gap:6px;}
+  .stock-adjust button{width:24px;height:24px;border-radius:50%;background:var(--cream);font-weight:700;font-size:13px;}
+
+  .status-buttons{display:flex;gap:4px;flex-wrap:wrap;}
+  .status-btn{font-size:10px;padding:4px 8px;border-radius:999px;border:1px solid rgba(110,59,30,0.25);color:#8A7660;font-weight:700;background:var(--white);}
+  .status-btn.active.vendu{background:#2E7D46;color:#fff;border-color:#2E7D46;}
+  .status-btn.active.rembourse{background:#C77B1E;color:#fff;border-color:#C77B1E;}
+  .status-btn.active.annule{background:var(--rust);color:#fff;border-color:var(--rust);}
+
+  .admin-empty{text-align:center;padding:40px;color:#8A7660;font-size:13.5px;}
+
+  input#cameraInput, input#galleryInput{position:absolute !important;left:-9999px !important;opacity:0 !important;pointer-events:none !important;display:none !important;}
+
+  .toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer;}
+  .toggle-switch input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:28px;transition:all .3s ease;}
+  .toggle-slider:before{position:absolute;content:"";height:22px;width:22px;left:3px;bottom:3px;background:white;border-radius:50%;transition:all .3s ease;}
+  .toggle-switch input:checked + .toggle-slider{background:var(--rust);}
+  .toggle-switch input:checked + .toggle-slider:before{transform:translateX(24px);}
+
+  .map-search-container{display:flex;gap:8px;align-items:flex-end;}
+  .map-search-container input{flex:1;}
+  .map-search-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--coffee-black);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .map-search-btn:hover{background:var(--gold-light);}
+  .map-search-btn svg{width:14px;height:14px;}
+
+  /* ---------- CHAT / ASSISTANCE ---------- */
+  .call-btn{display:inline-flex;align-items:center;gap:8px;background:#2E7D46;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;}
+  .call-btn:hover{background:#256238;}
+  .chat-wrap{display:flex;flex-direction:column;height:60vh;max-height:520px;border:1px solid rgba(110,59,30,0.15);border-radius:14px;overflow:hidden;}
+  .chat-messages{flex:1;overflow-y:auto;padding:18px;background:var(--cream-light);display:flex;flex-direction:column;gap:10px;}
+  .chat-bubble{max-width:75%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.4;}
+  .chat-bubble .chat-meta{font-size:10.5px;opacity:0.65;margin-top:4px;}
+  .chat-bubble.mine{align-self:flex-end;background:var(--coffee-brown);color:#fff;border-bottom-right-radius:4px;}
+  .chat-bubble.theirs{align-self:flex-start;background:var(--white);color:var(--ink);border:1px solid rgba(110,59,30,0.15);border-bottom-left-radius:4px;}
+  .chat-empty{text-align:center;color:#8A7660;font-size:13px;margin:auto;}
+  .chat-input-row{display:flex;gap:10px;padding:14px;border-top:1px solid rgba(110,59,30,0.12);background:var(--white);}
+  .chat-input-row input{flex:1;padding:11px 14px;border-radius:999px;border:1px solid rgba(110,59,30,0.25);font-family:inherit;font-size:13.5px;}
+  .chat-input-row button{background:var(--rust);color:#fff;padding:0 20px;border-radius:999px;font-weight:700;font-size:13px;}
+
+  /* ---------- MODE PLEIN ÉCRAN ADMIN ---------- */
+  body.admin-mode .hero, body.admin-mode .section#menu, body.admin-mode .section#points, body.admin-mode .section#avis{display:none !important;}
+  body.admin-mode header, body.admin-mode footer{display:block !important;}
+  body.admin-mode .admin-overlay{position:fixed;inset:0;background:var(--cream-light);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;}
+  body.admin-mode .admin-panel{max-width:100%;width:100%;height:100vh;max-height:100vh;border-radius:0;margin-bottom:0;box-shadow:none;}
+  body.admin-mode .admin-trigger{display:none;}
+  body.admin-mode .admin-body{flex:1;overflow-y:auto;max-height:calc(100vh - 120px);}
+
+  .admin-sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:linear-gradient(180deg,var(--coffee-black) 0%,var(--coffee-brown) 100%);z-index:201;transform:translateX(-100%);transition:transform .3s ease;padding:80px 20px 20px;box-shadow:4px 0 12px rgba(0,0,0,0.3);}
+  .admin-sidebar.open{transform:translateX(0);}
+  .admin-sidebar-toggle{position:fixed;left:16px;top:16px;z-index:202;width:44px;height:44px;border-radius:12px;background:var(--coffee-brown);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(221,165,63,0.3);}
+  .admin-sidebar-toggle:hover{background:var(--coffee-black);transform:scale(1.05);}
+  .admin-sidebar-menu{list-style:none;padding:0;margin:0;}
+  .admin-sidebar-menu li{margin-bottom:8px;}
+  .admin-sidebar-menu button{width:100%;padding:12px 16px;background:rgba(255,255,255,0.08);color:var(--white);border:1px solid rgba(221,165,63,0.2);border-radius:10px;font-size:14px;font-weight:600;text-align:left;display:flex;align-items:center;gap:10px;}
+  .admin-sidebar-menu button:hover{background:rgba(255,255,255,0.15);border-color:var(--gold);}
+  .admin-sidebar-menu button.active{background:var(--rust);border-color:var(--rust);color:var(--white);}
+  .admin-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;opacity:0;transition:opacity .3s ease;}
+  .admin-sidebar-overlay.open{display:block;opacity:1;}
+
+  /* ---------- CAISSE (POS) ---------- */
+  .caisse-layout{display:flex;height:100%;gap:0;position:relative;}
+  .caisse-left{flex:1;overflow-y:auto;padding-right:24px;min-height:0;}
+  .caisse-right{width:380px;flex-shrink:0;position:sticky;top:90px;align-self:flex-start;height:calc(100vh - 110px);max-height:calc(100vh - 110px);overflow-y:auto;background:var(--cream);border-left:2px solid rgba(110,59,30,0.15);padding:16px;box-shadow:-4px 0 12px rgba(0,0,0,0.08);display:flex;flex-direction:column;border-radius:14px 0 0 14px;}
+  .caisse-cart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid rgba(110,59,30,0.15);}
+  .caisse-cart-header h4{font-size:16px;color:var(--coffee-black);}
+  .caisse-cart-header .cart-badge{background:var(--rust);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
+  .caisse-cart-body{flex:1;overflow-y:auto;margin-bottom:10px;}
+  .caisse-cart-footer{border-top:1px solid rgba(110,59,30,0.15);padding-top:12px;flex-shrink:0;}
+  .caisse-cart-icon-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--cream);border:1px solid rgba(110,59,30,0.2);font-size:20px;}
+  .caisse-cart-icon-btn .cart-badge{position:absolute;top:-4px;right:-4px;background:var(--rust);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;}
+  .caisse-footer-actions{margin-top:20px;}
+  .pending-orders-banner{background:var(--cream);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:20px;}
+  .pending-orders-section{margin-bottom:28px;}
+  .pending-orders-section .section-title{font-size:14px;font-weight:700;color:var(--coffee-black);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .pending-orders-section .count-badge{background:var(--gold);color:var(--coffee-black);font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;}
+  .pending-order-card{background:var(--white);border:1px solid rgba(110,59,30,0.12);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+  .pending-order-card:hover{border-color:var(--gold);box-shadow:0 3px 12px rgba(0,0,0,0.1);}
+  .pending-order-card .order-info{flex:1;min-width:0;}
+  .pending-order-card .order-client{font-weight:700;font-size:14px;color:var(--coffee-black);}
+  .pending-order-card .order-detail{font-size:12px;color:#8A7660;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pending-order-card .order-time{font-size:11px;color:#8A7660;margin-top:2px;}
+  .pending-order-card .order-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .pending-order-card .order-total{font-weight:700;color:var(--rust);font-size:14px;white-space:nowrap;}
+  .pending-order-card .import-btn{background:var(--gold);color:var(--coffee-black);padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .pending-order-card .import-btn:hover{background:var(--gold-light);}
+
+  @media(max-width:900px){
+    .caisse-layout{flex-direction:column;}
+    .caisse-left{padding-right:0;padding-bottom:56vh;}
+    .caisse-right{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:55vh;height:auto;z-index:150;border-left:none;border-top:2px solid rgba(110,59,30,0.15);border-radius:16px 16px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,0.15);margin-top:0;}
+  }
+  @media(max-width:760px){
+    body.sidebar-mode .admin-tabs{display:none !important;}
+    .wrap{padding:0 16px;}
+    .hero-copy{padding:48px 20px 40px;}
+    .section{padding:48px 0;}
+    .drawer{width:100%;max-width:100%;}
+    .admin-product-form{grid-template-columns:1fr;}
+    .admin-toolbar{flex-direction:column;align-items:stretch;}
+    .chat-wrap{height:50vh;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <div class="brand-mark">TK</div>
+      <div><div class="brand-name">TOK'COS</div><div class="brand-sub">Touba Kawsara Coffee Shop</div></div>
+    </div>
+    <nav class="nav-links"><a href="#menu">Menu</a><a href="#points">Points de vente</a><a href="#avis">Avis</a></nav>
+    <div class="nav-right">
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+      <button class="cart-btn" onclick="openDrawer()" aria-label="Panier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-count cart-hidden" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" onclick="if(event.target===this) closeMobileMenu()">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mobile-menu-inner">
+    <a href="#menu" onclick="closeMobileMenu()">Menu</a>
+    <a href="#points" onclick="closeMobileMenu()">Points de vente</a>
+    <a href="#avis" onclick="closeMobileMenu()">Avis</a>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <h1>Le café Touba,<br><em>servi comme il se doit.</em></h1>
+      <p>Grains torréfiés, wass artisanal et jus locaux... TOK'COS réinvente le salon de thé sénégalais, une tasse à la fois.</p>
+      <div class="hero-ctas">
+        <a class="btn-wa" href="https://wa.me/221777077270?text=Bonjour%20TOK'COS%2C%20je%20souhaite%20passer%20une%20commande" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.3A8.9 8.9 0 0 0 3.3 16.5L2 22l5.7-1.3A8.9 8.9 0 1 0 17.6 6.3zM12 20a7.3 7.3 0 0 1-3.7-1l-.3-.2-2.7.6.6-2.6-.2-.3A7.3 7.3 0 1 1 19.3 12 7.3 7.3 0 0 1 12 20z"/></svg>
+          Commander sur WhatsApp
+        </a>
+        <a class="btn-outline" href="#menu">Voir le menu</a>
+      </div>
+    </div>
+    <div class="hero-photo"><span class="hero-tag">Point de vente</span></div>
+  </div>
+</section>
+
+<section class="section" id="menu">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">La carte</span>
+      <h2>Vente de café tous genres</h2>
+      <p>Cliquez sur une carte pour voir la description, puis ajoutez-la au panier.</p>
+    </div>
+    <div class="menu-cols">
+      <div class="menu-col"><div class="menu-col-title"><span class="dot dot-gold"></span><h3>Café & Douceurs Chaudes</h3></div><div class="card-grid" id="grid-cafe"></div></div>
+      <div class="menu-col"><div class="menu-col-title"><span class="dot dot-rust"></span><h3>Wass, Jus & Saveurs Locales</h3></div><div class="card-grid" id="grid-wass"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section points on-dark" id="points">
+  <div class="wrap">
+    <div class="section-head"><span class="section-eyebrow">Où nous trouver à Dakar</span><h2>Points de vente</h2></div>
+    <div class="point-cards" id="pointCardsContainer"></div>
+  </div>
+</section>
+
+<section class="section review" id="avis">
+  <div class="wrap">
+    <div class="review-box">
+      <h2>Vous avez goûté ?</h2>
+      <p>Un mot, une note, une suggestion dites-le nous directement sur WhatsApp. On lit chaque message.</p>
+      <a class="btn-wa-lg" href="https://wa.me/221766345639?text=Bonjour%20TOK'COS%2C%20je%20souhaite%20laisser%20un%20avis%20%3A%20" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.6 6.3A8.9 8.9 0 0 0 3.3 16.5L2 22l5.7-1.3A8.9 8.9 0 1 0 17.6 6.3zM12 20a7.3 7.3 0 0 1-3.7-1l-.3-.2-2.7.6.6-2.6-.2-.3A7.3 7.3 0 1 1 19.3 12 7.3 7.3 0 0 1 12 20zm4-5.4c-.2-.1-1.3-.6-1.5-.7s-.3-.1-.5.1-.6.7-.7.8-.3.2-.5.1a6 6 0 0 1-1.7-1 6.6 6.6 0 0 1-1.2-1.5c-.1-.2 0-.4.1-.5l.4-.4.2-.3v-.3c0-.1-.5-1.2-.6-1.6s-.3-.4-.5-.4h-.4a.9.9 0 0 0-.6.3 2.6 2.6 0 0 0-.8 1.9 4.5 4.5 0 0 0 1 2.4A10.2 10.2 0 0 0 12 15.8a3.7 3.7 0 0 0 2.3.5 1.9 1.9 0 0 0 1.3-1 1.6 1.6 0 0 0 .1-1c-.1 0-.2-.1-.4-.2z"/></svg>
+        Laisser un avis
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-stripe"></div>
+  <div class="wrap footer-inner">
+    <div class="foot-main">
+      <div class="foot-brand"><div class="brand-mark">TK</div><div><div class="brand-name">TOK'COS</div><div class="brand-sub">Touba Kawsara Coffee Shop</div></div></div>
+      <div class="foot-contact"><span class="foot-location">📍 QG Ouakam, Cité Avion</span><span class="foot-phone">📞 77 707 72 70</span><span class="foot-phone">📞 76 634 56 39</span></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Tout droits réservés — <a href="#" class="admin-trigger" onclick="event.preventDefault();openAdmin()">admin</a></span>
+      <a href="https://aequilibros.online/" target="_blank" rel="noopener noreferrer"><span>prodby AequiliBros</span></a>
+    </div>
+  </div>
+</footer>
+
+<a class="float-wa" href="https://wa.me/221777077270?text=Bonjour%20TOK'COS" target="_blank" rel="noopener" aria-label="Contacter sur WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.3A8.9 8.9 0 0 0 3.3 16.5L2 22l5.7-1.3A8.9 8.9 0 1 0 17.6 6.3zM12 20a7.3 7.3 0 0 1-3.7-1l-.3-.2-2.7.6.6-2.6-.2-.3A7.3 7.3 0 1 1 19.3 12 7.3 7.3 0 0 1 12 20zm4-5.4c-.2-.1-1.3-.6-1.5-.7s-.3-.1-.5.1-.6.7-.7.8-.3.2-.5.1a6 6 0 0 1-1.7-1 6.6 6.6 0 0 1-1.2-1.5c-.1-.2 0-.4.1-.5l.4-.4.2-.3v-.3c0-.1-.5-1.2-.6-1.6s-.3-.4-.5-.4h-.4a.9.9 0 0 0-.6.3 2.6 2.6 0 0 0-.8 1.9 4.5 4.5 0 0 0 1 2.4A10.2 10.2 0 0 0 12 15.8a3.7 3.7 0 0 0 2.3.5 1.9 1.9 0 0 0 1.3-1 1.6 1.6 0 0 0 .1-1c-.1 0-.2-.1-.4-.2z"/></svg>
+</a>
+
+<div class="overlay" id="productOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-relative"><div class="modal-visual" id="modalVisual"></div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <h3 id="modalName"></h3><p id="modalDesc"></p><div class="modal-price" id="modalPrice"></div>
+      <div class="qty-row"><span class="qty-label">Quantité</span><div class="qty-stepper"><button onclick="changeModalQty(-1)">−</button><span id="modalQty">1</span><button onclick="changeModalQty(1)">+</button></div></div>
+      <div class="modal-actions"><button class="btn-ghost" onclick="closeModal()">Annuler</button><button class="btn-primary" id="modalAddBtn" onclick="addModalToCart()">Ajouter au panier</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head"><h3 id="drawerTitle">Votre panier</h3><button class="drawer-close" onclick="closeDrawer()">✕</button></div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</div>
+
+<div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
+  <div class="admin-panel">
+    <div class="admin-head">
+      <h3 id="adminTitle">Espace gérant</h3>
+      <div class="admin-header-actions">
+        <button class="admin-logout-btn admin-logout-btn-hidden" id="adminLogoutBtn" onclick="adminLogout()">Déconnexion</button>
+        <button class="admin-close" onclick="closeAdmin()">✕</button>
+      </div>
+    </div>
+    <div class="admin-tabs admin-tabs-hidden" id="adminTabs"></div>
+    <div class="admin-point-bar" id="adminPointBar"></div>
+    <div class="admin-body" id="adminBody"></div>
+  </div>
+</div>
+
+<input type="file" accept="image/*" id="cameraInput" onchange="handlePhotoUpload(event)">
+<input type="file" accept="image/*" id="galleryInput" onchange="handlePhotoUpload(event)">
+<div class="overlay" id="photoChoiceOverlay" onclick="if(event.target===this) closePhotoChoice()">
+  <div class="modal modal-small">
+    <div class="modal-body modal-body-compact">
+      <h3 class="modal-title-small">Ajouter une photo</h3>
+      <div class="modal-buttons-vertical">
+        <button class="btn-primary" onclick="triggerCamera()">📷 Prendre une photo</button>
+        <button class="btn-ghost" onclick="triggerGallery()">🖼️ Choisir dans la galerie</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://tsqzvqadawlgkmeiitis.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzcXp2cWFkYXdsZ2ttZWlpdGlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMzE2OTAsImV4cCI6MjEwMDgwNzY5MH0.Yz8EQTt1lY1kmn0KPpa7ozUEwf3RNLRaq2toJqnDgT4';
+let sb = null;
+try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.error('Supabase indisponible :', e); sb = null; }
+
+let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1;
+let cart = loadCart();
+function loadCart(){ try{ const raw = localStorage.getItem('tokcos_cart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; } }
+function saveCart(){ try{ localStorage.setItem('tokcos_cart', JSON.stringify(cart)); }catch(e){} }
+let OFFLINE = false;
+let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
+let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null;
+let salesSelectedPoint = 'all', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
+let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [];
+
+/* ---------- DONNÉES PAR DÉFAUT (menu & points affichés SANS connexion, même si Supabase est indisponible) ---------- */
+const DEFAULT_PRODUCTS = [
+  {id:'default-cafe-1', cat:'cafe', name:'Café Touba Wakan Khakhan', price:500, description:"Café Touba signature, à la saveur intense et épicée.", icon:'☕', active:true},
+  {id:'default-cafe-2', cat:'cafe', name:'Café en poudre', price:500, description:"Café moulu en poudre, prêt à l'infusion.", icon:'☕', active:true},
+  {id:'default-cafe-3', cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
+  {id:'default-cafe-4', cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
+  {id:'default-cafe-5', cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
+  {id:'default-wass-1', cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🥤', active:true},
+  {id:'default-wass-2', cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🥤', active:true},
+  {id:'default-wass-3', cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🥤', active:true},
+  {id:'default-wass-4', cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+  {id:'default-wass-5', cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
+];
+const DEFAULT_POINTS = [
+  {id:'default-point-1', name:'QG Ouakam', address:'Cité Avion, Ouakam — Dakar', phone1:'77 707 72 70', phone2:'76 634 56 39', map_query:'Ouakam Dakar Senegal', active:true},
+  {id:'default-point-2', name:'Dakar Plateau', address:'Centre-ville, Avenue Léopold Sédar Senghor — Dakar', phone1:'77 707 72 70', phone2:'', map_query:'Plateau Dakar Senegal', active:true},
+  {id:'default-point-3', name:'Almadies', address:'Route des Almadies, près de la Corniche — Dakar', phone1:'77 707 72 70', phone2:'', map_query:'Almadies Dakar Senegal', active:true},
+  {id:'default-point-4', name:'Sacré-Cœur', address:'Sacré-Cœur 3, Dakar', phone1:'77 707 72 70', phone2:'', map_query:'Sacre Coeur Dakar Senegal', active:true}
+];
+
+function money(n){ return (n||0).toLocaleString('fr-FR') + ' FCFA'; }
+function toggleMobileMenu(){ document.getElementById('mobileMenu').classList.add('open'); }
+function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); }
+
+/* ---------- CHARGEMENT ---------- */
+async function loadAll(){
+  if(!sb){ OFFLINE = true; }
+  await Promise.all([loadProducts(), loadPoints(), loadStock()]);
+  if(PRODUCTS.length===0){ await seedDefaultProducts(); }
+  renderMenu(); renderPointCards();
+  renderCartBadge();
+}
+async function loadProducts(){
+  if(!sb){ PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
+  const {data,error} = await sb.from('products').select('*').order('created_at');
+  if(error){ console.error(error); OFFLINE=true; PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
+  PRODUCTS = (data && data.length) ? data : [];
+}
+/* Insère le menu par défaut si la table produits est vide */
+async function seedDefaultProducts(){
+  if(!sb || OFFLINE) return;
+  const defaults = [
+    {cat:'cafe', name:'Café Touba Wakan Khakhan', price:500, description:"Café Touba signature, à la saveur intense et épicée.", icon:'☕', active:true},
+    {cat:'cafe', name:'Café en poudre', price:500, description:"Café moulu en poudre, prêt à l'infusion.", icon:'☕', active:true},
+    {cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
+    {cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
+    {cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
+    {cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🥤', active:true},
+    {cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🥤', active:true},
+    {cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🥤', active:true},
+    {cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+    {cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
+  ];
+  const {data, error} = await sb.from('products').insert(defaults).select();
+  if(error){ console.error('Erreur seed produits:', error); return; }
+  PRODUCTS = data;
+  if(POINTS.length){
+    const rows = [];
+    for(const p of data){ for(const pt of POINTS){ rows.push({point_id:pt.id, product_id:p.id, quantity:20}); } }
+    await sb.from('stock').insert(rows);
+  }
+  await loadStock();
+}
+async function loadPoints(){
+  if(!sb){ POINTS=[...DEFAULT_POINTS]; return; }
+  const {data,error} = await sb.from('points_de_vente').select('*').order('created_at');
+  if(error){ console.error(error); OFFLINE=true; POINTS=[...DEFAULT_POINTS]; return; }
+  POINTS = (data && data.length) ? data : [];
+}
+async function loadStock(){
+  if(!sb){ STOCK=[]; return; }
+  const {data,error} = await sb.from('stock').select('*');
+  if(error){ console.error(error); OFFLINE=true; STOCK=[]; return; }
+  STOCK = (data && data.length) ? data : [];
+}
+function totalStock(productId){
+  if(OFFLINE || STOCK.length===0){ return 20; }
+  const rows = STOCK.filter(s=>s.product_id===productId);
+  return rows.length ? rows.reduce((sum,s)=>sum+s.quantity,0) : 0;
+}
+function stockFor(pointId, productId){
+  if(OFFLINE || STOCK.length===0){ return 20; }
+  const row = STOCK.find(s=>s.point_id===pointId && s.product_id===productId);
+  return row ? row.quantity : 0;
+}
+
+/* ---------- STOREFRONT ---------- */
+function renderMenu(){
+  const gridCafe = document.getElementById('grid-cafe'), gridWass = document.getElementById('grid-wass');
+  gridCafe.innerHTML=''; gridWass.innerHTML='';
+  PRODUCTS.filter(p=>p.active).forEach(p=>{
+    const stock = totalStock(p.id), outOfStock = stock<=0;
+    const el = document.createElement('div');
+    el.className = 'menu-card ' + p.cat + (outOfStock?' out-of-stock':'');
+    const visual = p.image_url ? `<img src="${p.image_url}" class="card-photo" alt="${p.name}">` : `<span class="card-icon">${p.icon||'☕'}</span>`;
+    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`;
+    el.onclick = ()=>{ if(!outOfStock) openModal(p.id); };
+    (p.cat==='cafe'?gridCafe:gridWass).appendChild(el);
+  });
+}
+function renderPointCards(){
+  const container = document.getElementById('pointCardsContainer');
+  container.innerHTML = POINTS.filter(p=>p.active).map(p=>`
+    <div class="flip-card" id="card-${p.id}"><div class="flip-card-inner">
+      <div class="flip-card-front"><h4>${p.name}</h4><p>${p.address}</p><a onclick="flipCard('card-${p.id}')">Itinéraire →</a></div>
+      <div class="flip-card-back"><button class="close-btn" onclick="flipCard('card-${p.id}')">✕</button>
+        <div class="contact-info"><h5>📍 ${p.name}</h5><p>${p.address}</p>
+          ${p.phone1?`<p class="phone">📞 ${p.phone1}</p>`:''}${p.phone2?`<p class="phone">📞 ${p.phone2}</p>`:''}
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.map_query||p.address)}" target="_blank" rel="noopener" class="map-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            Voir sur Maps</a>
+        </div></div>
+    </div></div>`).join('');
+}
+function flipCard(id){ document.getElementById(id).classList.toggle('flipped'); }
+
+function openModal(id){
+  modalProduct = PRODUCTS.find(p=>p.id===id); modalQty = 1;
+  const v = document.getElementById('modalVisual');
+  v.className = 'modal-visual ' + modalProduct.cat;
+  v.innerHTML = modalProduct.image_url ? `<img src="${modalProduct.image_url}" alt="${modalProduct.name}">` : (modalProduct.icon||'☕');
+  document.getElementById('modalName').textContent = modalProduct.name;
+  document.getElementById('modalDesc').textContent = modalProduct.description || '';
+  document.getElementById('modalPrice').textContent = money(modalProduct.price);
+  document.getElementById('modalQty').textContent = modalQty;
+  document.getElementById('modalAddBtn').disabled = totalStock(modalProduct.id)<=0;
+  document.getElementById('productOverlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('productOverlay').classList.remove('open'); }
+function changeModalQty(d){ const max=Math.max(1,totalStock(modalProduct.id)); modalQty=Math.max(1,Math.min(max,modalQty+d)); document.getElementById('modalQty').textContent=modalQty; }
+function addModalToCart(){ const e=cart.find(c=>c.id===modalProduct.id); if(e){e.qty+=modalQty;}else{cart.push({id:modalProduct.id,qty:modalQty});} saveCart(); closeModal(); renderCartBadge(); openDrawer(); }
+function renderCartBadge(){ const t=cart.reduce((s,c)=>s+c.qty,0); const b=document.getElementById('cartCount'); if(t>0){b.classList.remove('cart-hidden');b.style.display='flex';b.textContent=t;}else{b.classList.add('cart-hidden');b.style.display='none';} }
+function openDrawer(){
+  checkoutStep='cart'; renderDrawer();
+  const drawer=document.getElementById('drawer'), overlay=document.getElementById('drawerOverlay');
+  if(!drawer || !overlay) return;
+  drawer.classList.add('open'); drawer.style.transform='translateX(0)';
+  overlay.classList.add('open'); overlay.style.display='block';
+}
+function closeDrawer(){
+  const drawer=document.getElementById('drawer'), overlay=document.getElementById('drawerOverlay');
+  if(drawer){ drawer.classList.remove('open'); drawer.style.transform=''; }
+  if(overlay){ overlay.classList.remove('open'); overlay.style.display=''; }
+}
+function cartTotal(){ return cart.reduce((s,c)=>{const p=PRODUCTS.find(pp=>pp.id===c.id);return s+p.price*c.qty;},0); }
+
+function renderDrawer(){
+  const body=document.getElementById('drawerBody'), foot=document.getElementById('drawerFoot');
+  document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Finaliser la commande';
+  if(checkoutStep==='cart'){
+    if(cart.length===0){ body.innerHTML='<div class="empty-cart">Votre panier est vide.<br>Ajoutez des produits depuis le menu.</div>'; foot.innerHTML=''; return; }
+    body.innerHTML = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); const thumb=p.image_url?`<img src="${p.image_url}" alt="${p.name}">`:(p.icon||'☕');
+      return `<div class="cart-item"><div class="ci-icon">${thumb}</div><div class="ci-info"><h4>${p.name}</h4><div class="ci-price">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div><div class="ci-qty"><button onclick="cartQty('${c.id}',-1)">−</button><span>${c.qty}</span><button onclick="cartQty('${c.id}',1)">+</button></div><div class="ci-remove" onclick="cartRemove('${c.id}')">Retirer</div></div></div>`; }).join('');
+    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Passer commande</button>`;
+  } else {
+    body.innerHTML = `<div class="field"><label>Point de vente</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Nom et prénom</label><input type="text" id="ckName" placeholder="Ex : Aïssatou Diop"></div>
+      <div class="field"><label>Numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
+      <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Sur place" class="active">Sur place</button><button type="button" data-val="À emporter">À emporter</button></div></div>
+      <div class="checkout-note">Commandes uniquement sur place ou à emporter.</div>
+      <div class="field"><label>Moyen de paiement</label><div class="seg" id="segPayment"><button type="button" data-val="Wave" class="active">Wave</button><button type="button" data-val="Orange Money">Orange Money</button><button type="button" data-val="Espèces">Espèces</button></div></div>
+      <div class="checkout-note">Un PDF récapitulatif se télécharge automatiquement, et WhatsApp s'ouvre avec le détail de votre commande.</div>`;
+    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Envoyer la commande</button></div>`;
+    setupSegButtons();
+  }
+}
+function setupSegButtons(){
+  document.querySelectorAll('#segDelivery button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#segDelivery button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; });
+  document.querySelectorAll('#segPayment button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#segPayment button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; });
+}
+function cartQty(id,d){ const it=cart.find(c=>c.id===id); const max=Math.max(1,totalStock(id)); it.qty=Math.max(1,Math.min(max,it.qty+d)); saveCart(); renderDrawer(); renderCartBadge(); }
+function cartRemove(id){ cart=cart.filter(c=>c.id!==id); saveCart(); renderDrawer(); renderCartBadge(); }
+function goCheckout(){ checkoutStep='checkout'; renderDrawer(); }
+function backToCart(){ checkoutStep='cart'; renderDrawer(); }
+
+/* Commande en ligne : channel='en_ligne', fulfilled=false => apparaît comme "en attente" côté caisse du point choisi */
+async function submitOrder(){
+  if(submitting) return;
+  const name=document.getElementById('ckName').value.trim(), phone=document.getElementById('ckPhone').value.trim(), pointId=document.getElementById('ckPoint').value;
+  if(!name || !phone){ alert("Merci de renseigner votre nom et votre numéro de téléphone."); return; }
+  if(!pointId){ alert("Merci de choisir un point de vente."); return; }
+  const delivery=document.querySelector('#segDelivery button.active').dataset.val, payment=document.querySelector('#segPayment button.active').dataset.val;
+  const lines = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });
+  for(const l of lines){ const avail=stockFor(pointId,l.id); if(l.qty>avail){ alert(`Stock insuffisant pour "${l.name}" (disponible : ${avail}).`); return; } }
+  submitting=true; const btn=document.getElementById('submitOrderBtn'); if(btn){btn.disabled=true;btn.textContent='Envoi...';}
+  const total = lines.reduce((s,l)=>s+l.sub,0);
+  try{
+    const pointName = POINTS.find(p=>p.id===pointId)?.name || '';
+    if(sb && !OFFLINE){
+      for(const l of lines){ const row=STOCK.find(s=>s.point_id===pointId && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id); row.quantity=newQty; }
+      const {data:saleRow, error:saleError} = await sb.from('sales').insert({
+        point_id: pointId, client_name:name, client_phone:phone, delivery_mode:delivery, payment_method:payment,
+        total, status:'vendu', channel:'en_ligne', fulfilled:false
+      }).select().single();
+      if(saleError) throw saleError;
+      const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
+      const {error:itemsError} = await sb.from('sale_items').insert(itemsPayload); if(itemsError) throw itemsError;
+    }
+    generatePDF(name, phone, delivery, payment, pointName, lines, total);
+    sendWhatsApp(name, phone, delivery, payment, pointName, lines, total);
+    cart=[]; saveCart(); renderCartBadge(); closeDrawer(); renderMenu();
+  } catch(err){ console.error(err); alert("Une erreur est survenue lors de l'enregistrement de la commande."); } finally { submitting=false; }
+}
+
+function generatePDF(name, phone, delivery, payment, pointName, lines, total){
+  if(!window.jspdf){ console.warn('jsPDF non chargé — PDF ignoré.'); return; }
+  const { jsPDF } = window.jspdf; const doc=new jsPDF(); let y=20;
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text("TOK'COS — Bon de commande",14,y); y+=10;
+  doc.setFontSize(11); doc.setFont('helvetica','normal');
+  doc.text(`Date : ${new Date().toLocaleString('fr-FR')}`,14,y); y+=8;
+  doc.text(`Point de vente : ${pointName}`,14,y); y+=7;
+  doc.text(`Client : ${name}`,14,y); y+=7;
+  doc.text(`Téléphone : ${phone}`,14,y); y+=7;
+  doc.text(`Mode de réception : ${delivery}`,14,y); y+=7;
+  doc.text(`Moyen de paiement : ${payment}`,14,y); y+=12;
+  doc.setFont('helvetica','bold'); doc.text("Produit",14,y); doc.text("Qté",120,y); doc.text("P.U.",145,y); doc.text("Sous-total",170,y);
+  y+=6; doc.setFont('helvetica','normal'); doc.line(14,y-3,196,y-3);
+  lines.forEach(l=>{ doc.text(l.name,14,y); doc.text(String(l.qty),120,y); doc.text(String(l.price),145,y); doc.text(String(l.sub),170,y); y+=7; });
+  y+=4; doc.line(14,y-4,196,y-4); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text(`Total : ${total.toLocaleString('fr-FR')} FCFA`,14,y);
+  doc.save(`TOKCOS-commande-${name.replace(/\s+/g,'_')}.pdf`);
+}
+function sendWhatsApp(name, phone, delivery, payment, pointName, lines, total){
+  let msg = `Bonjour TOK'COS, voici ma commande (${pointName}) :%0A%0A`;
+  lines.forEach(l=>{ msg += `• ${l.name} x${l.qty} — ${l.sub.toLocaleString('fr-FR')} FCFA%0A`; });
+  msg += `%0ATotal : ${total.toLocaleString('fr-FR')} FCFA%0A%0AClient : ${name}%0ATéléphone : ${phone}%0AMode de réception : ${delivery}%0APaiement : ${payment}%0A%0A(PDF récapitulatif téléchargé)`;
+  window.open(`https://wa.me/221777077270?text=${msg}`, '_blank');
+}
+
+/* ---------- PHOTO ---------- */
+function openPhotoChoice(){ document.getElementById('photoChoiceOverlay').classList.add('open'); }
+function closePhotoChoice(){ document.getElementById('photoChoiceOverlay').classList.remove('open'); }
+function triggerCamera(){ closePhotoChoice(); document.getElementById('cameraInput').click(); }
+function triggerGallery(){ closePhotoChoice(); document.getElementById('galleryInput').click(); }
+function handlePhotoUpload(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ pendingPhotoData=ev.target.result; const pv=document.getElementById('photoPreview'); if(pv) pv.innerHTML=`<img src="${pendingPhotoData}">`; }; r.readAsDataURL(f); }
+
+/* =======================================================
+   ADMIN — auth + rôles
+   ======================================================= */
+async function openAdmin(){
+  document.getElementById('adminOverlay').classList.add('open');
+  if(!sb){ alert("L'espace gérant nécessite une connexion à la base de données. Vérifiez votre connexion internet."); document.getElementById('adminOverlay').classList.remove('open'); return; }
+  const {data:{session}} = await sb.auth.getSession();
+  if(session){ adminSession=session; await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }
+}
+function closeAdmin(){
+  document.getElementById('adminOverlay').classList.remove('open');
+  document.body.classList.remove('admin-mode');
+  removeSidebar();
+  unsubscribeChat();
+}
+function renderAdminLogin(){
+  document.getElementById('adminTitle').textContent = 'Espace gérant';
+  document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
+  document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
+  document.body.classList.remove('admin-mode');
+  removeSidebar();
+  document.getElementById('adminBody').innerHTML = `
+    <div class="admin-login">
+      <p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Connexion</p>
+      <div class="field" style="max-width:280px;margin:16px auto;text-align:left;"><label>Email</label><input type="email" id="adminEmail" placeholder="admin@tokcos.sn"></div>
+      <div class="field" style="max-width:280px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="adminPassword" placeholder="••••••••"></div>
+      <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="checkAdminLogin()">Se connecter</button></div>
+      <p>Propriétaire ou gérant d'un point de vente.</p>
+    </div>`;
+  document.getElementById('adminPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAdminLogin(); });
+}
+async function checkAdminLogin(){
+  const email=document.getElementById('adminEmail').value.trim(), password=document.getElementById('adminPassword').value;
+  const {data, error} = await sb.auth.signInWithPassword({email, password});
+  if(error){ alert("Identifiants incorrects."); return; }
+  adminSession = data.session;
+  await loadAdminProfile();
+  if(!adminProfile){ alert("Ce compte n'a pas de profil rattaché. Contactez le propriétaire."); await sb.auth.signOut(); return; }
+  renderAdminShell();
+}
+async function loadAdminProfile(){
+  const {data, error} = await sb.from('profiles').select('*').eq('id', adminSession.user.id).single();
+  if(error){ console.error(error); adminProfile=null; return; }
+  adminProfile = data;
+}
+async function adminLogout(){
+  if(sb){ await sb.auth.signOut(); } adminSession=null; adminProfile=null; unsubscribeChat();
+  document.body.classList.remove('admin-mode'); removeSidebar();
+  closeAdmin();
+}
+
+function renderAdminShell(){
+  const isManager = adminProfile.role==='manager';
+  document.getElementById('adminTitle').textContent = isManager ? "Espace propriétaire — TOK'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||''}`;
+  document.getElementById('adminLogoutBtn').classList.remove('admin-logout-btn-hidden');
+  const tabsEl = document.getElementById('adminTabs');
+  tabsEl.classList.remove('admin-tabs-hidden');
+  const tabs = isManager
+    ? [['caisse','Caisse'],['produits','Produits'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
+    : [['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['assistance','Assistance']];
+  tabsEl.innerHTML = tabs.map(([key,label],i)=>`<button class="admin-tab${i===0?' active':''}" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button>`).join('');
+  document.body.classList.add('admin-mode');
+  if(isManager) createSidebar(tabs); else removeSidebar();
+  switchAdminTab('caisse');
+}
+
+function switchAdminTab(tab){
+  adminActiveTab = tab; unsubscribeChat();
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='produits') renderAdminProducts();
+  if(tab==='points') renderAdminPoints();
+  if(tab==='stock') renderAdminStock();
+  if(tab==='ventes') renderAdminSales();
+  if(tab==='caisse') renderAdminCaisse();
+  if(tab==='utilisateurs') renderAdminUsers();
+  if(tab==='assistance') renderAdminAssistance();
+  renderAdminPointBar();
+  closeSidebar();
+}
+
+function createSidebar(tabs){
+  removeSidebar();
+  document.body.classList.add('sidebar-mode');
+  const toggle=document.createElement('button'); toggle.className='admin-sidebar-toggle'; toggle.innerHTML='☰'; toggle.onclick=toggleSidebar;
+  const overlay=document.createElement('div'); overlay.className='admin-sidebar-overlay'; overlay.onclick=closeSidebar;
+  const sidebar=document.createElement('div'); sidebar.className='admin-sidebar';
+  sidebar.innerHTML = `<ul class="admin-sidebar-menu">${tabs.map(([key,label])=>`<li><button data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button></li>`).join('')}</ul>`;
+  document.body.appendChild(toggle); document.body.appendChild(overlay); document.body.appendChild(sidebar);
+}
+function removeSidebar(){ document.body.classList.remove('sidebar-mode'); document.querySelector('.admin-sidebar')?.remove(); document.querySelector('.admin-sidebar-overlay')?.remove(); document.querySelector('.admin-sidebar-toggle')?.remove(); }
+function toggleSidebar(){ const s=document.querySelector('.admin-sidebar'), o=document.querySelector('.admin-sidebar-overlay'); if(!s) return; if(s.classList.contains('open')) closeSidebar(); else { s.classList.add('open'); o.classList.add('open'); } }
+function closeSidebar(){ document.querySelector('.admin-sidebar')?.classList.remove('open'); document.querySelector('.admin-sidebar-overlay')?.classList.remove('open'); }
+
+function renderAdminPointBar(){
+  const bar=document.getElementById('adminPointBar');
+  if(!bar) return;
+  const isManager=adminProfile?.role==='manager';
+  const pointTabs=['caisse','stock','ventes','assistance'];
+  if(!isManager || !pointTabs.includes(adminActiveTab)){ bar.innerHTML=''; bar.style.display='none'; return; }
+  const config={
+    caisse:{id:'caissePointSelect',label:'Point de vente',value:caisseSelectedPoint,change:'onCaissePointChange'},
+    stock:{id:'stockPointSelect',label:'Point de vente',value:stockSelectedPoint,change:'onStockPointChange'},
+    ventes:{id:'salesPointFilter',label:'Filtrer par point de vente',value:salesSelectedPoint,change:'onSalesFilterChange',all:true},
+    assistance:{id:'chatPointSelect',label:'Conversation avec',value:chatSelectedPoint,change:'onChatPointChange'}
+  }[adminActiveTab];
+  const options=config.all
+    ? `<option value="all" ${config.value==='all'?'selected':''}>Tous les points</option>`
+    : '';
+  bar.innerHTML=`<div class="field admin-toolbar-field"><label>${config.label}</label><select id="${config.id}" onchange="${config.change}(this.value)">${options}${POINTS.map(p=>`<option value="${p.id}" ${p.id===config.value?'selected':''}>${p.name}</option>`).join('')}</select></div>`;
+  bar.style.display='block';
+}
+
+/* ---------- PRODUITS (manager) ---------- */
+function renderAdminProducts(){
+  editingProductId=null; pendingPhotoData=null;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
+  renderProductForm(); renderProductRows();
+}
+function renderProductForm(product){
+  editingProductId = product?product.id:null; pendingPhotoData = product?product.image_url:null;
+  document.getElementById('adminProductForm').innerHTML = `<div class="admin-product-form">
+    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${pendingPhotoData}">`:'📷'}</div><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 Ajouter une photo</button></div>
+    <div class="field"><label>Nom du produit</label><input type="text" id="pfName" value="${product?product.name.replace(/"/g,'"'):''}" placeholder="Ex : Café Touba"></div>
+    <div class="field"><label>Catégorie</label><select id="pfCat"><option value="cafe" ${product&&product.cat==='cafe'?'selected':''}>Café</option><option value="wass" ${product&&product.cat==='wass'?'selected':''}>Wass / Boissons</option></select></div>
+    <div class="field"><label>Prix (FCFA)</label><input type="number" id="pfPrice" value="${product?product.price:''}" min="0" placeholder="500"></div>
+    ${!product?`<div class="field"><label>Stock initial (par point)</label><input type="number" id="pfStock" value="20" min="0"></div>`:`<div class="field"><label>Stock</label><input type="text" value="Géré dans l'onglet Stock" disabled class="stock-field-disabled"></div>`}
+    <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?(product.description||''):''}</textarea></div>
+    <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?'Enregistrer':'Ajouter le produit'}</button>${product?'<button class="btn-ghost" onclick="renderProductForm()">Annuler</button>':''}</div>
+  </div>`;
+}
+async function saveProductForm(){
+  const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(document.getElementById('pfPrice').value,10), desc=document.getElementById('pfDesc').value.trim();
+  if(!name || isNaN(price)){ alert("Merci de renseigner le nom et le prix."); return; }
+  if(editingProductId){
+    const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData}).eq('id',editingProductId);
+    if(error){ alert("Erreur lors de la mise à jour."); console.error(error); return; }
+  } else {
+    const initialStock = parseInt(document.getElementById('pfStock').value,10)||0;
+    const {data, error} = await sb.from('products').insert({cat,name,price,description:desc,icon:cat==='cafe'?'☕':'🥤',image_url:pendingPhotoData}).select().single();
+    if(error){ alert("Erreur lors de la création."); console.error(error); return; }
+    if(POINTS.length){ const rows=POINTS.map(pt=>({point_id:pt.id,product_id:data.id,quantity:initialStock})); await sb.from('stock').insert(rows); }
+  }
+  await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts();
+}
+function renderProductRows(){
+  const tbody=document.getElementById('adminProductRows');
+  if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="6" class="admin-empty">Aucun produit.</td></tr>'; return; }
+  tbody.innerHTML = PRODUCTS.map(p=>`<tr>
+    <td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="product-thumb-placeholder">${p.icon||'☕'}</div>`}</td>
+    <td>${p.name}</td><td>${p.cat==='cafe'?'Café':'Wass'}</td><td>${money(p.price)}</td>
+    <td class="${totalStock(p.id)<=5?'stock-low':''}">${totalStock(p.id)}</td>
+    <td><div class="admin-row-actions"><button class="admin-icon-btn" onclick='editProductById("${p.id}")'>✎</button><button class="admin-icon-btn danger" onclick="deleteProduct('${p.id}')">🗑</button></div></td>
+  </tr>`).join('');
+}
+function editProductById(id){ renderProductForm(PRODUCTS.find(p=>p.id===id)); document.getElementById('adminProductForm').scrollIntoView({behavior:'smooth'}); }
+async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts(); }
+
+/* ---------- POINTS DE VENTE (manager) ---------- */
+function renderAdminPoints(){
+  editingPointId=null;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
+  renderPointForm(); renderPointRows();
+}
+function renderPointForm(point){
+  editingPointId = point?point.id:null;
+  document.getElementById('adminPointForm').innerHTML = `<div class="admin-product-form">
+    <div class="field"><label>Nom</label><input id="ptName" value="${point?point.name.replace(/"/g,'"'):''}" placeholder="Ex : Plateau"></div>
+    <div class="field"><label>Adresse / repère</label><input id="ptAddress" value="${point?point.address.replace(/"/g,'"'):''}"></div>
+    <div class="field"><label>Téléphone 1</label><input id="ptPhone1" value="${point?(point.phone1||''):''}"></div>
+    <div class="field"><label>Téléphone 2</label><input id="ptPhone2" value="${point?(point.phone2||''):''}"></div>
+    <div class="field full"><label>Recherche Google Maps</label><div class="map-search-container"><input id="ptMapQuery" value="${point?(point.map_query||''):''}" placeholder="Nom+Quartier+Dakar"><button type="button" class="map-search-btn" onclick="openGoogleMaps()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Rechercher</button></div></div>
+    <div class="field"><label>Actif</label><label class="toggle-switch"><input type="checkbox" id="ptActive" ${!point||point.active?'checked':''}><span class="toggle-slider"></span></label></div>
+    <div class="full admin-form-actions"><button class="btn-primary" onclick="savePointForm()">${point?'Enregistrer':'Ajouter le point de vente'}</button>${point?'<button class="btn-ghost" onclick="renderPointForm()">Annuler</button>':''}</div>
+  </div>`;
+}
+function openGoogleMaps(){ const q=document.getElementById('ptMapQuery').value.trim(); if(!q){alert("Saisissez d'abord un lieu.");return;} window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`,'_blank'); }
+async function savePointForm(){
+  const name=document.getElementById('ptName').value.trim(), address=document.getElementById('ptAddress').value.trim(), phone1=document.getElementById('ptPhone1').value.trim(), phone2=document.getElementById('ptPhone2').value.trim(), map_query=document.getElementById('ptMapQuery').value.trim(), active=document.getElementById('ptActive').checked;
+  if(!name||!address){ alert("Nom et adresse obligatoires."); return; }
+  if(editingPointId){
+    const {error}=await sb.from('points_de_vente').update({name,address,phone1,phone2,map_query,active}).eq('id',editingPointId);
+    if(error){ alert("Erreur."); return; }
+  } else {
+    const {data, error}=await sb.from('points_de_vente').insert({name,address,phone1,phone2,map_query,active}).select().single();
+    if(error){ alert("Erreur."); return; }
+    if(PRODUCTS.length){ const rows=PRODUCTS.map(p=>({point_id:data.id,product_id:p.id,quantity:0})); await sb.from('stock').insert(rows); }
+  }
+  await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints();
+}
+function renderPointRows(){
+  const tbody=document.getElementById('adminPointRows');
+  if(POINTS.length===0){ tbody.innerHTML='<tr><td colspan="5" class="admin-empty">Aucun point.</td></tr>'; return; }
+  tbody.innerHTML = POINTS.map(p=>`<tr><td>${p.name}</td><td>${p.address}</td><td>${p.phone1||''}${p.phone2?'<br>'+p.phone2:''}</td><td>${p.active?'Oui':'Non'}</td><td><div class="admin-row-actions"><button class="admin-icon-btn" onclick='editPointById("${p.id}")'>✎</button><button class="admin-icon-btn danger" onclick="deletePoint('${p.id}')">🗑</button></div></td></tr>`).join('');
+}
+function editPointById(id){ renderPointForm(POINTS.find(p=>p.id===id)); document.getElementById('adminPointForm').scrollIntoView({behavior:'smooth'}); }
+async function deletePoint(id){ if(!confirm("Supprimer ce point de vente ?")) return; const {error}=await sb.from('points_de_vente').delete().eq('id',id); if(error){alert("Erreur.");return;} await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints(); }
+
+/* ---------- STOCK (manager: tous les points / gérant: son point) ---------- */
+function renderAdminStock(){
+  const isManager = adminProfile.role==='manager';
+  if(!isManager){ stockSelectedPoint = adminProfile.point_id; } else if(!stockSelectedPoint && POINTS.length){ stockSelectedPoint = POINTS[0].id; }
+  const lowCount = PRODUCTS.filter(p=>stockFor(stockSelectedPoint,p.id)<=5).length;
+  const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===stockSelectedPoint)?.name||''}</b>votre point de vente</div>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th><th>Ajuster</th></tr></thead><tbody id="adminStockRows"></tbody></table>`;
+  renderStockRows();
+}
+function onStockPointChange(id){ stockSelectedPoint=id; renderAdminStock(); renderAdminPointBar(); }
+function renderStockRows(){
+  const tbody=document.getElementById('adminStockRows');
+  if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="4" class="admin-empty">Aucun produit.</td></tr>'; return; }
+  tbody.innerHTML = PRODUCTS.map(p=>{ const qty=stockFor(stockSelectedPoint,p.id);
+    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${p.name}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td><div class="stock-adjust"><button onclick="adjustStock('${p.id}',-1)">−</button><input type="number" class="stock-input" value="${qty}" onchange="setStock('${p.id}', this.value)"><button onclick="adjustStock('${p.id}',1)">+</button></div></td></tr>`; }).join('');
+}
+async function adjustStock(productId, delta){
+  let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
+  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:Math.max(0,delta)}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
+  else { const newQty=Math.max(0,row.quantity+delta); const {error}=await sb.from('stock').update({quantity:newQty}).eq('id',row.id); if(error){console.error(error);return;} row.quantity=newQty; }
+  renderStockRows(); renderMenu();
+}
+async function setStock(productId, val){
+  const n=parseInt(val,10), qty=isNaN(n)?0:Math.max(0,n);
+  let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
+  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:qty}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
+  else { const {error}=await sb.from('stock').update({quantity:qty}).eq('id',row.id); if(error){console.error(error);return;} row.quantity=qty; }
+  renderStockRows(); renderMenu();
+}
+
+/* ---------- CARNET DE VENTE (manager: tous / gérant: son point) ---------- */
+function renderAdminSales(){
+  const isManager = adminProfile.role==='manager';
+  if(!isManager){ salesSelectedPoint = adminProfile.point_id; }
+  const filterHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===salesSelectedPoint)?.name||''}</b>votre point de vente</div>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
+  loadAndRenderSales();
+}
+function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
+async function loadAndRenderSales(){
+  let query = sb.from('sales').select('*, sale_items(*)').order('created_at',{ascending:false});
+  if(salesSelectedPoint!=='all') query = query.eq('point_id', salesSelectedPoint);
+  const {data, error} = await query; if(error){console.error(error);return;}
+  SALES_CACHE = data;
+  const vendu = SALES_CACHE.filter(v=>v.status==='vendu');
+  const totalRevenue = vendu.reduce((s,v)=>s+v.total,0);
+  const statsEl = document.getElementById('salesStats');
+  if(statsEl){ statsEl.innerHTML = `<div class="admin-stat"><b>${SALES_CACHE.length}</b>commandes</div><div class="admin-stat"><b>${money(totalRevenue)}</b>CA net confirmé</div><div class="admin-stat"><b>${SALES_CACHE.filter(v=>v.channel==='en_ligne' && !v.fulfilled).length}</b>en attente (en ligne)</div>`; }
+  renderSalesRows();
+}
+function renderSalesRows(){
+  const tbody=document.getElementById('adminSalesRows');
+  if(SALES_CACHE.length===0){ tbody.innerHTML='<tr><td colspan="9" class="admin-empty">Aucune vente.</td></tr>'; return; }
+  tbody.innerHTML = SALES_CACHE.map(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||'—';
+    return `<tr><td>${new Date(v.created_at).toLocaleString('fr-FR')}</td><td>${pointName}</td><td>${v.channel==='caisse'?'Comptoir':'En ligne'+(v.fulfilled?'':' ⏳')}</td><td>${v.client_name}<br><span class="sales-phone">${v.client_phone}</span></td><td>${v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join('<br>')}</td><td>${v.delivery_mode}</td><td>${v.payment_method}</td><td class="sales-total">${money(v.total)}</td>
+    <td><div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div></td></tr>`; }).join('');
+}
+async function setSaleStatus(id, status){ const {error}=await sb.from('sales').update({status}).eq('id',id); if(error){console.error(error);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales(); }
+function exportSalesCSV(){
+  let csv="Date;Point;Canal;Client;Telephone;Produits;Mode;Paiement;Total;Statut\n";
+  SALES_CACHE.forEach(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||''; const items=v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join(' | ');
+    csv += `"${new Date(v.created_at).toLocaleString('fr-FR')}";"${pointName}";"${v.channel}";"${v.client_name}";"${v.client_phone}";"${items}";"${v.delivery_mode}";"${v.payment_method}";"${v.total}";"${v.status}"\n`; });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`TOKCOS-ventes-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+
+/* ---------- CAISSE (manager: choisit un point / gérant: son point) ---------- */
+function renderAdminCaisse(){
+  const isManager = adminProfile.role==='manager';
+  if(!isManager){ caisseSelectedPoint = adminProfile.point_id; } else if(!caisseSelectedPoint && POINTS.length){ caisseSelectedPoint = POINTS[0].id; }
+  const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===caisseSelectedPoint)?.name||''}</b>votre point de vente</div>`;
+  document.getElementById('adminBody').innerHTML = `
+    <div class="admin-toolbar">${pointSelectorHtml}<button class="caisse-cart-icon-btn" aria-label="Afficher le panier" onclick="document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth'})">🛒 <span class="cart-badge" id="caisseCartIconBadge">${caisseCart.length}</span></button></div>
+    <div class="pending-orders-banner"><div class="pending-orders-section"><div class="section-title">📋 Commandes en ligne à préparer <span class="count-badge" id="pendingCount">0</span></div><div id="pendingOrdersList"></div></div></div>
+    <div class="caisse-layout">
+      <div class="caisse-left">
+        <h4 style="margin-bottom:12px;">Produits</h4>
+        <div class="card-grid" id="caisseProductGrid"></div>
+      </div>
+      <div class="caisse-right">
+        <div class="caisse-cart-header"><h4>Panier</h4><span class="cart-badge" id="caisseCartBadge">${caisseCart.length}</span></div>
+        <div class="caisse-cart-body" id="caisseCartItems"></div>
+        <div class="caisse-cart-footer">
+          <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;color:var(--rust);margin:12px 0;"><span>Total</span><span id="caisseTotal">0 FCFA</span></div>
+          <div class="field"><label>Client</label><input type="text" id="caisseClientName" placeholder="Client comptoir"></div>
+          <div class="field"><label>Paiement</label><div class="seg" id="caissePayment"><button type="button" data-val="Espèces" class="active">Espèces</button><button type="button" data-val="Wave">Wave</button><button type="button" data-val="Orange Money">Orange Money</button></div></div>
+          <button class="btn-primary btn-full-width" onclick="validerVenteCaisse()">Valider la vente</button>
+        </div>
+      </div>
+    </div>
+    <div class="caisse-footer-actions"><button class="btn-ghost btn-full-width" onclick="showClotureModal()">🔒 Clôture de caisse</button></div>`;
+  renderCaisseProductGrid(); renderCaisseCart(); setupCaissePaymentButtons(); loadPendingOrders();
+}
+function onCaissePointChange(id){ caisseSelectedPoint=id; caisseCart=[]; renderAdminCaisse(); renderAdminPointBar(); }
+
+/* commandes en ligne pas encore préparées pour ce point */
+async function loadPendingOrders(){
+  const {data, error} = await sb.from('sales').select('*, sale_items(*)').eq('point_id', caisseSelectedPoint).eq('channel','en_ligne').eq('fulfilled', false).eq('status','vendu').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
+  CACHED_PENDING_ORDERS = data || [];
+  renderPendingOrders();
+}
+function renderPendingOrders(){
+  const container=document.getElementById('pendingOrdersList'); const badge=document.getElementById('pendingCount');
+  if(!container) return; if(badge) badge.textContent = CACHED_PENDING_ORDERS.length;
+  if(CACHED_PENDING_ORDERS.length===0){ container.innerHTML='<p style="text-align:center;color:#8A7660;font-size:12px;padding:12px 0;">Aucune commande en attente</p>'; return; }
+  container.innerHTML = CACHED_PENDING_ORDERS.map(o=>`<div class="pending-order-card"><div class="order-info"><div class="order-client">${o.client_name}</div><div class="order-detail">${o.sale_items.map(i=>i.product_name+' x'+i.qty).join(', ')}</div><div class="order-time">${new Date(o.created_at).toLocaleString('fr-FR')}</div></div><div class="order-right"><div class="order-total">${money(o.total)}</div><button class="import-btn" onclick="markOrderFulfilled('${o.id}')">✓ Remise au client</button></div></div>`).join('');
+}
+/* Marque la commande comme remise — ne touche PAS au stock ni ne crée de nouvelle vente (déjà fait au moment de la commande en ligne) */
+async function markOrderFulfilled(orderId){
+  const order = CACHED_PENDING_ORDERS.find(o=>o.id===orderId); if(!order) return;
+  if(!confirm(`Confirmer la remise de la commande de ${order.client_name} (${money(order.total)}) ?`)) return;
+  const {error} = await sb.from('sales').update({fulfilled:true}).eq('id', orderId);
+  if(error){ console.error(error); alert("Erreur."); return; }
+  loadPendingOrders();
+}
+
+function renderCaisseProductGrid(){
+  const grid=document.getElementById('caisseProductGrid'); if(!grid) return;
+  grid.innerHTML = PRODUCTS.filter(p=>p.active && stockFor(caisseSelectedPoint,p.id)>0).map(p=>{ const qty=stockFor(caisseSelectedPoint,p.id);
+    return `<div class="menu-card ${p.cat}" onclick="addToCaisse('${p.id}')">${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add">Ajouter</button></div>`; }).join('');
+  if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit en stock sur ce point.</div>';
+}
+function addToCaisse(productId){
+  const existing=caisseCart.find(c=>c.id===productId); const max=stockFor(caisseSelectedPoint,productId);
+  if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
+  renderCaisseCart(); renderCaisseProductGrid();
+}
+function removeFromCaisse(productId){ caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
+function changeCaisseQty(productId, delta){ const it=caisseCart.find(c=>c.id===productId); const max=stockFor(caisseSelectedPoint,productId); it.qty=Math.max(1,Math.min(max,it.qty+delta)); renderCaisseCart(); renderCaisseProductGrid(); }
+function renderCaisseCart(){
+  const container=document.getElementById('caisseCartItems'), totalEl=document.getElementById('caisseTotal'), badge=document.getElementById('caisseCartBadge'), iconBadge=document.getElementById('caisseCartIconBadge');
+  if(!container) return;
+  if(badge) badge.textContent = caisseCart.length;
+  if(iconBadge) iconBadge.textContent = caisseCart.length;
+  if(caisseCart.length===0){ container.innerHTML='<p style="text-align:center;color:#8A7660;padding:20px 0;">Panier vide</p>'; if(totalEl) totalEl.textContent='0 FCFA'; return; }
+  container.innerHTML = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id);
+    return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(110,59,30,0.1);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${p.name}</div><div style="font-size:12px;color:#8A7660;">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div></div><div style="display:flex;align-items:center;gap:4px;"><button onclick="changeCaisseQty('${c.id}',-1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">−</button><span style="min-width:20px;text-align:center;font-weight:700;">${c.qty}</span><button onclick="changeCaisseQty('${c.id}',1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">+</button><button onclick="removeFromCaisse('${c.id}')" style="color:var(--rust);font-size:11px;margin-left:4px;">✕</button></div></div>`; }).join('');
+  const total = caisseCart.reduce((s,c)=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return s+p.price*c.qty; },0);
+  if(totalEl) totalEl.textContent = money(total);
+}
+function setupCaissePaymentButtons(){ document.querySelectorAll('#caissePayment button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#caissePayment button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; }); }
+
+/* Vente comptoir : channel='caisse', fulfilled=true, décrémente le stock immédiatement */
+async function validerVenteCaisse(){
+  if(caisseCart.length===0){ alert('Panier vide.'); return; }
+  const clientName = document.getElementById('caisseClientName').value.trim() || 'Client comptoir';
+  const payment = document.querySelector('#caissePayment button.active').dataset.val;
+  const lines = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });
+  const total = lines.reduce((s,l)=>s+l.sub,0);
+  if(!confirm(`Valider la vente de ${money(total)} ?`)) return;
+  try{
+    for(const l of lines){ const row=STOCK.find(s=>s.point_id===caisseSelectedPoint && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id); row.quantity=newQty; }
+    const {data:saleRow, error} = await sb.from('sales').insert({ point_id:caisseSelectedPoint, client_name:clientName, client_phone:'Comptoir', delivery_mode:'Sur place', payment_method:payment, total, status:'vendu', channel:'caisse', fulfilled:true }).select().single();
+    if(error) throw error;
+    const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
+    await sb.from('sale_items').insert(itemsPayload);
+    caisseCart = [];
+    renderCaisseCart(); renderCaisseProductGrid();
+    alert('Vente enregistrée !');
+  } catch(err){ console.error(err); alert("Erreur lors de l'enregistrement de la vente."); }
+}
+
+/* ---------- CLÔTURE DE CAISSE ---------- */
+function showClotureModal(){
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><button class="btn-ghost" onclick="renderAdminCaisse()">← Retour à la caisse</button></div>
+    <div style="max-width:500px;margin:20px auto;padding:24px;background:var(--cream);border-radius:14px;">
+      <h3 style="margin-bottom:20px;color:var(--coffee-black);">🔒 Clôture de caisse — ${POINTS.find(p=>p.id===caisseSelectedPoint)?.name||''}</h3>
+      <div class="field"><label>Montant d'ouverture (FCFA)</label><input type="number" id="clotureOpening" value="0" min="0"></div>
+      <div class="field"><label>Montant de fermeture compté (FCFA)</label><input type="number" id="clotureClosing" min="0"></div>
+      <div style="background:var(--white);padding:16px;border-radius:10px;margin-bottom:20px;">
+        <div style="font-size:13px;color:#8A7660;margin-bottom:8px;">Résumé du jour (ce point de vente)</div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span>Total ventes confirmées :</span><span id="clotureTotalSales" style="font-weight:700;">0 FCFA</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;"><span>Nombre de transactions :</span><span id="clotureTxCount" style="font-weight:700;">0</span></div>
+      </div>
+      <button class="btn-primary btn-full-width" onclick="validateCloture()">Valider la clôture</button>
+    </div>`;
+  loadClotureData();
+}
+async function loadClotureData(){
+  const today = new Date().toISOString().split('T')[0];
+  const {data, error} = await sb.from('sales').select('total').eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
+  if(error){ console.error(error); return; }
+  const totalSales = data.reduce((s,v)=>s+v.total,0);
+  document.getElementById('clotureTotalSales').textContent = money(totalSales);
+  document.getElementById('clotureTxCount').textContent = data.length;
+}
+async function validateCloture(){
+  const opening = parseInt(document.getElementById('clotureOpening').value)||0;
+  const closing = parseInt(document.getElementById('clotureClosing').value)||0;
+  const today = new Date().toISOString().split('T')[0];
+  const {data, error} = await sb.from('sales').select('total').eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
+  if(error){ console.error(error); return; }
+  const totalSales = data.reduce((s,v)=>s+v.total,0);
+  const expected = totalSales + opening;
+  if(closing !== expected){
+    if(!confirm(`Le montant compté (${money(closing)}) ne correspond pas au montant attendu (${money(expected)} = ventes ${money(totalSales)} + ouverture ${money(opening)}).\n\nValider quand même ?`)) return;
+  }
+  const {error:insertError} = await sb.from('caisse_cloture').insert({ point_id: caisseSelectedPoint, opening_amount:opening, closing_amount:closing, total_sales:totalSales, date:today, created_by: adminProfile.id });
+  if(insertError){ console.error(insertError); alert("Erreur lors de l'enregistrement de la clôture."); return; }
+  alert('Clôture enregistrée !');
+  renderAdminCaisse();
+}
+
+/* ---------- UTILISATEURS (manager uniquement) ---------- */
+function renderAdminUsers(){
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>Comptes gérants</b></div></div>
+    <p style="font-size:12.5px;color:#8A7660;margin-bottom:16px;">Pour créer un nouveau compte gérant, passez par Supabase Dashboard → Authentication → Users, puis ajoutez une ligne correspondante dans la table <code>profiles</code> (rôle, point de vente). "Retirer l'accès" ci-dessous supprime le profil applicatif (l'utilisateur perd immédiatement tout accès) mais ne supprime pas le compte de connexion lui-même.</p>
+    <table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Rôle</th><th></th></tr></thead><tbody id="usersTableBody"></tbody></table>`;
+  renderUsersTable();
+}
+async function renderUsersTable(){
+  const tbody = document.getElementById('usersTableBody'); if(!tbody) return;
+  const {data:profiles, error} = await sb.from('profiles').select('*').order('created_at');
+  if(error){ console.error(error); tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Erreur de chargement.</td></tr>'; return; }
+  if(profiles.length===0){ tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Aucun utilisateur.</td></tr>'; return; }
+  tbody.innerHTML = profiles.map(u=>{ const pointName = POINTS.find(p=>p.id===u.point_id)?.name || (u.role==='manager'?'Tous les points':'—');
+    return `<tr><td><strong>${u.display_name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td>${pointName}</td><td><span style="font-size:11px;padding:4px 8px;border-radius:999px;background:${u.role==='manager'?'var(--gold-light)':'var(--cream)'};font-weight:700;">${u.role==='manager'?'Propriétaire':'Gérant'}</span></td><td>${u.role!=='manager'?`<button class="admin-icon-btn danger" onclick="deleteUserProfile('${u.id}')">🗑</button>`:''}</td></tr>`; }).join('');
+}
+async function deleteUserProfile(userId){
+  if(!confirm("Retirer l'accès de ce gérant ? Son profil applicatif sera supprimé (accès révoqué immédiatement).")) return;
+  const {error} = await sb.from('profiles').delete().eq('id', userId);
+  if(error){ console.error(error); alert("Erreur : " + error.message); return; }
+  alert('Accès retiré.'); renderUsersTable();
+}
+
+/* ---------- ASSISTANCE (chat temps réel + appel) ---------- */
+function renderAdminAssistance(){
+  const isManager = adminProfile.role==='manager';
+  if(!isManager){ chatSelectedPoint = adminProfile.point_id; } else if(!chatSelectedPoint && POINTS.length){ chatSelectedPoint = POINTS[0].id; }
+  const currentPoint = POINTS.find(p=>p.id===chatSelectedPoint);
+  const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>Propriétaire</b>assistance TOK'COS</div>`;
+  const callHref = isManager ? `tel:${(currentPoint?.phone1||'').replace(/\s+/g,'')}` : `tel:${(window.__managerPhone||'77 707 72 70').replace(/\s+/g,'')}`;
+  const callLabel = isManager ? `📞 Appeler ${currentPoint?.name||'ce point'}` : '📞 Appeler le propriétaire';
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<a class="call-btn" href="${callHref}">${callLabel}</a></div>
+    <div class="chat-wrap"><div class="chat-messages" id="chatMessages"><div class="chat-empty">Chargement...</div></div><div class="chat-input-row"><input type="text" id="chatInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()">Envoyer</button></div></div>`;
+  loadManagerPhoneIfNeeded(); loadChatMessages(); subscribeToChat();
+}
+async function loadManagerPhoneIfNeeded(){
+  if(window.__managerPhone) return;
+  const {data} = await sb.from('profiles').select('phone').eq('role','manager').limit(1).single();
+  if(data && data.phone){ window.__managerPhone = data.phone; if(adminProfile.role!=='manager' && adminActiveTab==='assistance') renderAdminAssistance(); }
+}
+async function loadChatMessages(){ const {data, error} = await sb.from('messages').select('*').eq('point_id', chatSelectedPoint).order('created_at',{ascending:true}); if(error){console.error(error);return;} renderChatMessages(data); }
+function renderChatMessages(list){
+  const container=document.getElementById('chatMessages'); if(!container) return;
+  if(!list||list.length===0){ container.innerHTML='<div class="chat-empty">Aucun message. Démarrez la conversation.</div>'; return; }
+  container.innerHTML = list.map(m=>{ const mine=m.sender_role===adminProfile.role; return `<div class="chat-bubble ${mine?'mine':'theirs'}">${m.body}<div class="chat-meta">${m.sender_name||(m.sender_role==='manager'?'Propriétaire':'Gérant')} · ${new Date(m.created_at).toLocaleString('fr-FR')}</div></div>`; }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+async function sendChatMessage(){
+  const input=document.getElementById('chatInput'); const text=input.value.trim(); if(!text) return; input.value='';
+  const {error} = await sb.from('messages').insert({point_id:chatSelectedPoint, sender_role:adminProfile.role, sender_name:adminProfile.display_name||(adminProfile.role==='manager'?'Propriétaire':'Gérant'), body:text});
+  if(error){ console.error(error); alert("Le message n'a pas pu être envoyé."); }
+}
+function onChatPointChange(id){ chatSelectedPoint=id; unsubscribeChat(); loadChatMessages(); subscribeToChat(); renderAdminAssistance(); renderAdminPointBar(); }
+function subscribeToChat(){
+  unsubscribeChat();
+  chatChannel = sb.channel('messages-'+chatSelectedPoint).on('postgres_changes', {event:'INSERT', schema:'public', table:'messages', filter:`point_id=eq.${chatSelectedPoint}`}, payload=>{
+    const container=document.getElementById('chatMessages'); if(!container) return;
+    const m=payload.new; const mine=m.sender_role===adminProfile.role; const empty=container.querySelector('.chat-empty'); if(empty) empty.remove();
+    container.insertAdjacentHTML('beforeend', `<div class="chat-bubble ${mine?'mine':'theirs'}">${m.body}<div class="chat-meta">${m.sender_name||''} · ${new Date(m.created_at).toLocaleString('fr-FR')}</div></div>`);
+    container.scrollTop = container.scrollHeight;
+  }).subscribe();
+}
+function unsubscribeChat(){ if(chatChannel){ sb.removeChannel(chatChannel); chatChannel=null; } }
+
+/* Affiche IMMÉDIATEMENT le menu et les points de vente par défaut, sans attendre Supabase */
+PRODUCTS = [...DEFAULT_PRODUCTS];
+POINTS = [...DEFAULT_POINTS];
+renderMenu();
+renderPointCards();
+renderCartBadge();
+/* Charge ensuite les données réelles en arrière-plan (remplace les valeurs par défaut si disponibles) */
+loadAll();
+</script>
+</body>
+</html>
