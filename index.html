@@ -215,6 +215,7 @@
   @media(max-width:760px){ .admin-overlay{padding:0;align-items:stretch;} .admin-panel{max-width:100%;width:100%;height:100dvh;max-height:none;border-radius:0;margin-bottom:0;} }
 
   .admin-header-actions{display:flex;align-items:center;gap:10px;}
+  .admin-store-select{max-width:150px;padding:8px 10px;border-radius:8px;border:1px solid rgba(221,165,63,0.4);background:var(--cream-light);color:var(--ink);font-size:12px;font-weight:700;}
   .admin-head{background:linear-gradient(120deg,var(--coffee-black),var(--coffee-brown));padding:20px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
   .admin-head h3{color:var(--white);font-size:18px;flex:1;text-align:center;}
   .admin-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);color:var(--white);font-size:16px;}
@@ -540,7 +541,7 @@ let OFFLINE = false;
 let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
 let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null;
 let salesSelectedPoint = 'all', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
-let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null;
+let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null, ACTIVE_STORES = [];
 
 /* ---------- DONNÉES PAR DÉFAUT (menu & points affichés SANS connexion, même si Supabase est indisponible) ---------- */
 const DEFAULT_PRODUCTS = [
@@ -577,13 +578,20 @@ async function loadAll(){
 }
 async function loadActiveStore(){
   if(!sb) return;
-  let query=sb.from('stores').select('id').eq('active',true).order('created_at').limit(1);
   if(adminSession?.user?.id){
-    const {data:membership}=await sb.from('store_members').select('store_id').eq('user_id',adminSession.user.id).order('created_at').limit(1).maybeSingle();
-    if(membership?.store_id) ACTIVE_STORE_ID=membership.store_id;
+    const {data:memberships}=await sb.from('store_members').select('store_id,stores(*)').eq('user_id',adminSession.user.id).order('created_at');
+    ACTIVE_STORES=(memberships||[]).map(member=>member.stores).filter(Boolean);
+    if(ACTIVE_STORES.length){ ACTIVE_STORE_ID=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID)?.id||ACTIVE_STORES[0].id; ACTIVE_STORE=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID); }
   }
-  if(!ACTIVE_STORE_ID){ const {data,error}=await query.maybeSingle(); if(error) console.error('Boutique active introuvable :',error); ACTIVE_STORE_ID=data?.id||null; }
+  if(!ACTIVE_STORE_ID){ const {data,error}=await sb.from('stores').select('*').eq('active',true).order('created_at').limit(1).maybeSingle(); if(error) console.error('Boutique active introuvable :',error); ACTIVE_STORE=data; ACTIVE_STORE_ID=data?.id||null; ACTIVE_STORES=data?[data]:[]; }
+  if(ACTIVE_STORE_ID && !ACTIVE_STORE){ const {data}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single(); ACTIVE_STORE=data; }
   if(!ACTIVE_STORE_ID) console.warn('Aucune boutique active : exécutez la migration SaaS 002.');
+  if(ACTIVE_STORE) applyStoreBranding(ACTIVE_STORE);
+}
+function applyStoreBranding(store){
+  if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
+  if(store.logo_url){ document.querySelectorAll('.brand-mark').forEach(el=>{ el.textContent=''; el.style.background=`url("${store.logo_url}") center/cover`; }); }
+  const hero=document.querySelector('.hero-copy p'); if(hero && store.description) hero.textContent=store.description;
 }
 async function loadProducts(){
   if(!sb){ PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
@@ -864,17 +872,24 @@ async function adminLogout(){
 function renderAdminShell(){
   const isManager = adminProfile.role==='manager';
   document.getElementById('adminTitle').textContent = isManager ? "Espace propriétaire — TOK'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||''}`;
+  renderAdminStoreSelector();
   document.getElementById('adminLogoutBtn').classList.remove('admin-logout-btn-hidden');
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
   const tabs = isManager
-    ? [['dashboard','Tableau de bord'],['caisse','Caisse'],['produits','Produits'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
-    : [['dashboard','Tableau de bord'],['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['assistance','Assistance']];
+    ? [['dashboard','Tableau de bord'],['caisse','Caisse'],['produits','Produits'],['categories','Catégories'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['rapports','Rapports'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
+    : [['dashboard','Tableau de bord'],['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['assistance','Assistance']];
   tabsEl.innerHTML = tabs.map(([key,label],i)=>`<button class="admin-tab${i===0?' active':''}" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button>`).join('');
   document.body.classList.add('admin-mode');
   if(isManager) createSidebar(tabs); else removeSidebar();
   switchAdminTab('caisse');
 }
+function renderAdminStoreSelector(){
+  let selector=document.getElementById('adminStoreSelect');
+  if(!selector){ selector=document.createElement('select'); selector.id='adminStoreSelect'; selector.className='admin-store-select'; document.querySelector('.admin-header-actions').prepend(selector); }
+  selector.innerHTML=ACTIVE_STORES.map(store=>`<option value="${store.id}" ${store.id===ACTIVE_STORE_ID?'selected':''}>${store.name}</option>`).join(''); selector.style.display=ACTIVE_STORES.length>1?'block':'none'; selector.onchange=()=>switchActiveStore(selector.value);
+}
+async function switchActiveStore(storeId){ ACTIVE_STORE_ID=storeId; ACTIVE_STORE=ACTIVE_STORES.find(store=>store.id===storeId)||null; caisseCart=[]; await loadAll(); renderAdminShell(); }
 
 function switchAdminTab(tab){
   adminActiveTab = tab; unsubscribeChat();
@@ -883,6 +898,9 @@ function switchAdminTab(tab){
   document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   if(tab==='dashboard') renderAdminDashboard();
   if(tab==='boutique') renderAdminBoutique();
+  if(tab==='categories') renderAdminCategories();
+  if(tab==='clients') renderAdminCustomers();
+  if(tab==='rapports') renderAdminReports();
   if(tab==='produits') renderAdminProducts();
   if(tab==='points') renderAdminPoints();
   if(tab==='stock') renderAdminStock();
@@ -956,8 +974,41 @@ async function renderAdminBoutique(){
 async function saveStoreSettings(){
   let openingHours={}; try{ openingHours=JSON.parse(document.getElementById('storeHours').value||'{}'); }catch(e){ alert('Les horaires doivent être un JSON valide.'); return; }
   const payload={name:document.getElementById('storeName').value.trim(),slug:document.getElementById('storeSlug').value.trim(),description:document.getElementById('storeDescription').value.trim(),logo_url:document.getElementById('storeLogo').value.trim(),phone:document.getElementById('storePhone').value.trim(),email:document.getElementById('storeEmail').value.trim(),address:document.getElementById('storeAddress').value.trim(),currency:document.getElementById('storeCurrency').value,custom_domain:document.getElementById('storeDomain').value.trim(),opening_hours:openingHours};
-  const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} alert('Boutique enregistrée.');
+  const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); alert('Boutique enregistrée.');
 }
+
+async function renderAdminCategories(){
+  const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('categories').select('*').eq('store_id',ACTIVE_STORE_ID).order('name');
+  if(error){body.innerHTML='<p class="admin-empty">Erreur de chargement des catégories.</p>';return;}
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Catégories</h3><button class="btn-primary" onclick="createCategory()">Ajouter</button></div><div class="admin-product-form"><div class="field"><label>Nom</label><input id="newCategoryName" placeholder="Boissons"></div></div><table class="admin-table"><thead><tr><th>Nom</th><th>Actions</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.name}</td><td><button class="admin-icon-btn danger" onclick="deleteCategory('${row.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="2" class="admin-empty">Aucune catégorie.</td></tr>'}</tbody></table>`;
+}
+async function createCategory(){ const name=document.getElementById('newCategoryName').value.trim(); if(!name)return; const {error}=await sb.from('categories').insert({name,store_id:ACTIVE_STORE_ID}); if(error){alert(error.message);return;} renderAdminCategories(); }
+async function deleteCategory(id){ if(!confirm('Supprimer cette catégorie ?'))return; const {error}=await sb.from('categories').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} renderAdminCategories(); }
+
+async function renderAdminCustomers(){
+  const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('customers').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
+  if(error){body.innerHTML='<p class="admin-empty">Erreur de chargement des clients.</p>';return;}
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Clients</h3><button class="btn-primary" onclick="createCustomer()">Ajouter</button></div><div class="admin-product-form"><div class="field"><label>Nom</label><input id="customerName" placeholder="Nom du client"></div><div class="field"><label>Téléphone</label><input id="customerPhone" placeholder="77 000 00 00"></div><div class="field"><label>Email</label><input id="customerEmail" type="email"></div></div><table class="admin-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Actions</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.name}</td><td>${row.phone||'—'}</td><td>${row.email||'—'}</td><td><button class="admin-icon-btn danger" onclick="deleteCustomer('${row.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" class="admin-empty">Aucun client.</td></tr>'}</tbody></table>`;
+}
+async function createCustomer(){ const name=document.getElementById('customerName').value.trim(); if(!name)return; const {error}=await sb.from('customers').insert({name,phone:document.getElementById('customerPhone').value.trim(),email:document.getElementById('customerEmail').value.trim(),store_id:ACTIVE_STORE_ID}); if(error){alert(error.message);return;} renderAdminCustomers(); }
+async function deleteCustomer(id){ if(!confirm('Supprimer ce client ?'))return; const {error}=await sb.from('customers').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} renderAdminCustomers(); }
+
+let REPORT_ROWS=[];
+async function renderAdminReports(){
+  const body=document.getElementById('adminBody');
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Rapports comptables</h3><div><button class="btn-ghost" onclick="exportReportCSV()">CSV</button><button class="btn-primary" onclick="exportReportPDF()">PDF</button></div></div><div class="admin-product-form"><div class="field"><label>Période</label><select id="reportPeriod" onchange="loadAdminReports()"><option value="day">Journalier</option><option value="week">Hebdomadaire</option><option value="month">Mensuel</option><option value="year">Annuel</option></select></div><div class="field"><label>Point de vente</label><select id="reportPoint"><option value="all">Tous les points</option>${POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div></div><div id="reportResult" class="admin-empty">Chargement...</div>`;
+  document.getElementById('reportPoint').onchange=loadAdminReports; loadAdminReports();
+}
+async function loadAdminReports(){
+  const period=document.getElementById('reportPeriod')?.value||'day', point=document.getElementById('reportPoint')?.value||'all'; const now=new Date(), start=new Date(now);
+  if(period==='day') start.setHours(0,0,0,0); if(period==='week'){start.setDate(now.getDate()-now.getDay()+1);start.setHours(0,0,0,0);} if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);} if(period==='year'){start.setMonth(0,1);start.setHours(0,0,0,0);}
+  let query=sb.from('sales').select('created_at,total,status,channel,point_id').eq('store_id',ACTIVE_STORE_ID).gte('created_at',start.toISOString()).lte('created_at',now.toISOString()).order('created_at',{ascending:false}); if(point!=='all')query=query.eq('point_id',point);
+  const {data=[],error}=await query; if(error){document.getElementById('reportResult').textContent=error.message;return;} REPORT_ROWS=data;
+  const confirmed=data.filter(s=>s.status==='vendu'), refunds=data.filter(s=>s.status==='rembourse'), cancelled=data.filter(s=>s.status==='annule'); const total=confirmed.reduce((sum,s)=>sum+(s.total||0),0), refundTotal=refunds.reduce((sum,s)=>sum+(s.total||0),0);
+  document.getElementById('reportResult').innerHTML=`<div class="sales-stats-container"><div class="admin-stat"><b>${money(total)}</b>CA confirmé</div><div class="admin-stat"><b>${confirmed.length}</b>ventes</div><div class="admin-stat"><b>${money(refundTotal)}</b>remboursements</div><div class="admin-stat"><b>${cancelled.length}</b>annulations</div></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Total</th><th>Statut</th></tr></thead><tbody>${data.map(s=>`<tr><td>${new Date(s.created_at).toLocaleString('fr-FR')}</td><td>${POINTS.find(p=>p.id===s.point_id)?.name||'—'}</td><td>${s.channel}</td><td>${money(s.total)}</td><td>${s.status}</td></tr>`).join('')||'<tr><td colspan="5" class="admin-empty">Aucune vente sur cette période.</td></tr>'}</tbody></table>`;
+}
+function exportReportCSV(){ const csv=['Date;Point;Canal;Total;Statut',...REPORT_ROWS.map(s=>`${new Date(s.created_at).toLocaleString('fr-FR')};${POINTS.find(p=>p.id===s.point_id)?.name||''};${s.channel};${s.total};${s.status}`)].join('\n'); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rapport-tokcos.csv';a.click(); }
+function exportReportPDF(){ if(!window.jspdf){alert('Le module PDF est indisponible.');return;} const {jsPDF}=window.jspdf,doc=new jsPDF(); doc.text('Rapport TOKCOS',14,18); REPORT_ROWS.forEach((s,index)=>doc.text(`${new Date(s.created_at).toLocaleDateString('fr-FR')} - ${money(s.total)} - ${s.status}`,14,28+index*7)); doc.save('rapport-tokcos.pdf'); }
 
 /* ---------- PRODUITS (manager) ---------- */
 function renderAdminProducts(){
@@ -1263,8 +1314,9 @@ async function renderUsersTable(){
   if(error){ console.error(error); tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Erreur de chargement.</td></tr>'; return; }
   if(profiles.length===0){ tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Aucun utilisateur.</td></tr>'; return; }
   tbody.innerHTML = profiles.map(u=>{ const pointName = POINTS.find(p=>p.id===u.point_id)?.name || (u.role==='manager'?'Tous les points':'—');
-    return `<tr><td><strong>${u.display_name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td>${pointName}</td><td><span style="font-size:11px;padding:4px 8px;border-radius:999px;background:${u.role==='manager'?'var(--gold-light)':'var(--cream)'};font-weight:700;">${u.role==='manager'?'Propriétaire':'Gérant'}</span></td><td>${u.role!=='manager'?`<button class="admin-icon-btn danger" onclick="deleteUserProfile('${u.id}')">🗑</button>`:''}</td></tr>`; }).join('');
+    return `<tr><td><strong>${u.display_name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td>${pointName}</td><td><select onchange="updateUserRole('${u.id}',this.value)">${['manager','gerant','cashier','viewer'].map(role=>`<option value="${role}" ${u.role===role?'selected':''}>${role}</option>`).join('')}</select></td><td>${u.role!=='manager'?`<button class="admin-icon-btn danger" onclick="deleteUserProfile('${u.id}')">🗑</button>`:''}</td></tr>`; }).join('');
 }
+  async function updateUserRole(userId, role){ const mappedRole=role==='manager'?'manager':'gerant'; const {error}=await sb.from('profiles').update({role:mappedRole}).eq('id',userId).eq('organization_id',adminProfile.organization_id); if(error){alert(error.message);return;} renderUsersTable(); }
 async function deleteUserProfile(userId){
   if(!confirm("Retirer l'accès de ce gérant ? Son profil applicatif sera supprimé (accès révoqué immédiatement).")) return;
   const {error} = await sb.from('profiles').delete().eq('id', userId);

@@ -26,6 +26,20 @@ create table if not exists public.customers (
 alter table public.products add column if not exists category_id uuid references public.categories(id) on delete set null;
 alter table public.sales add column if not exists customer_id uuid references public.customers(id) on delete set null;
 
+update public.profiles pr
+set organization_id = st.organization_id
+from public.stores st
+join public.points_de_vente pt on pt.store_id = st.id
+where pr.point_id = pt.id and pr.organization_id is null;
+
+insert into public.store_members (store_id, user_id, role)
+select pt.store_id, pr.id,
+  case when pr.role = 'manager' then 'owner' else 'cashier' end
+from public.profiles pr
+join public.points_de_vente pt on pt.id = pr.point_id
+where pr.point_id is not null
+on conflict (store_id, user_id) do nothing;
+
 create index if not exists categories_store_id_idx on public.categories(store_id);
 create index if not exists customers_store_id_idx on public.customers(store_id);
 create index if not exists products_category_id_idx on public.products(category_id);
