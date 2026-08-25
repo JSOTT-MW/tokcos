@@ -540,7 +540,7 @@ let OFFLINE = false;
 let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
 let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null;
 let salesSelectedPoint = 'all', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
-let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [];
+let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null;
 
 /* ---------- DONNÉES PAR DÉFAUT (menu & points affichés SANS connexion, même si Supabase est indisponible) ---------- */
 const DEFAULT_PRODUCTS = [
@@ -569,14 +569,25 @@ function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remo
 /* ---------- CHARGEMENT ---------- */
 async function loadAll(){
   if(!sb){ OFFLINE = true; }
+  await loadActiveStore();
   await Promise.all([loadProducts(), loadPoints(), loadStock()]);
   if(PRODUCTS.length===0){ await seedDefaultProducts(); }
   renderMenu(); renderPointCards();
   renderCartBadge();
 }
+async function loadActiveStore(){
+  if(!sb) return;
+  let query=sb.from('stores').select('id').eq('active',true).order('created_at').limit(1);
+  if(adminSession?.user?.id){
+    const {data:membership}=await sb.from('store_members').select('store_id').eq('user_id',adminSession.user.id).order('created_at').limit(1).maybeSingle();
+    if(membership?.store_id) ACTIVE_STORE_ID=membership.store_id;
+  }
+  if(!ACTIVE_STORE_ID){ const {data,error}=await query.maybeSingle(); if(error) console.error('Boutique active introuvable :',error); ACTIVE_STORE_ID=data?.id||null; }
+  if(!ACTIVE_STORE_ID) console.warn('Aucune boutique active : exécutez la migration SaaS 002.');
+}
 async function loadProducts(){
   if(!sb){ PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
-  const {data,error} = await sb.from('products').select('*').order('created_at');
+  const {data,error} = await sb.from('products').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at');
   if(error){ console.error(error); OFFLINE=true; PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
   PRODUCTS = (data && data.length) ? data : [];
 }
@@ -595,25 +606,25 @@ async function seedDefaultProducts(){
     {cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
     {cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
   ];
-  const {data, error} = await sb.from('products').insert(defaults).select();
+  const {data, error} = await sb.from('products').insert(defaults.map(product=>({...product,store_id:ACTIVE_STORE_ID}))).select();
   if(error){ console.error('Erreur seed produits:', error); return; }
   PRODUCTS = data;
   if(POINTS.length){
     const rows = [];
     for(const p of data){ for(const pt of POINTS){ rows.push({point_id:pt.id, product_id:p.id, quantity:20}); } }
-    await sb.from('stock').insert(rows);
+    await sb.from('stock').insert(rows.map(row=>({...row,store_id:ACTIVE_STORE_ID})));
   }
   await loadStock();
 }
 async function loadPoints(){
   if(!sb){ POINTS=[...DEFAULT_POINTS]; return; }
-  const {data,error} = await sb.from('points_de_vente').select('*').order('created_at');
+  const {data,error} = await sb.from('points_de_vente').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at');
   if(error){ console.error(error); OFFLINE=true; POINTS=[...DEFAULT_POINTS]; return; }
   POINTS = (data && data.length) ? data : [];
 }
 async function loadStock(){
   if(!sb){ STOCK=[]; return; }
-  const {data,error} = await sb.from('stock').select('*');
+  const {data,error} = await sb.from('stock').select('*').eq('store_id',ACTIVE_STORE_ID);
   if(error){ console.error(error); OFFLINE=true; STOCK=[]; return; }
   STOCK = (data && data.length) ? data : [];
 }
@@ -731,10 +742,10 @@ async function submitOrder(){
   try{
     const pointName = POINTS.find(p=>p.id===pointId)?.name || '';
     if(sb && !OFFLINE){
-      for(const l of lines){ const row=STOCK.find(s=>s.point_id===pointId && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id); row.quantity=newQty; }
+      for(const l of lines){ const row=STOCK.find(s=>s.point_id===pointId && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
       const {data:saleRow, error:saleError} = await sb.from('sales').insert({
         point_id: pointId, client_name:name, client_phone:phone, delivery_mode:delivery, payment_method:payment,
-        total, status:'vendu', channel:'en_ligne', fulfilled:false
+        total, status:'vendu', channel:'en_ligne', fulfilled:false, store_id:ACTIVE_STORE_ID
       }).select().single();
       if(saleError) throw saleError;
       const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
@@ -821,6 +832,7 @@ async function loadAdminProfile(){
   const {data, error} = await sb.from('profiles').select('*').eq('id', adminSession.user.id).single();
   if(error){ console.error(error); adminProfile=null; return; }
   adminProfile = data;
+  await loadActiveStore();
 }
 async function adminLogout(){
   if(sb){ await sb.auth.signOut(); } adminSession=null; adminProfile=null; unsubscribeChat();
@@ -913,13 +925,13 @@ async function saveProductForm(){
   const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(document.getElementById('pfPrice').value,10), desc=document.getElementById('pfDesc').value.trim();
   if(!name || isNaN(price)){ alert("Merci de renseigner le nom et le prix."); return; }
   if(editingProductId){
-    const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData}).eq('id',editingProductId);
+    const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
     if(error){ alert("Erreur lors de la mise à jour."); console.error(error); return; }
   } else {
     const initialStock = parseInt(document.getElementById('pfStock').value,10)||0;
-    const {data, error} = await sb.from('products').insert({cat,name,price,description:desc,icon:cat==='cafe'?'☕':'🥤',image_url:pendingPhotoData}).select().single();
+    const {data, error} = await sb.from('products').insert({cat,name,price,description:desc,icon:cat==='cafe'?'☕':'🥤',image_url:pendingPhotoData,store_id:ACTIVE_STORE_ID}).select().single();
     if(error){ alert("Erreur lors de la création."); console.error(error); return; }
-    if(POINTS.length){ const rows=POINTS.map(pt=>({point_id:pt.id,product_id:data.id,quantity:initialStock})); await sb.from('stock').insert(rows); }
+    if(POINTS.length){ const rows=POINTS.map(pt=>({point_id:pt.id,product_id:data.id,quantity:initialStock,store_id:ACTIVE_STORE_ID})); await sb.from('stock').insert(rows); }
   }
   await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts();
 }
@@ -934,7 +946,7 @@ function renderProductRows(){
   </tr>`).join('');
 }
 function editProductById(id){ renderProductForm(PRODUCTS.find(p=>p.id===id)); document.getElementById('adminProductForm').scrollIntoView({behavior:'smooth'}); }
-async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts(); }
+async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts(); }
 
 /* ---------- POINTS DE VENTE (manager) ---------- */
 function renderAdminPoints(){
@@ -959,12 +971,12 @@ async function savePointForm(){
   const name=document.getElementById('ptName').value.trim(), address=document.getElementById('ptAddress').value.trim(), phone1=document.getElementById('ptPhone1').value.trim(), phone2=document.getElementById('ptPhone2').value.trim(), map_query=document.getElementById('ptMapQuery').value.trim(), active=document.getElementById('ptActive').checked;
   if(!name||!address){ alert("Nom et adresse obligatoires."); return; }
   if(editingPointId){
-    const {error}=await sb.from('points_de_vente').update({name,address,phone1,phone2,map_query,active}).eq('id',editingPointId);
+    const {error}=await sb.from('points_de_vente').update({name,address,phone1,phone2,map_query,active}).eq('id',editingPointId).eq('store_id',ACTIVE_STORE_ID);
     if(error){ alert("Erreur."); return; }
   } else {
-    const {data, error}=await sb.from('points_de_vente').insert({name,address,phone1,phone2,map_query,active}).select().single();
+    const {data, error}=await sb.from('points_de_vente').insert({name,address,phone1,phone2,map_query,active,store_id:ACTIVE_STORE_ID}).select().single();
     if(error){ alert("Erreur."); return; }
-    if(PRODUCTS.length){ const rows=PRODUCTS.map(p=>({point_id:data.id,product_id:p.id,quantity:0})); await sb.from('stock').insert(rows); }
+    if(PRODUCTS.length){ const rows=PRODUCTS.map(p=>({point_id:data.id,product_id:p.id,quantity:0,store_id:ACTIVE_STORE_ID})); await sb.from('stock').insert(rows); }
   }
   await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints();
 }
@@ -974,7 +986,7 @@ function renderPointRows(){
   tbody.innerHTML = POINTS.map(p=>`<tr><td>${p.name}</td><td>${p.address}</td><td>${p.phone1||''}${p.phone2?'<br>'+p.phone2:''}</td><td>${p.active?'Oui':'Non'}</td><td><div class="admin-row-actions"><button class="admin-icon-btn" onclick='editPointById("${p.id}")'>✎</button><button class="admin-icon-btn danger" onclick="deletePoint('${p.id}')">🗑</button></div></td></tr>`).join('');
 }
 function editPointById(id){ renderPointForm(POINTS.find(p=>p.id===id)); document.getElementById('adminPointForm').scrollIntoView({behavior:'smooth'}); }
-async function deletePoint(id){ if(!confirm("Supprimer ce point de vente ?")) return; const {error}=await sb.from('points_de_vente').delete().eq('id',id); if(error){alert("Erreur.");return;} await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints(); }
+async function deletePoint(id){ if(!confirm("Supprimer ce point de vente ?")) return; const {error}=await sb.from('points_de_vente').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints(); }
 
 /* ---------- STOCK (manager: tous les points / gérant: son point) ---------- */
 function renderAdminStock(){
@@ -994,15 +1006,15 @@ function renderStockRows(){
 }
 async function adjustStock(productId, delta){
   let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
-  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:Math.max(0,delta)}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
-  else { const newQty=Math.max(0,row.quantity+delta); const {error}=await sb.from('stock').update({quantity:newQty}).eq('id',row.id); if(error){console.error(error);return;} row.quantity=newQty; }
+  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:Math.max(0,delta),store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
+  else { const newQty=Math.max(0,row.quantity+delta); const {error}=await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} row.quantity=newQty; }
   renderStockRows(); renderMenu();
 }
 async function setStock(productId, val){
   const n=parseInt(val,10), qty=isNaN(n)?0:Math.max(0,n);
   let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
-  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:qty}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
-  else { const {error}=await sb.from('stock').update({quantity:qty}).eq('id',row.id); if(error){console.error(error);return;} row.quantity=qty; }
+  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:qty,store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
+  else { const {error}=await sb.from('stock').update({quantity:qty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} row.quantity=qty; }
   renderStockRows(); renderMenu();
 }
 
@@ -1016,7 +1028,7 @@ function renderAdminSales(){
 }
 function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
 async function loadAndRenderSales(){
-  let query = sb.from('sales').select('*, sale_items(*)').order('created_at',{ascending:false});
+  let query = sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(salesSelectedPoint!=='all') query = query.eq('point_id', salesSelectedPoint);
   const {data, error} = await query; if(error){console.error(error);return;}
   SALES_CACHE = data;
@@ -1033,7 +1045,7 @@ function renderSalesRows(){
     return `<tr><td>${new Date(v.created_at).toLocaleString('fr-FR')}</td><td>${pointName}</td><td>${v.channel==='caisse'?'Comptoir':'En ligne'+(v.fulfilled?'':' ⏳')}</td><td>${v.client_name}<br><span class="sales-phone">${v.client_phone}</span></td><td>${v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join('<br>')}</td><td>${v.delivery_mode}</td><td>${v.payment_method}</td><td class="sales-total">${money(v.total)}</td>
     <td><div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div></td></tr>`; }).join('');
 }
-async function setSaleStatus(id, status){ const {error}=await sb.from('sales').update({status}).eq('id',id); if(error){console.error(error);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales(); }
+async function setSaleStatus(id, status){ const {error}=await sb.from('sales').update({status}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales(); }
 function exportSalesCSV(){
   let csv="Date;Point;Canal;Client;Telephone;Produits;Mode;Paiement;Total;Statut\n";
   SALES_CACHE.forEach(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||''; const items=v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join(' | ');
@@ -1075,7 +1087,7 @@ function onCaissePointChange(id){ caisseSelectedPoint=id; caisseCart=[]; renderA
 
 /* commandes en ligne pas encore préparées pour ce point */
 async function loadPendingOrders(){
-  const {data, error} = await sb.from('sales').select('*, sale_items(*)').eq('point_id', caisseSelectedPoint).eq('channel','en_ligne').eq('fulfilled', false).eq('status','vendu').order('created_at',{ascending:false});
+  const {data, error} = await sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('channel','en_ligne').eq('fulfilled', false).eq('status','vendu').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
   CACHED_PENDING_ORDERS = data || [];
   renderPendingOrders();
@@ -1130,8 +1142,8 @@ async function validerVenteCaisse(){
   const total = lines.reduce((s,l)=>s+l.sub,0);
   if(!confirm(`Valider la vente de ${money(total)} ?`)) return;
   try{
-    for(const l of lines){ const row=STOCK.find(s=>s.point_id===caisseSelectedPoint && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id); row.quantity=newQty; }
-    const {data:saleRow, error} = await sb.from('sales').insert({ point_id:caisseSelectedPoint, client_name:clientName, client_phone:'Comptoir', delivery_mode:'Sur place', payment_method:payment, total, status:'vendu', channel:'caisse', fulfilled:true }).select().single();
+    for(const l of lines){ const row=STOCK.find(s=>s.point_id===caisseSelectedPoint && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
+    const {data:saleRow, error} = await sb.from('sales').insert({ point_id:caisseSelectedPoint, client_name:clientName, client_phone:'Comptoir', delivery_mode:'Sur place', payment_method:payment, total, status:'vendu', channel:'caisse', fulfilled:true, store_id:ACTIVE_STORE_ID }).select().single();
     if(error) throw error;
     const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
     await sb.from('sale_items').insert(itemsPayload);
@@ -1159,7 +1171,7 @@ function showClotureModal(){
 }
 async function loadClotureData(){
   const today = new Date().toISOString().split('T')[0];
-  const {data, error} = await sb.from('sales').select('total').eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
+  const {data, error} = await sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
   if(error){ console.error(error); return; }
   const totalSales = data.reduce((s,v)=>s+v.total,0);
   document.getElementById('clotureTotalSales').textContent = money(totalSales);
@@ -1169,14 +1181,14 @@ async function validateCloture(){
   const opening = parseInt(document.getElementById('clotureOpening').value)||0;
   const closing = parseInt(document.getElementById('clotureClosing').value)||0;
   const today = new Date().toISOString().split('T')[0];
-  const {data, error} = await sb.from('sales').select('total').eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
+  const {data, error} = await sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
   if(error){ console.error(error); return; }
   const totalSales = data.reduce((s,v)=>s+v.total,0);
   const expected = totalSales + opening;
   if(closing !== expected){
     if(!confirm(`Le montant compté (${money(closing)}) ne correspond pas au montant attendu (${money(expected)} = ventes ${money(totalSales)} + ouverture ${money(opening)}).\n\nValider quand même ?`)) return;
   }
-  const {error:insertError} = await sb.from('caisse_cloture').insert({ point_id: caisseSelectedPoint, opening_amount:opening, closing_amount:closing, total_sales:totalSales, date:today, created_by: adminProfile.id });
+  const {error:insertError} = await sb.from('caisse_cloture').insert({ point_id: caisseSelectedPoint, opening_amount:opening, closing_amount:closing, total_sales:totalSales, date:today, created_by: adminProfile.id, store_id:ACTIVE_STORE_ID });
   if(insertError){ console.error(insertError); alert("Erreur lors de l'enregistrement de la clôture."); return; }
   alert('Clôture enregistrée !');
   renderAdminCaisse();
@@ -1221,7 +1233,7 @@ async function loadManagerPhoneIfNeeded(){
   const {data} = await sb.from('profiles').select('phone').eq('role','manager').limit(1).single();
   if(data && data.phone){ window.__managerPhone = data.phone; if(adminProfile.role!=='manager' && adminActiveTab==='assistance') renderAdminAssistance(); }
 }
-async function loadChatMessages(){ const {data, error} = await sb.from('messages').select('*').eq('point_id', chatSelectedPoint).order('created_at',{ascending:true}); if(error){console.error(error);return;} renderChatMessages(data); }
+async function loadChatMessages(){ const {data, error} = await sb.from('messages').select('*').eq('store_id',ACTIVE_STORE_ID).eq('point_id', chatSelectedPoint).order('created_at',{ascending:true}); if(error){console.error(error);return;} renderChatMessages(data); }
 function renderChatMessages(list){
   const container=document.getElementById('chatMessages'); if(!container) return;
   if(!list||list.length===0){ container.innerHTML='<div class="chat-empty">Aucun message. Démarrez la conversation.</div>'; return; }
@@ -1230,7 +1242,7 @@ function renderChatMessages(list){
 }
 async function sendChatMessage(){
   const input=document.getElementById('chatInput'); const text=input.value.trim(); if(!text) return; input.value='';
-  const {error} = await sb.from('messages').insert({point_id:chatSelectedPoint, sender_role:adminProfile.role, sender_name:adminProfile.display_name||(adminProfile.role==='manager'?'Propriétaire':'Gérant'), body:text});
+  const {error} = await sb.from('messages').insert({point_id:chatSelectedPoint, sender_role:adminProfile.role, sender_name:adminProfile.display_name||(adminProfile.role==='manager'?'Propriétaire':'Gérant'), body:text, store_id:ACTIVE_STORE_ID});
   if(error){ console.error(error); alert("Le message n'a pas pu être envoyé."); }
 }
 function onChatPointChange(id){ chatSelectedPoint=id; unsubscribeChat(); loadChatMessages(); subscribeToChat(); renderAdminAssistance(); renderAdminPointBar(); }

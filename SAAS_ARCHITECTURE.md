@@ -29,9 +29,9 @@ La fonction crée l'organisation, la boutique et le membre propriétaire. Elle e
 ## Déploiement de la migration
 
 1. Ouvrir Supabase > SQL Editor.
-2. Copier le contenu de `supabase/migrations/001_multi_tenant_saas.sql`.
-3. Exécuter la migration une seule fois.
+2. La migration `001_multi_tenant_saas.sql` doit déjà être exécutée.
+3. Exécuter ensuite `002_public_storefront_access.sql` une seule fois.
 4. Vérifier les tables, index et policies RLS.
-5. Migrer ensuite le frontend pour charger la boutique active et inclure son `store_id` dans les insertions.
+5. Le frontend charge la boutique active et inclut son `store_id` dans les opérations métier.
 
 Cette étape prépare le SaaS sans changer immédiatement les requêtes actuelles du site vitrine. La migration rattache les données existantes à la première boutique TOK'COS.
