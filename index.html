@@ -583,10 +583,28 @@ async function loadActiveStore(){
     ACTIVE_STORES=(memberships||[]).map(member=>member.stores).filter(Boolean);
     if(ACTIVE_STORES.length){ ACTIVE_STORE_ID=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID)?.id||ACTIVE_STORES[0].id; ACTIVE_STORE=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID); }
   }
-  if(!ACTIVE_STORE_ID){ const {data,error}=await sb.from('stores').select('*').eq('active',true).order('created_at').limit(1).maybeSingle(); if(error) console.error('Boutique active introuvable :',error); ACTIVE_STORE=data; ACTIVE_STORE_ID=data?.id||null; ACTIVE_STORES=data?[data]:[]; }
+  if(!ACTIVE_STORE_ID){
+    const publicStoreKey=getPublicStoreKey();
+    let publicQuery=sb.from('stores').select('*').eq('active',true).eq('public_enabled',true);
+    if(publicStoreKey.type==='domain') publicQuery=publicQuery.ilike('custom_domain',publicStoreKey.value);
+    if(publicStoreKey.type==='slug') publicQuery=publicQuery.eq('slug',publicStoreKey.value);
+    let result=await publicQuery.limit(1).maybeSingle();
+    if(!result.data && publicStoreKey.type!=='default') result=await sb.from('stores').select('*').eq('active',true).eq('public_enabled',true).order('created_at').limit(1).maybeSingle();
+    if(result.error) console.error('Boutique active introuvable :',result.error); ACTIVE_STORE=result.data; ACTIVE_STORE_ID=result.data?.id||null; ACTIVE_STORES=result.data?[result.data]:[];
+  }
   if(ACTIVE_STORE_ID && !ACTIVE_STORE){ const {data}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single(); ACTIVE_STORE=data; }
   if(!ACTIVE_STORE_ID) console.warn('Aucune boutique active : exécutez la migration SaaS 002.');
   if(ACTIVE_STORE) applyStoreBranding(ACTIVE_STORE);
+}
+function getPublicStoreKey(){
+  const host=window.location.hostname.toLowerCase();
+  const queryStore=new URLSearchParams(window.location.search).get('store');
+  const pathStore=window.location.pathname.split('/').filter(Boolean)[0];
+  const reserved=['index.html','favicon.ico'];
+  if(host && !host.includes('vercel.app') && host!=='localhost' && host!=='127.0.0.1') return {type:'domain',value:host};
+  if(queryStore) return {type:'slug',value:queryStore.toLowerCase()};
+  if(pathStore && !reserved.includes(pathStore.toLowerCase())) return {type:'slug',value:pathStore.toLowerCase()};
+  return {type:'default',value:''};
 }
 function applyStoreBranding(store){
   if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
@@ -968,7 +986,9 @@ async function renderAdminBoutique(){
   const {data:store,error}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single();
   if(error||!store){ body.innerHTML='<p class="admin-empty">Boutique introuvable.</p>'; return; }
   const hours=store.opening_hours||{};
+  const publicUrl=store.custom_domain?`https://${store.custom_domain}`:`${location.origin}/${store.slug}`;
   body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3><button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
+    <div class="admin-stat" style="margin-bottom:16px;"><b>Site public</b><a href="${publicUrl}" target="_blank" rel="noopener" style="color:var(--rust);">${publicUrl}</a></div>
     <div class="admin-product-form"><div class="field"><label>Nom</label><input id="storeName" value="${store.name||''}"></div><div class="field"><label>Slug public</label><input id="storeSlug" value="${store.slug||''}"></div><div class="field full"><label>Description</label><textarea id="storeDescription">${store.description||''}</textarea></div><div class="field"><label>Logo URL</label><input id="storeLogo" value="${store.logo_url||''}" placeholder="https://..."></div><div class="field"><label>Téléphone</label><input id="storePhone" value="${store.phone||''}"></div><div class="field"><label>Email</label><input id="storeEmail" value="${store.email||''}"></div><div class="field"><label>Adresse</label><input id="storeAddress" value="${store.address||''}"></div><div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${store.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${store.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${store.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div><div class="field"><label>Domaine personnalisé</label><input id="storeDomain" value="${store.custom_domain||''}" placeholder="boutique.exemple.com"></div><div class="field"><label>Horaires (JSON)</label><textarea id="storeHours">${JSON.stringify(hours)}</textarea></div></div>`;
 }
 async function saveStoreSettings(){
@@ -1316,11 +1336,18 @@ async function renderUsersTable(){
   tbody.innerHTML = profiles.map(u=>{ const pointName = POINTS.find(p=>p.id===u.point_id)?.name || (u.role==='manager'?'Tous les points':'—');
     return `<tr><td><strong>${u.display_name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td>${pointName}</td><td><select onchange="updateUserRole('${u.id}',this.value)">${['manager','gerant','cashier','viewer'].map(role=>`<option value="${role}" ${u.role===role?'selected':''}>${role}</option>`).join('')}</select></td><td>${u.role!=='manager'?`<button class="admin-icon-btn danger" onclick="deleteUserProfile('${u.id}')">🗑</button>`:''}</td></tr>`; }).join('');
 }
-  async function updateUserRole(userId, role){ const mappedRole=role==='manager'?'manager':'gerant'; const {error}=await sb.from('profiles').update({role:mappedRole}).eq('id',userId).eq('organization_id',adminProfile.organization_id); if(error){alert(error.message);return;} renderUsersTable(); }
+  async function updateUserRole(userId, role){
+    const mappedRole=role==='manager'?'manager':'gerant', storeRole=role==='manager'?'owner':(role==='cashier'?'cashier':'viewer');
+    const {error}=await sb.from('profiles').update({role:mappedRole}).eq('id',userId).eq('organization_id',adminProfile.organization_id);
+    if(error){alert(error.message);return;}
+    const {error:memberError}=await sb.from('store_members').update({role:storeRole}).eq('store_id',ACTIVE_STORE_ID).eq('user_id',userId);
+    if(memberError){alert(memberError.message);return;} renderUsersTable();
+  }
 async function deleteUserProfile(userId){
   if(!confirm("Retirer l'accès de ce gérant ? Son profil applicatif sera supprimé (accès révoqué immédiatement).")) return;
   const {error} = await sb.from('profiles').delete().eq('id', userId);
   if(error){ console.error(error); alert("Erreur : " + error.message); return; }
+  await sb.from('store_members').delete().eq('store_id',ACTIVE_STORE_ID).eq('user_id',userId);
   alert('Accès retiré.'); renderUsersTable();
 }
 
