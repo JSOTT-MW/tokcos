@@ -815,9 +815,30 @@ function renderAdminLogin(){
       <div class="field" style="max-width:280px;margin:16px auto;text-align:left;"><label>Email</label><input type="email" id="adminEmail" placeholder="admin@tokcos.sn"></div>
       <div class="field" style="max-width:280px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="adminPassword" placeholder="••••••••"></div>
       <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="checkAdminLogin()">Se connecter</button></div>
+      <button class="btn-ghost" style="margin-top:14px;" onclick="renderAdminSignup()">Créer ma boutique</button>
       <p>Propriétaire ou gérant d'un point de vente.</p>
     </div>`;
   document.getElementById('adminPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAdminLogin(); });
+}
+function renderAdminSignup(){
+  document.getElementById('adminBody').innerHTML=`<div class="admin-login"><p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Créer une boutique</p>
+    <div class="field" style="max-width:320px;margin:16px auto;text-align:left;"><label>Nom de la boutique</label><input id="signupStoreName" placeholder="Ma boutique"></div>
+    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Identifiant public</label><input id="signupStoreSlug" placeholder="ma-boutique"></div>
+    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Email</label><input type="email" id="signupEmail" placeholder="vous@exemple.com"></div>
+    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="signupPassword" placeholder="8 caractères minimum"></div>
+    <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="createAdminAccount()">Créer la boutique</button></div>
+    <button class="btn-ghost" style="margin-top:14px;" onclick="renderAdminLogin()">Retour</button></div>`;
+}
+async function createAdminAccount(){
+  const storeName=document.getElementById('signupStoreName').value.trim(), storeSlug=document.getElementById('signupStoreSlug').value.trim(), email=document.getElementById('signupEmail').value.trim(), password=document.getElementById('signupPassword').value;
+  if(!storeName||!storeSlug||!email||password.length<8){ alert('Renseignez tous les champs. Le mot de passe doit contenir au moins 8 caractères.'); return; }
+  const {data,error}=await sb.auth.signUp({email,password});
+  if(error){ alert(error.message); return; }
+  if(!data.session){ alert('Compte créé. Vérifiez votre email, puis connectez-vous.'); renderAdminLogin(); return; }
+  adminSession=data.session;
+  const {error:storeError}=await sb.rpc('create_store_for_current_user',{store_name:storeName,store_slug:storeSlug});
+  if(storeError){ alert('Compte créé, mais la boutique n’a pas pu être créée : '+storeError.message); return; }
+  await loadAdminProfile(); renderAdminShell();
 }
 async function checkAdminLogin(){
   const email=document.getElementById('adminEmail').value.trim(), password=document.getElementById('adminPassword').value;
@@ -847,8 +868,8 @@ function renderAdminShell(){
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
   const tabs = isManager
-    ? [['caisse','Caisse'],['produits','Produits'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
-    : [['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['assistance','Assistance']];
+    ? [['dashboard','Tableau de bord'],['caisse','Caisse'],['produits','Produits'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
+    : [['dashboard','Tableau de bord'],['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['assistance','Assistance']];
   tabsEl.innerHTML = tabs.map(([key,label],i)=>`<button class="admin-tab${i===0?' active':''}" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button>`).join('');
   document.body.classList.add('admin-mode');
   if(isManager) createSidebar(tabs); else removeSidebar();
@@ -860,6 +881,8 @@ function switchAdminTab(tab){
   document.getElementById('adminBody').classList.remove('admin-caisse-body');
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='dashboard') renderAdminDashboard();
+  if(tab==='boutique') renderAdminBoutique();
   if(tab==='produits') renderAdminProducts();
   if(tab==='points') renderAdminPoints();
   if(tab==='stock') renderAdminStock();
@@ -901,6 +924,39 @@ function renderAdminPointBar(){
     : '';
   bar.innerHTML=`<div class="field admin-toolbar-field"><label>${config.label}</label><select id="${config.id}" onchange="${config.change}(this.value)">${options}${POINTS.map(p=>`<option value="${p.id}" ${p.id===config.value?'selected':''}>${p.name}</option>`).join('')}</select></div>`;
   bar.style.display='block';
+}
+
+async function renderAdminDashboard(){
+  const body=document.getElementById('adminBody');
+  body.innerHTML='<div class="admin-login"><p>Chargement du tableau de bord...</p></div>';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const [{data:sales=[]},{data:pending=[]},{data:stock=[]},{data:points=[]}]=await Promise.all([
+    sb.from('sales').select('total,status,point_id,created_at').eq('store_id',ACTIVE_STORE_ID),
+    sb.from('sales').select('id').eq('store_id',ACTIVE_STORE_ID).eq('channel','en_ligne').eq('fulfilled',false).eq('status','vendu'),
+    sb.from('stock').select('quantity,point_id,product_id').eq('store_id',ACTIVE_STORE_ID),
+    sb.from('points_de_vente').select('id,name').eq('store_id',ACTIVE_STORE_ID).eq('active',true)
+  ]);
+  const confirmed=sales.filter(s=>s.status==='vendu'), todaySales=confirmed.filter(s=>new Date(s.created_at)>=today);
+  const revenue=confirmed.reduce((sum,s)=>sum+(s.total||0),0), todayRevenue=todaySales.reduce((sum,s)=>sum+(s.total||0),0);
+  const lowStock=stock.filter(s=>s.quantity<=5).length;
+  const pointSummary=points.map(point=>{ const rows=confirmed.filter(s=>s.point_id===point.id); return `<div class="admin-stat"><b>${money(rows.reduce((sum,s)=>sum+(s.total||0),0))}</b>${point.name}</div>`; }).join('');
+  body.innerHTML=`<div class="admin-toolbar"><div><h3 style="color:var(--coffee-black);">Tableau de bord</h3><p style="font-size:12px;color:#8A7660;">Vue de la boutique active</p></div><button class="btn-ghost" onclick="switchAdminTab('boutique')">Configurer la boutique</button></div>
+    <div class="sales-stats-container"><div class="admin-stat"><b>${money(revenue)}</b>chiffre d'affaires</div><div class="admin-stat"><b>${money(todayRevenue)}</b>ventes du jour</div><div class="admin-stat"><b>${pending.length}</b>commandes en attente</div><div class="admin-stat"><b>${lowStock}</b>stocks faibles</div></div>
+    <h4 style="margin:24px 0 12px;color:var(--coffee-black);">Ventes par point de vente</h4><div class="sales-stats-container">${pointSummary||'<p class="admin-empty">Aucun point de vente actif.</p>'}</div>`;
+}
+
+async function renderAdminBoutique(){
+  const body=document.getElementById('adminBody');
+  const {data:store,error}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single();
+  if(error||!store){ body.innerHTML='<p class="admin-empty">Boutique introuvable.</p>'; return; }
+  const hours=store.opening_hours||{};
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3><button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
+    <div class="admin-product-form"><div class="field"><label>Nom</label><input id="storeName" value="${store.name||''}"></div><div class="field"><label>Slug public</label><input id="storeSlug" value="${store.slug||''}"></div><div class="field full"><label>Description</label><textarea id="storeDescription">${store.description||''}</textarea></div><div class="field"><label>Logo URL</label><input id="storeLogo" value="${store.logo_url||''}" placeholder="https://..."></div><div class="field"><label>Téléphone</label><input id="storePhone" value="${store.phone||''}"></div><div class="field"><label>Email</label><input id="storeEmail" value="${store.email||''}"></div><div class="field"><label>Adresse</label><input id="storeAddress" value="${store.address||''}"></div><div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${store.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${store.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${store.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div><div class="field"><label>Domaine personnalisé</label><input id="storeDomain" value="${store.custom_domain||''}" placeholder="boutique.exemple.com"></div><div class="field"><label>Horaires (JSON)</label><textarea id="storeHours">${JSON.stringify(hours)}</textarea></div></div>`;
+}
+async function saveStoreSettings(){
+  let openingHours={}; try{ openingHours=JSON.parse(document.getElementById('storeHours').value||'{}'); }catch(e){ alert('Les horaires doivent être un JSON valide.'); return; }
+  const payload={name:document.getElementById('storeName').value.trim(),slug:document.getElementById('storeSlug').value.trim(),description:document.getElementById('storeDescription').value.trim(),logo_url:document.getElementById('storeLogo').value.trim(),phone:document.getElementById('storePhone').value.trim(),email:document.getElementById('storeEmail').value.trim(),address:document.getElementById('storeAddress').value.trim(),currency:document.getElementById('storeCurrency').value,custom_domain:document.getElementById('storeDomain').value.trim(),opening_hours:openingHours};
+  const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} alert('Boutique enregistrée.');
 }
 
 /* ---------- PRODUITS (manager) ---------- */
