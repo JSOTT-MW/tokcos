@@ -273,7 +273,8 @@
 
   .admin-empty{text-align:center;padding:40px;color:#8A7660;font-size:13.5px;}
 
-  input#cameraInput, input#galleryInput{position:absolute !important;left:-9999px !important;opacity:0 !important;pointer-events:none !important;display:none !important;}
+  #photoChoiceOverlay{z-index:300;}
+  input#cameraInput, input#galleryInput{position:fixed !important;left:-9999px !important;top:0 !important;width:1px !important;height:1px !important;opacity:0 !important;pointer-events:none !important;}
 
   .toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer;}
   .toggle-switch input{opacity:0;width:0;height:0;}
@@ -513,8 +514,10 @@
   </div>
 </div>
 
-<input type="file" accept="image/*" id="cameraInput" onchange="handlePhotoUpload(event)">
-<input type="file" accept="image/*" id="galleryInput" onchange="handlePhotoUpload(event)">
+<label for="cameraInput" class="sr-only">Prendre une photo</label>
+<input type="file" accept="image/*" id="cameraInput" title="Prendre une photo" aria-label="Prendre une photo" onchange="handlePhotoUpload(event)">
+<label for="galleryInput" class="sr-only">Choisir une image</label>
+<input type="file" accept="image/*" id="galleryInput" title="Choisir une image" aria-label="Choisir une image" onchange="handlePhotoUpload(event)">
 <div class="overlay" id="photoChoiceOverlay" onclick="if(event.target===this) closePhotoChoice()">
   <div class="modal modal-small">
     <div class="modal-body modal-body-compact">
@@ -550,9 +553,9 @@ const DEFAULT_PRODUCTS = [
   {id:'default-cafe-3', cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
   {id:'default-cafe-4', cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
   {id:'default-cafe-5', cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
-  {id:'default-wass-1', cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🥤', active:true},
-  {id:'default-wass-2', cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🥤', active:true},
-  {id:'default-wass-3', cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🥤', active:true},
+  {id:'default-wass-1', cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
+  {id:'default-wass-2', cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
+  {id:'default-wass-3', cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
   {id:'default-wass-4', cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
   {id:'default-wass-5', cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
 ];
@@ -808,11 +811,11 @@ function sendWhatsApp(name, phone, delivery, payment, pointName, lines, total){
 }
 
 /* ---------- PHOTO ---------- */
-function openPhotoChoice(){ document.getElementById('photoChoiceOverlay').classList.add('open'); }
+function openPhotoChoice(){ const overlay=document.getElementById('photoChoiceOverlay'); if(overlay) overlay.classList.add('open'); }
 function closePhotoChoice(){ document.getElementById('photoChoiceOverlay').classList.remove('open'); }
-function triggerCamera(){ closePhotoChoice(); document.getElementById('cameraInput').click(); }
-function triggerGallery(){ closePhotoChoice(); document.getElementById('galleryInput').click(); }
-function handlePhotoUpload(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ pendingPhotoData=ev.target.result; const pv=document.getElementById('photoPreview'); if(pv) pv.innerHTML=`<img src="${pendingPhotoData}">`; }; r.readAsDataURL(f); }
+function triggerCamera(){ const input=document.getElementById('cameraInput'); closePhotoChoice(); if(input){ input.value=''; input.click(); } }
+function triggerGallery(){ const input=document.getElementById('galleryInput'); closePhotoChoice(); if(input){ input.value=''; input.click(); } }
+function handlePhotoUpload(e){ const f=e.target.files?.[0]; if(!f || !f.type.startsWith('image/')){ if(f) alert('Veuillez sélectionner une image.'); return; } const r=new FileReader(); r.onload=ev=>{ pendingPhotoData=ev.target.result; const pv=document.getElementById('photoPreview'); if(pv) pv.innerHTML=`<img src="${pendingPhotoData}" alt="Aperçu de la photo">`; }; r.readAsDataURL(f); }
 
 /* =======================================================
    ADMIN — auth + rôles
