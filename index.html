@@ -787,60 +787,56 @@ function cartTotal(){ return cart.reduce((s,c)=>{const p=PRODUCTS.find(pp=>pp.id
 
 function renderDrawer(){
   const body=document.getElementById('drawerBody'), foot=document.getElementById('drawerFoot');
-  document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Finaliser la commande';
+  document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Demande d\'approvisionnement';
   if(checkoutStep==='cart'){
-    if(cart.length===0){ body.innerHTML='<div class="empty-cart">Votre panier est vide.<br>Ajoutez des produits depuis le menu.</div>'; foot.innerHTML=''; return; }
+    if(cart.length===0){ body.innerHTML='<div class="empty-cart">Votre panier est vide.<br>Ajoutez les produits dont le point de vente a besoin.</div>'; foot.innerHTML=''; return; }
     body.innerHTML = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); const thumb=p.image_url?`<img src="${p.image_url}" alt="${p.name}">`:(p.icon||'☕');
       return `<div class="cart-item"><div class="ci-icon">${thumb}</div><div class="ci-info"><h4>${p.name}</h4><div class="ci-price">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div><div class="ci-qty"><button onclick="cartQty('${c.id}',-1)">−</button><span>${c.qty}</span><button onclick="cartQty('${c.id}',1)">+</button></div><div class="ci-remove" onclick="cartRemove('${c.id}')">Retirer</div></div></div>`; }).join('');
-    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Passer commande</button>`;
+    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Envoyer la demande d'approvisionnement</button>`;
   } else {
-    body.innerHTML = `<div class="field"><label>Point de vente</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
-      <div class="field"><label>Nom et prénom</label><input type="text" id="ckName" placeholder="Ex : Aïssatou Diop"></div>
+    body.innerHTML = `<div class="field"><label>Point de vente demandeur</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Nom du responsable</label><input type="text" id="ckName" placeholder="Ex : Aïssatou Diop"></div>
       <div class="field"><label>Numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
-      <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Sur place" class="active">Sur place</button><button type="button" data-val="À emporter">À emporter</button></div></div>
-      <div class="checkout-note">Commandes uniquement sur place ou à emporter.</div>
-      <div class="field"><label>Moyen de paiement</label><div class="seg" id="segPayment"><button type="button" data-val="Wave" class="active">Wave</button><button type="button" data-val="Orange Money">Orange Money</button><button type="button" data-val="Espèces">Espèces</button></div></div>
-      <div class="checkout-note">Un PDF récapitulatif se télécharge automatiquement, et WhatsApp s'ouvre avec le détail de votre commande.</div>`;
-    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Envoyer la commande</button></div>`;
+      <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Livraison boutique" class="active">Livraison boutique</button><button type="button" data-val="Retrait au point">Retrait au point</button></div></div>
+      <div class="checkout-note">La boutique prépare la marchandise et vous livre le point de vente. Aucun paiement en ligne.</div>`;
+    foot.innerHTML = `<div class="drawer-total"><span>Total estimé</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Envoyer la demande</button></div>`;
     setupSegButtons();
   }
 }
 function setupSegButtons(){
   document.querySelectorAll('#segDelivery button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#segDelivery button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; });
-  document.querySelectorAll('#segPayment button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#segPayment button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; });
 }
 function cartQty(id,d){ const it=cart.find(c=>c.id===id); const max=Math.max(1,totalStock(id)); it.qty=Math.max(1,Math.min(max,it.qty+d)); saveCart(); renderDrawer(); renderCartBadge(); }
 function cartRemove(id){ cart=cart.filter(c=>c.id!==id); saveCart(); renderDrawer(); renderCartBadge(); }
 function goCheckout(){ checkoutStep='checkout'; renderDrawer(); }
 function backToCart(){ checkoutStep='cart'; renderDrawer(); }
 
-/* Commande en ligne : channel='en_ligne', fulfilled=false => apparaît comme "en attente" côté caisse du point choisi */
+/* Demande d'approvisionnement d'un point de vente vers la boutique (channel appro). */
 async function submitOrder(){
   if(submitting) return;
   const name=document.getElementById('ckName').value.trim(), phone=document.getElementById('ckPhone').value.trim(), pointId=document.getElementById('ckPoint').value;
   if(!name || !phone){ alert("Merci de renseigner votre nom et votre numéro de téléphone."); return; }
-  if(!pointId){ alert("Merci de choisir un point de vente."); return; }
-  const delivery=document.querySelector('#segDelivery button.active').dataset.val, payment=document.querySelector('#segPayment button.active').dataset.val;
+  if(!pointId){ alert("Merci de choisir le point de vente demandeur."); return; }
+  const delivery=document.querySelector('#segDelivery button.active')?.dataset.val||'Livraison boutique';
   const lines = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });
-  for(const l of lines){ const avail=stockFor(pointId,l.id); if(l.qty>avail){ alert(`Stock insuffisant pour "${l.name}" (disponible : ${avail}).`); return; } }
+  if(lines.length===0){ alert("Votre panier est vide."); return; }
   submitting=true; const btn=document.getElementById('submitOrderBtn'); if(btn){btn.disabled=true;btn.textContent='Envoi...';}
   const total = lines.reduce((s,l)=>s+l.sub,0);
   try{
     const pointName = POINTS.find(p=>p.id===pointId)?.name || '';
     if(sb && !OFFLINE){
-      for(const l of lines){ const row=STOCK.find(s=>s.point_id===pointId && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
-      const {data:saleRow, error:saleError} = await sb.from('sales').insert({
-        point_id: pointId, client_name:name, client_phone:phone, delivery_mode:delivery, payment_method:payment,
-        total, status:'vendu', channel:'en_ligne', fulfilled:false, store_id:ACTIVE_STORE_ID
+      const {data:head, error:headError} = await sb.from('approvisionnements').insert({
+        point_id: pointId, note:`${name} — ${phone}`, status:'demande', total, store_id:ACTIVE_STORE_ID
       }).select().single();
-      if(saleError) throw saleError;
-      const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
-      const {error:itemsError} = await sb.from('sale_items').insert(itemsPayload); if(itemsError) throw itemsError;
+      if(headError) throw headError;
+      const itemsPayload = lines.map(l=>({approvisionnement_id:head.id, product_id:l.id, product_name:l.name, qty:l.qty, cost:l.price}));
+      const {error:itemsError} = await sb.from('approvisionnement_items').insert(itemsPayload); if(itemsError) throw itemsError;
     }
-    generatePDF(name, phone, delivery, payment, pointName, lines, total);
-    sendWhatsApp(name, phone, delivery, payment, pointName, lines, total);
-    cart=[]; saveCart(); renderCartBadge(); closeDrawer(); renderMenu();
-  } catch(err){ console.error(err); alert("Une erreur est survenue lors de l'enregistrement de la commande."); } finally { submitting=false; }
+    sendWhatsAppApprov(name, phone, pointName, lines, total, delivery);
+    cart=[]; saveCart(); renderCartBadge();
+    alert(`Demande d'approvisionnement envoyée pour ${pointName}.`);
+    closeDrawer(); renderMenu();
+  } catch(err){ console.error(err); alert("Une erreur est survenue lors de l'envoi de la demande."); } finally { submitting=false; }
 }
 
 function generatePDF(name, phone, delivery, payment, pointName, lines, total){
@@ -860,11 +856,28 @@ function generatePDF(name, phone, delivery, payment, pointName, lines, total){
   y+=4; doc.line(14,y-4,196,y-4); doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text(`Total : ${total.toLocaleString('fr-FR')} FCFA`,14,y);
   doc.save(`TOKCOS-commande-${name.replace(/\s+/g,'_')}.pdf`);
 }
-function sendWhatsApp(name, phone, delivery, payment, pointName, lines, total){
-  let msg = `Bonjour TOK'COS, voici ma commande (${pointName}) :%0A%0A`;
+async function sendWhatsAppApprov(name, phone, pointName, lines, total, delivery){
+  let msg = `Bonjour, demande d'approvisionnement (${pointName}) :%0A%0A`;
   lines.forEach(l=>{ msg += `• ${l.name} x${l.qty} — ${l.sub.toLocaleString('fr-FR')} FCFA%0A`; });
-  msg += `%0ATotal : ${total.toLocaleString('fr-FR')} FCFA%0A%0AClient : ${name}%0ATéléphone : ${phone}%0AMode de réception : ${delivery}%0APaiement : ${payment}%0A%0A(PDF récapitulatif téléchargé)`;
-  window.open(`https://wa.me/221777077270?text=${msg}`, '_blank');
+  msg += `%0ATotal estimé : ${total.toLocaleString('fr-FR')} FCFA%0A%0AResponsable : ${name}%0ATéléphone : ${phone}%0AMode : ${delivery}%0A%0A(Aucun paiement en ligne)`;
+
+  // Récupérer dynamiquement le numéro du manager propriétaire de la boutique
+  let managerPhone = '';
+  try {
+    const { data: mgr, error } = await sb
+      .from('profiles')
+      .select('phone')
+      .eq('store_id', ACTIVE_STORE_ID)
+      .eq('role', 'manager')
+      .single();
+    if (!error && mgr?.phone) managerPhone = mgr.phone;
+  } catch (e) { console.warn('Impossible de récupérer le téléphone du manager :', e); }
+
+  // Nettoyer le numéro : garder uniquement les chiffres (format international sans le 00)
+  const cleanPhone = (managerPhone || phone || '').replace(/[^0-9]/g, '').replace(/^00/, '');
+  const waNumber = cleanPhone || '221777077270';
+
+  window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
 }
 
 /* ---------- PHOTO ---------- */
@@ -955,8 +968,8 @@ function renderAdminShell(){
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
   const tabs = isManager
-    ? [['dashboard','Tableau de bord'],['caisse','Caisse'],['produits','Produits'],['categories','Catégories'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['rapports','Rapports'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
-    : [['dashboard','Tableau de bord'],['caisse','Caisse'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['assistance','Assistance']];
+    ? [['dashboard','Tableau de bord'],['compta','Comptabilité'],['appro','Approvisionnements'],['caisse','Caisse'],['produits','Produits'],['categories','Catégories'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['rapports','Rapports'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
+    : [['dashboard','Tableau de bord'],['appro','Approvisionnement'],['compta','Caisse'],['stock','Stock'],['clients','Clients'],['assistance','Assistance']];
   tabsEl.innerHTML = tabs.map(([key,label],i)=>`<button class="admin-tab${i===0?' active':''}" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button>`).join('');
   document.body.classList.add('admin-mode');
   if(isManager) createSidebar(tabs); else removeSidebar();
@@ -975,6 +988,8 @@ function switchAdminTab(tab){
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   if(tab==='dashboard') renderAdminDashboard();
+  if(tab==='compta') renderAdminCompta();
+  if(tab==='appro') renderAdminAppro();
   if(tab==='boutique') renderAdminBoutique();
   if(tab==='categories') renderAdminCategories();
   if(tab==='clients') renderAdminCustomers();
@@ -1173,6 +1188,143 @@ async function saveStoreSettings(){
 }
 
 
+/* =======================================================
+   COMPTABILITÉ (journal de caisse simplifié)
+   ======================================================= */
+let comptaPeriod='day', comptaPoint='all';
+
+async function renderAdminCompta(){
+  const body=document.getElementById('adminBody');
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Comptabilité</h3>
+      <button class="btn-primary" onclick="openTransactionModal()">+ Nouvelle ligne</button></div>
+    <div class="admin-product-form">
+      <div class="field"><label>Période</label><select id="comptaPeriod" onchange="comptaPeriod=this.value;loadCompta()"><option value="day">Aujourd'hui</option><option value="week">Cette semaine</option><option value="month">Ce mois</option><option value="all">Tout</option></select></div>
+      <div class="field"><label>Point de vente</label><select id="comptaPoint" onchange="comptaPoint=this.value;loadCompta()"><option value="all">Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${comptaPoint===p.id?'selected':''}>${p.name}</option>`).join('')}</select></div>
+    </div>
+    <div id="comptaSummary" class="sales-stats-container"></div>
+    <table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Type</th><th>Libellé</th><th>Montant</th><th>Actions</th></tr></thead><tbody id="comptaRows"></tbody></table>`;
+  await loadCompta();
+}
+async function loadCompta(){
+  const now=new Date(), start=new Date(now);
+  if(comptaPeriod==='day'){ start.setHours(0,0,0,0); }
+  else if(comptaPeriod==='week'){ start.setDate(now.getDate()-now.getDay()+1); start.setHours(0,0,0,0); }
+  else if(comptaPeriod==='month'){ start.setDate(1); start.setHours(0,0,0,0); }
+  let q=sb.from('transactions').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
+  if(comptaPeriod!=='all') q=q.gte('created_at',start.toISOString());
+  if(comptaPoint!=='all') q=q.eq('point_id',comptaPoint);
+  const {data=[],error}=await q;
+  const sumEl=document.getElementById('comptaSummary'), rowsEl=document.getElementById('comptaRows');
+  if(error){ if(rowsEl) rowsEl.innerHTML=`<tr><td colspan="6" class="admin-empty">${error.message}</td></tr>`; return; }
+  if(rowsEl){
+    rowsEl.innerHTML=data.length?data.map(t=>{ const point=POINTS.find(p=>p.id===t.point_id)?.name||'—';
+      const sign=(t.type==='depense'||t.type==='achat'||t.type==='sortie')?'− ':'';
+      const badge=t.type==='encaissement'||t.type==='apport'?'active vendu':'active annule';
+      return `<tr>
+        <td>${new Date(t.created_at).toLocaleString('fr-FR')}</td>
+        <td>${point}</td>
+        <td><span class="status-btn ${badge}" style="font-size:10px;">${t.type}</span></td>
+        <td>${t.category?`<b>${esc(t.category)}</b><br>`:''}${esc(t.label||'')}</td>
+        <td style="font-weight:700;">${sign}${money(t.amount)}</td>
+        <td><button class="admin-icon-btn danger" onclick="deleteTransaction('${t.id}')">🗑</button></td>
+      </tr>`; }).join('') : '<tr><td colspan="6" class="admin-empty">Aucune ligne sur cette période.</td></tr>';
+  }
+  const encaisse=data.filter(t=>t.type==='encaissement'||t.type==='apport').reduce((s,t)=>s+Number(t.amount||0),0);
+  const sorties=data.filter(t=>t.type==='depense'||t.type==='achat'||t.type==='sortie').reduce((s,t)=>s+Number(t.amount||0),0);
+  const solde=encaisse-sorties;
+  if(sumEl) sumEl.innerHTML=`<div class="admin-stat"><b>${money(encaisse)}</b>encaissé</div><div class="admin-stat"><b>${money(sorties)}</b>sorties</div><div class="admin-stat"><b style="color:${solde<0?'var(--rust)':'#2E7D46'};">${money(solde)}</b>solde</div>`;
+}
+function openTransactionModal(){
+  const pointOptions=POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  document.getElementById('adminBody').insertAdjacentHTML('beforeend', `<div class="overlay" id="txOverlay" onclick="if(event.target===this) closeTransactionModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact">
+    <h3 class="modal-title-small">Nouvelle ligne</h3>
+    <div class="field"><label>Type</label><select id="txType"><option value="encaissement">💵 Encaissement (vente)</option><option value="apport">💰 Apport de fonds</option><option value="achat">📦 Achat de marchandise</option><option value="depense">💸 Dépense (loyer, salaire…)</option></select></div>
+    <div class="field"><label>Point de vente</label><select id="txPoint">${pointOptions}</select></div>
+    <div class="field"><label>Montant (FCFA)</label><input type="number" id="txAmount" min="0" placeholder="0"></div>
+    <div class="field"><label>Catégorie</label><input id="txCategory" placeholder="Ex: Fournisseur, Loyer, Salaires…"></div>
+    <div class="field"><label>Libellé</label><input id="txLabel" placeholder="Description"></div>
+    <button class="btn-primary btn-full-width" onclick="saveTransaction()">Enregistrer</button>
+    <button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeTransactionModal()">Annuler</button>
+  </div></div></div>`);
+  document.getElementById('txOverlay').classList.add('open');
+}
+function closeTransactionModal(){ const o=document.getElementById('txOverlay'); if(o) o.classList.remove('open'); }
+async function saveTransaction(){
+  const type=document.getElementById('txType').value, point=document.getElementById('txPoint').value,
+    amount=parseInt(document.getElementById('txAmount').value)||0,
+    category=document.getElementById('txCategory').value.trim(), label=document.getElementById('txLabel').value.trim();
+  if(amount<=0){ alert('Saisissez un montant valide.'); return; }
+  const {error}=await sb.from('transactions').insert({store_id:ACTIVE_STORE_ID, point_id:point, type, amount, category, label, created_by:adminProfile?.id||null});
+  if(error){ alert(error.message); return; }
+  closeTransactionModal(); loadCompta();
+}
+async function deleteTransaction(id){ if(!confirm('Supprimer cette ligne ?')) return; const {error}=await sb.from('transactions').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(!error) loadCompta(); else alert(error.message); }
+/* =======================================================
+   APPROVISIONNEMENTS (points de vente → boutique)
+   ======================================================= */
+let approPoint='all';
+async function renderAdminAppro(){
+  const body=document.getElementById('adminBody');
+  const pointFilter=`<option value="all">Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${approPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`;
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Approvisionnements</h3><button class="btn-primary" onclick="openApproModal()">+ Demander</button></div>
+    <p class="shop-note" style="margin-bottom:12px;">Demandes de marchandise des points de vente vers la boutique. Validez pour déclencher le transfert de stock.</p>
+    <div class="admin-product-form"><div class="field"><label>Point</label><select id="approPoint" onchange="approPoint=this.value;loadAppro()">${pointFilter}</select></div></div>
+    <table class="admin-table"><thead><tr><th>Date</th><th>Point demandeur</th><th>Détail</th><th>Total (coût)</th><th>Statut</th><th>Action</th></tr></thead><tbody id="approRows"></tbody></table>`;
+  await loadAppro();
+}
+async function loadAppro(){
+  const rowsEl=document.getElementById('approRows');
+  let q=sb.from('approvisionnements').select('*, approvisionnement_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
+  if(approPoint!=='all') q=q.eq('point_id',approPoint);
+  const {data=[],error}=await q;
+  if(error){ if(rowsEl) rowsEl.innerHTML=`<tr><td colspan="6" class="admin-empty">${error.message}</td></tr>`; return; }
+  if(rowsEl) rowsEl.innerHTML=data.map(a=>{ const point=POINTS.find(p=>p.id===a.point_id)?.name||'—';
+    const det=(a.approvisionnement_items||[]).map(l=>`${esc(l.product_name||'?')} ×${l.qty}`).join('<br>');
+    const statusLabel={demande:'<span class="status-btn active">Demandé</span>',livre:'<span class="status-btn active vendu">Livré</span>',annule:'<span class="status-btn active annule">Annulé</span>'}[a.status]||esc(a.status);
+    const action=a.status==='demande'?`<button class="status-btn active vendu" onclick="validerAppro('${a.id}')">✔ Livrer</button> <button class="status-btn active annule" onclick="annulerAppro('${a.id}')">✕</button>`:'—';
+    return `<tr><td>${new Date(a.created_at).toLocaleString('fr-FR')}</td><td>${point}</td><td>${det}</td><td>${money(a.total)}</td><td>${statusLabel}</td><td>${action}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="admin-empty">Aucune demande.</td></tr>';
+}
+async function validerAppro(id){
+  if(!confirm('Valider la livraison ? Le stock sera transféré de la boutique vers le point de vente.')) return;
+  const {data:a,error}=await sb.from('approvisionnements').select('*, approvisionnement_items(*)').eq('id',id).eq('store_id',ACTIVE_STORE_ID).maybeSingle();
+  if(error||!a) return alert((error&&error.message)||'Demande introuvable.');
+  if((a.approvisionnement_items||[]).length===0){ alert('Cette demande ne contient aucun article.'); return; }
+  for(const l of a.approvisionnement_items){ if(!l.product_id) continue;
+    let row=STOCK.find(s=>s.point_id===a.point_id && s.product_id===l.product_id);
+    const newQty=Number(row?row.quantity:0)+Number(l.qty);
+    if(row){ await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
+    else { await sb.from('stock').insert({point_id:a.point_id,product_id:l.product_id,quantity:l.qty,store_id:ACTIVE_STORE_ID}); }
+  }
+  const {error:up}=await sb.from('approvisionnements').update({status:'livre'}).eq('id',id).eq('store_id',ACTIVE_STORE_ID);
+  if(up) alert(up.message); else alert('Demande livrée.');
+  await loadAppro();
+}
+async function annulerAppro(id){ if(!confirm('Annuler cette demande ?')) return; const {error}=await sb.from('approvisionnements').update({status:'annule'}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(!error) loadAppro(); else alert(error.message); }
+function openApproModal(){
+  const body=document.getElementById('adminBody');
+  const pointOptions=POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const productRows=PRODUCTS.map(p=>`<div class="shop-color-row"><label>${esc(p.name)}</label><input type="number" id="appro-${p.id}" min="0" value="0" style="width:80px;"></div>`).join('');
+  body.insertAdjacentHTML('beforeend', `<div class="overlay" id="approModal" onclick="if(event.target===this) closeApproModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact">
+    <h3 class="modal-title-small">Demande d'approvisionnement</h3>
+    <div class="field"><label>Point de vente demandeur</label><select id="apPoint">${pointOptions}</select></div>
+    <div style="max-height:40vh;overflow-y:auto;border:1px solid rgba(110,59,30,0.12);border-radius:10px;padding:8px 12px;">${productRows}</div>
+    <button class="btn-primary btn-full-width" style="margin-top:12px;" onclick="saveAppro()">Envoyer la demande</button>
+    <button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeApproModal()">Annuler</button></div></div>`);
+  document.getElementById('approModal').classList.add('open');
+}
+function closeApproModal(){ const o=document.getElementById('approModal'); if(o) o.classList.remove('open'); }
+async function saveAppro(){
+  const point=document.getElementById('apPoint').value;
+  const items=PRODUCTS.map(p=>({ product_id:p.id, product_name:p.name, qty:parseInt(document.getElementById('appro-'+p.id).value)||0, cost:p.price||0 })).filter(l=>l.qty>0);
+  if(items.length===0){ alert('Sélectionnez au moins un produit avec une quantité.'); return; }
+  const total=items.reduce((s,l)=>s+(l.cost*l.qty),0);
+  const {data:head,error}=await sb.from('approvisionnements').insert({store_id:ACTIVE_STORE_ID, point_id:point, status:'demande', total}).select().single();
+  if(error){ alert(error.message); return; }
+  const {error:itErr}=await sb.from('approvisionnement_items').insert(items.map(l=>({approvisionnement_id:head.id, product_id:l.product_id, product_name:l.product_name, qty:l.qty, cost:l.cost})));
+  if(itErr){ alert(itErr.message); return; }
+  closeApproModal(); loadAppro();
+}
 async function renderAdminCategories(){
   const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('categories').select('*').eq('store_id',ACTIVE_STORE_ID).order('name');
   if(error){body.innerHTML='<p class="admin-empty">Erreur de chargement des catégories.</p>';return;}
