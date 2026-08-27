@@ -6,7 +6,7 @@
 <title>TOK'COS — Touba Kawsara Coffee Shop</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -14,12 +14,13 @@
     --coffee-black:#1E0F07; --coffee-brown:#5C3018; --coffee-tan:#B9814A;
     --gold:#DDA53F; --gold-light:#F2D189; --rust:#A6402A; --blush:#D98A73;
     --cream:#F4E9D6; --cream-light:#FBF5EA; --ink:#2A1B10; --white:#FFFFFF;
+    --font-display:'Fraunces',serif; --font-body:'Inter',sans-serif;
     --flag-stripe: repeating-linear-gradient(90deg,#00853F 0px,#00853F 24px,#FDEF42 24px,#FDEF42 48px,#E31B23 48px,#E31B23 72px,#FFFFFF 72px,#FFFFFF 96px);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;background:var(--coffee-black);}
-  body{font-family:'Inter',sans-serif;background:var(--cream-light);color:var(--ink);line-height:1.5;}
-  h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:700;letter-spacing:-0.01em;}
+  body{font-family:var(--font-body);background:var(--cream-light);color:var(--ink);line-height:1.5;}
+  h1,h2,h3,.display{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;}
   a{text-decoration:none;color:inherit;}
   img{max-width:100%;display:block;}
   button{font-family:inherit;cursor:pointer;border:none;background:none;}
@@ -272,6 +273,33 @@
   .status-btn.active.annule{background:var(--rust);color:#fff;border-color:var(--rust);}
 
   .admin-empty{text-align:center;padding:40px;color:#8A7660;font-size:13.5px;}
+
+  /* ---------- ÉDITEUR DE BOUTIQUE (façon Shopify) ---------- */
+  .shop-subtabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid rgba(110,59,30,0.12);padding-bottom:10px;margin-bottom:18px;}
+  .shop-subtab{padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;color:#8A7660;border:1px solid rgba(110,59,30,0.18);background:var(--white);}
+  .shop-subtab.active{background:var(--coffee-black);color:var(--white);border-color:var(--coffee-black);}
+  .shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media(max-width:760px){ .shop-grid{grid-template-columns:1fr;} }
+  .shop-grid .field.full{grid-column:1/-1;}
+  .shop-color-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(110,59,30,0.08);}
+  .shop-color-row:last-child{border-bottom:none;}
+  .shop-color-row label{flex:1;font-size:13px;font-weight:600;color:var(--coffee-black);}
+  .shop-color-row .hex-name{font-size:11.5px;color:#8A7660;font-family:ui-monospace,monospace;min-width:70px;text-align:right;}
+  .shop-color-row input[type=color]{width:46px;height:34px;border:1px solid rgba(110,59,30,0.25);border-radius:8px;background:var(--white);padding:2px;cursor:pointer;}
+  .theme-swatches{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
+  .theme-swatch{width:54px;height:54px;border-radius:12px;border:2px solid rgba(30,15,7,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .15s;}
+  .theme-swatch:hover{transform:scale(1.08);}
+  .theme-swatch .tick{opacity:0;color:var(--white);text-shadow:0 1px 3px rgba(0,0,0,0.6);font-weight:900;}
+  .theme-swatch.active{border-color:var(--coffee-black);}
+  .theme-swatch.active .tick{opacity:1;}
+  .shop-note{font-size:11.5px;color:#8A7660;line-height:1.5;margin-top:4px;}
+  .shop-logos-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .shop-logo-preview{width:56px;height:56px;border-radius:50%;background:conic-gradient(from 200deg,var(--coffee-tan),var(--rust),var(--coffee-brown),var(--coffee-tan));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--coffee-black);overflow:hidden;}
+  .shop-logo-preview img{width:100%;height:100%;object-fit:cover;}
+  .shop-banner-preview{width:100%;height:100px;border-radius:12px;background-size:cover;background-position:center;border:1px solid rgba(110,59,30,0.15);}
+  .shop-toggle{margin-top:10px;}
+  .shop-toggle label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--coffee-black);cursor:pointer;}
+
 
   #photoChoiceOverlay{z-index:300;}
   input#cameraInput, input#galleryInput{position:fixed !important;left:-9999px !important;top:0 !important;width:1px !important;height:1px !important;opacity:0 !important;pointer-events:none !important;}
@@ -609,11 +637,40 @@ function getPublicStoreKey(){
   if(pathStore && !reserved.includes(pathStore.toLowerCase())) return {type:'slug',value:pathStore.toLowerCase()};
   return {type:'default',value:''};
 }
+const THEME_KEYS = {
+  primary:'--coffee-black', brown:'--coffee-brown', tan:'--coffee-tan',
+  accent:'--gold', accentLight:'--gold-light', rust:'--rust', blush:'--blush',
+  bg:'--cream-light', bgCard:'--cream', ink:'--ink',
+  fontDisplay:'--font-display', fontBody:'--font-body'
+};
+const DEFAULT_THEME = {
+  primary:'#1E0F07', brown:'#5C3018', tan:'#B9814A',
+  accent:'#DDA53F', accentLight:'#F2D189', rust:'#A6402A', blush:'#D98A73',
+  bg:'#FBF5EA', bgCard:'#F4E9D6', ink:'#2A1B10',
+  fontDisplay:"'Fraunces', serif", fontBody:"'Inter', sans-serif"
+};
+const PRESET_THEMES = [
+  { id:'cafe',  icon:'☕', label:'Café',  colors:{ primary:'#1E0F07', brown:'#5C3018', tan:'#B9814A', accent:'#DDA53F', accentLight:'#F2D189', rust:'#A6402A', blush:'#D98A73', bg:'#FBF5EA', bgCard:'#F4E9D6', ink:'#2A1B10' } },
+  { id:'cacao', icon:'🍫', label:'Cacao', colors:{ primary:'#2A1208', brown:'#4E2B16', tan:'#9A6B4D', accent:'#C08A3E', accentLight:'#E6C58A', rust:'#8A3B1F', blush:'#C98A6E', bg:'#FAF3E8', bgCard:'#F1E3D0', ink:'#2A160C' } },
+  { id:'emeraude', icon:'🌿', label:'Émeraude', colors:{ primary:'#0E2A22', brown:'#14483A', tan:'#3F7A64', accent:'#2E9E6B', accentLight:'#9FE3C3', rust:'#B85C3A', blush:'#E0A48E', bg:'#F2FAF5', bgCard:'#E2F2E8', ink:'#122A21' } },
+  { id:'ocean', icon:'🌊', label:'Océan', colors:{ primary:'#0B2233', brown:'#0F3A55', tan:'#2E6E8F', accent:'#2A9BBF', accentLight:'#A7DCEF', rust:'#C0553E', blush:'#E2A08A', bg:'#F0F7FB', bgCard:'#DFEEF5', ink:'#0E2433' } },
+  { id:'rose',  icon:'🌸', label:'Rose', colors:{ primary:'#331022', brown:'#5C2036', tan:'#A05A72', accent:'#D9487A', accentLight:'#F2B4CC', rust:'#C0443C', blush:'#E89AB4', bg:'#FCF3F6', bgCard:'#F6E2E9', ink:'#34131F' } }
+];
 function applyStoreBranding(store){
   if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
   if(store.logo_url){ document.querySelectorAll('.brand-mark').forEach(el=>{ el.textContent=''; el.style.background=`url("${store.logo_url}") center/cover`; }); }
-  const hero=document.querySelector('.hero-copy p'); if(hero && store.description) hero.textContent=store.description;
+  const heroCopy=document.querySelector('.hero-copy');
+  if(heroCopy && store.tagline){ const h1=heroCopy.querySelector('h1'); if(h1) h1.innerHTML=store.tagline.split('|').map(part=>part.trim()).join('<br>'); }
+  const heroDesc=document.querySelector('.hero-copy p'); if(heroDesc && store.description) heroDesc.textContent=store.description;
+  const heroPhoto=document.querySelector('.hero-photo'); if(heroPhoto){ if(store.banner_url){ heroPhoto.style.backgroundImage=`url("${store.banner_url}")`; } else { heroPhoto.style.backgroundImage=''; } }
+  applyStoreTheme(store.theme);
 }
+function applyStoreTheme(theme){
+  const t=Object.assign({}, DEFAULT_THEME, (theme||{}));
+  const root=document.documentElement.style;
+  for(const k in THEME_KEYS){ if(t[k]!=null) root.setProperty(THEME_KEYS[k], t[k]); }
+}
+function resetThemePreview(applied){ applyStoreTheme(applied ? applied.theme : null); }
 async function loadProducts(){
   if(!sb){ PRODUCTS=[...DEFAULT_PRODUCTS]; return; }
   const {data,error} = await sb.from('products').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at');
@@ -984,21 +1041,137 @@ async function renderAdminDashboard(){
     <h4 style="margin:24px 0 12px;color:var(--coffee-black);">Ventes par point de vente</h4><div class="sales-stats-container">${pointSummary||'<p class="admin-empty">Aucun point de vente actif.</p>'}</div>`;
 }
 
+let shopDraft = null, shopTab = 'brand';
+const SHOP_COLORS=[['primary','Couleur principale (fond sombre)'],['brown','Brun / dégradé sombre'],['tan','Accent secondaire'],['accent','Accent — boutons & liens'],['accentLight','Accent clair'],['rust','Rouge — prix & alertes'],['blush','Rose doux'],['bg','Fond de page'],['bgCard','Fond des cartes'],['ink','Texte']];
+const SHOP_DISPLAY_FONTS=[["'Fraunces', serif","Fraunces"],["'Playfair Display', serif","Playfair Display"],["'Georgia', serif","Georgia"],["'Poppins', sans-serif","Poppins"]];
+const SHOP_BODY_FONTS=[["'Inter', sans-serif","Inter"],["'Open Sans', sans-serif","Open Sans"],["'Rubik', sans-serif","Rubik"],["'Poppins', sans-serif","Poppins"],["'Georgia', serif","Georgia"]];
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function shopVal(id,fb){ const e=document.getElementById(id); return (e&&e.value!=null)?e.value.trim():fb; }
+
 async function renderAdminBoutique(){
   const body=document.getElementById('adminBody');
   const {data:store,error}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single();
   if(error||!store){ body.innerHTML='<p class="admin-empty">Boutique introuvable.</p>'; return; }
-  const hours=store.opening_hours||{};
-  const publicUrl=store.custom_domain?`https://${store.custom_domain}`:`${location.origin}/${store.slug}`;
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3><button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
-    <div class="admin-stat" style="margin-bottom:16px;"><b>Site public</b><a href="${publicUrl}" target="_blank" rel="noopener" style="color:var(--rust);">${publicUrl}</a></div>
-    <div class="admin-product-form"><div class="field"><label>Nom</label><input id="storeName" value="${store.name||''}"></div><div class="field"><label>Slug public</label><input id="storeSlug" value="${store.slug||''}"></div><div class="field full"><label>Description</label><textarea id="storeDescription">${store.description||''}</textarea></div><div class="field"><label>Logo URL</label><input id="storeLogo" value="${store.logo_url||''}" placeholder="https://..."></div><div class="field"><label>Téléphone</label><input id="storePhone" value="${store.phone||''}"></div><div class="field"><label>Email</label><input id="storeEmail" value="${store.email||''}"></div><div class="field"><label>Adresse</label><input id="storeAddress" value="${store.address||''}"></div><div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${store.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${store.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${store.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div><div class="field"><label>Domaine personnalisé</label><input id="storeDomain" value="${store.custom_domain||''}" placeholder="boutique.exemple.com"></div><div class="field"><label>Horaires (JSON)</label><textarea id="storeHours">${JSON.stringify(hours)}</textarea></div></div>`;
+  shopDraft={
+    name:store.name||'', slug:store.slug||'', tagline:store.tagline||'', description:store.description||'',
+    logo_url:store.logo_url||'', banner_url:store.banner_url||'',
+    phone:store.phone||'', email:store.email||'', address:store.address||'',
+    currency:store.currency||'XOF', custom_domain:store.custom_domain||'', public_enabled:store.public_enabled!==false,
+    opening_hours:store.opening_hours||{}, theme:Object.assign({},DEFAULT_THEME,(store.theme||{}))
+  };
+  shopTab='brand';
+  renderShopShell();
+}
+function renderShopShell(){
+  const body=document.getElementById('adminBody');
+  const publicUrl=shopDraft.custom_domain?`https://${shopDraft.custom_domain}`:`${location.origin}/${shopDraft.slug}`;
+  const tabs=[['brand','Brand'],['apparence','Apparence'],['domaine','Domaine'],['horaires','Horaires']];
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3>
+      <button class="btn-ghost" onclick="switchShopTab('apparence')">🎨 Personnaliser</button>
+      <button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
+    <div class="admin-stat" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;"><b>Site public</b><a href="${esc(publicUrl)}" target="_blank" rel="noopener" style="color:var(--rust);">${esc(publicUrl)}</a>${shopDraft.public_enabled?'':'<span style="font-size:11px;color:#A6402A;">(non publié)</span>'}</div>
+    <div class="shop-subtabs" id="shopSubtabs">${tabs.map(([k,l])=>`<button class="shop-subtab${shopTab===k?' active':''}" onclick="switchShopTab('${k}')">${l}</button>`).join('')}</div>
+    <div id="shopPanel"></div>`;
+  renderShopTab();
+}
+function switchShopTab(tab){ collectShopTab(); shopTab=tab; renderShopShell(); }
+function collectShopTab(){
+  if(!shopDraft) return;
+  if(shopTab==='brand'){
+    shopDraft.name=shopVal('storeName',shopDraft.name); shopDraft.tagline=shopVal('storeTagline',shopDraft.tagline);
+    shopDraft.description=shopVal('storeDescription',shopDraft.description); shopDraft.logo_url=shopVal('storeLogo',shopDraft.logo_url);
+    shopDraft.banner_url=shopVal('storeBanner',shopDraft.banner_url); shopDraft.phone=shopVal('storePhone',shopDraft.phone);
+    shopDraft.email=shopVal('storeEmail',shopDraft.email); shopDraft.address=shopVal('storeAddress',shopDraft.address);
+    shopDraft.currency=shopVal('storeCurrency',shopDraft.currency);
+  } else if(shopTab==='apparence'){
+    shopDraft.theme=shopDraft.theme||Object.assign({},DEFAULT_THEME);
+    SHOP_COLORS.forEach(([k])=>shopDraft.theme[k]=shopVal('th-'+k,shopDraft.theme[k]));
+    shopDraft.theme.fontDisplay=shopVal('thDisplayFont',shopDraft.theme.fontDisplay);
+    shopDraft.theme.fontBody=shopVal('thBodyFont',shopDraft.theme.fontBody);
+  } else if(shopTab==='domaine'){
+    shopDraft.slug=shopVal('storeSlug',shopDraft.slug); shopDraft.custom_domain=shopVal('storeDomain',shopDraft.custom_domain);
+    const en=document.getElementById('storePublic'); if(en) shopDraft.public_enabled=en.checked;
+  } else if(shopTab==='horaires'){
+    const h=document.getElementById('storeHours');
+    if(h){ try{ shopDraft.opening_hours=JSON.parse(h.value||'{}'); }catch(e){ alert('Les horaires doivent être un JSON valide.'); } }
+  }
+}
+function renderShopTab(){
+  const panel=document.getElementById('shopPanel'); if(!panel) return;
+  if(shopTab==='brand'){ shopBrandPanel(panel); }
+  else if(shopTab==='apparence'){ shopAppearancePanel(panel); }
+  else if(shopTab==='domaine'){ shopDomainPanel(panel); }
+  else { shopHoursPanel(panel); }
+}
+function shopBrandPanel(panel){
+  const d=shopDraft;
+  panel.innerHTML=`<div class="shop-grid">
+    <div class="field"><label>Nom de la boutique</label><input id="storeName" value="${esc(d.name)}" placeholder="Ma boutique"></div>
+    <div class="field"><label>Slogan</label><input id="storeTagline" value="${esc(d.tagline)}" placeholder="Le café Touba, servi comme il se doit."></div>
+    <div class="field full"><label>Description (accroche sous le titre)</label><textarea id="storeDescription">${esc(d.description)}</textarea></div>
+    <div class="field full"><label>Logo</label><div class="shop-logos-row"><div class="shop-logo-preview" id="shopLogoPrev">${d.logo_url?'':(d.name?esc(d.name.charAt(0).toUpperCase()):'☕')}</div><input id="storeLogo" value="${esc(d.logo_url)}" placeholder="https://... (URL du logo)" oninput="previewShopLogo(this.value)"></div><p class="shop-note">Collez l'adresse d'une image hébergée. L'aperçu ci-contre illustre l'affichage en rond dans l'en-tête.</p></div>
+    <div class="field full"><label>Bannière d'accueil</label><div class="shop-banner-preview" id="shopBannerPrev" style="${d.banner_url?`background-image:url(&quot;${esc(d.banner_url)}&quot;)`:''}"></div><input id="storeBanner" value="${esc(d.banner_url)}" placeholder="https://... (URL de la bannière)" oninput="previewShopBanner(this.value)"></div>
+    <div class="field"><label>Téléphone</label><input id="storePhone" value="${esc(d.phone)}"></div>
+    <div class="field"><label>Email</label><input id="storeEmail" value="${esc(d.email)}"></div>
+    <div class="field full"><label>Adresse</label><input id="storeAddress" value="${esc(d.address)}"></div>
+    <div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${d.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${d.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${d.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div>
+  </div>`;
+}
+function previewShopLogo(url){ const p=document.getElementById('shopLogoPrev'); if(!p) return; if(url.trim()){ p.innerHTML=`<img src="${esc(url)}" alt="">`; } else { p.innerHTML=shopDraft.name?esc(shopDraft.name.charAt(0).toUpperCase()):'☕'; } }
+function previewShopBanner(url){ const p=document.getElementById('shopBannerPrev'); if(!p) return; if(url.trim()){ p.style.backgroundImage=`url("${esc(url)}")`; } else { p.style.backgroundImage=''; } }
+
+function shopAppearancePanel(panel){
+  const t=shopDraft.theme;
+  let activePreset=null; for(const p of PRESET_THEMES){ if(t.primary===p.colors.primary&&t.accent===p.colors.accent&&t.bg===p.colors.bg) activePreset=p.id; }
+  const swatches=PRESET_THEMES.map(p=>`<div class="theme-swatch${activePreset===p.id?' active':''}" title="${p.label}" style="background:linear-gradient(135deg,${p.colors.primary},${p.colors.accent})" onclick="pickPresetTheme('${p.id}')"><span class="tick">✓</span></div>`).join('');
+  const colorRows=SHOP_COLORS.map(([k,label])=>`<div class="shop-color-row"><label>${label}</label><input type="color" id="th-${k}" value="${esc(t[k]||DEFAULT_THEME[k]||'#000000')}" oninput="liveTheme()"><span class="hex-name">${esc(t[k]||DEFAULT_THEME[k]||'')}</span></div>`).join('');
+  const displayOpts=SHOP_DISPLAY_FONTS.map(([v,l])=>`<option value="${v}" ${t.fontDisplay===v?'selected':''}>${l}</option>`).join('');
+  const bodyOpts=SHOP_BODY_FONTS.map(([v,l])=>`<option value="${v}" ${t.fontBody===v?'selected':''}>${l}</option>`).join('');
+  panel.innerHTML=`<div class="admin-stat" style="margin-bottom:12px;"><b>Thèmes rapides</b></div>
+    <div class="theme-swatches">${swatches}</div>
+    <p class="shop-note">Cliquez sur un thème pour l'appliquer instantanément en aperçu, puis affinez les couleurs ci-dessous.</p>
+    <div class="admin-stat" style="margin:16px 0 8px;"><b>Couleurs</b></div>
+    ${colorRows}
+    <div class="shop-grid" style="margin-top:16px;">
+      <div class="field"><label>Police des titres</label><select id="thDisplayFont" onchange="liveTheme()">${displayOpts}</select></div>
+      <div class="field"><label>Police du texte</label><select id="thBodyFont" onchange="liveTheme()">${bodyOpts}</select></div>
+    </div>
+    <p class="shop-note">Les couleurs et polices s'appliquent en direct sur votre boutique (aperçu). Cliquez sur « Enregistrer » pour les conserver.</p>`;
+}
+function liveTheme(){ collectShopTab(); applyStoreTheme(shopDraft.theme); }
+function pickPresetTheme(id){ const p=PRESET_THEMES.find(x=>x.id===id); if(!p) return; collectShopTab(); shopDraft.theme=Object.assign({},shopDraft.theme,p.colors); applyStoreTheme(shopDraft.theme); renderShopShell(); }
+function previewShopTheme(){
+  collectShopTab();
+  applyStoreBranding(Object.assign({},ACTIVE_STORE,{name:shopDraft.name,tagline:shopDraft.tagline,description:shopDraft.description,logo_url:shopDraft.logo_url,banner_url:shopDraft.banner_url,theme:shopDraft.theme}));
+  alert('Aperçu appliqué sur la boutique (non enregistré).');
+}
+function shopDomainPanel(panel){
+  const d=shopDraft;
+  panel.innerHTML=`<div class="shop-grid">
+    <div class="field"><label>Adresse de la boutique (slug)</label><input id="storeSlug" value="${esc(d.slug)}" placeholder="ma-boutique"><p class="shop-note">Partout où il n'y a pas de domaine personnalisé, l'adresse sera ${esc(location.origin)}/<b>${esc(d.slug||'votre-slug')}</b></p></div>
+    <div class="field"><label>Domaine personnalisé</label><input id="storeDomain" value="${esc(d.custom_domain)}" placeholder="boutique.exemple.com"><p class="shop-note">Pointez ensuite ce domaine vers votre site (configuration DNS).</p></div>
+    <div class="field full shop-toggle"><label><input type="checkbox" id="storePublic" ${d.public_enabled?'checked':''}> Boutique publique en ligne</label><p class="shop-note">Activez pour que la boutique soit accessible publiquement via son slug ou domaine.</p></div>
+  </div>`;
+}
+function shopHoursPanel(panel){
+  const d=shopDraft;
+  panel.innerHTML=`<div class="field"><label>Horaires d'ouverture (JSON)</label><textarea id="storeHours" rows="8" style="font-family:ui-monospace,monospace;font-size:12px;">${esc(JSON.stringify(d.opening_hours||{},null,2))}</textarea>
+    <p class="shop-note">Exemple : ${esc(JSON.stringify({Lundi:'08:00 – 22:00',Mardi:'08:00 – 22:00',Samedi:'09:00 – 23:00',Dimanche:'Fermé'}))}</p></div>`;
 }
 async function saveStoreSettings(){
-  let openingHours={}; try{ openingHours=JSON.parse(document.getElementById('storeHours').value||'{}'); }catch(e){ alert('Les horaires doivent être un JSON valide.'); return; }
-  const payload={name:document.getElementById('storeName').value.trim(),slug:document.getElementById('storeSlug').value.trim(),description:document.getElementById('storeDescription').value.trim(),logo_url:document.getElementById('storeLogo').value.trim(),phone:document.getElementById('storePhone').value.trim(),email:document.getElementById('storeEmail').value.trim(),address:document.getElementById('storeAddress').value.trim(),currency:document.getElementById('storeCurrency').value,custom_domain:document.getElementById('storeDomain').value.trim(),opening_hours:openingHours};
-  const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); alert('Boutique enregistrée.');
+  collectShopTab();
+  const payload={
+    name:shopDraft.name, slug:shopDraft.slug, tagline:shopDraft.tagline, description:shopDraft.description,
+    logo_url:shopDraft.logo_url, banner_url:shopDraft.banner_url,
+    phone:shopDraft.phone, email:shopDraft.email, address:shopDraft.address,
+    currency:shopDraft.currency, custom_domain:shopDraft.custom_domain, public_enabled:shopDraft.public_enabled,
+    opening_hours:shopDraft.opening_hours, theme:shopDraft.theme
+  };
+  const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID);
+  if(error){ alert(error.message); return; }
+  ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); alert('Boutique enregistrée.');
 }
+
 
 async function renderAdminCategories(){
   const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('categories').select('*').eq('store_id',ACTIVE_STORE_ID).order('name');
