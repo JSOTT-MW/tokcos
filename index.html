@@ -875,7 +875,7 @@ async function sendWhatsAppApprov(name, phone, pointName, lines, total, delivery
 
   // Nettoyer le numéro : garder uniquement les chiffres (format international sans le 00)
   const cleanPhone = (managerPhone || phone || '').replace(/[^0-9]/g, '').replace(/^00/, '');
-  const waNumber = cleanPhone || '221777077270';
+  const waNumber = cleanPhone || '221776165055';
 
   window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
 }
