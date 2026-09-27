@@ -396,7 +396,7 @@ body.admin-mode .admin-overlay {
   align-items: flex-start;
   justify-content: center;
   padding: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 body.admin-mode .admin-panel {
@@ -407,6 +407,7 @@ body.admin-mode .admin-panel {
   border-radius: 0;
   margin-bottom: 0;
   box-shadow: none;
+  overflow: hidden;
 }
 
 /* Cache le bouton admin dans le footer en mode admin */
@@ -418,7 +419,10 @@ body.admin-mode .admin-trigger {
 body.admin-mode .admin-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(100vh - 120px);
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Sidebar dropdown pour manager */
@@ -841,6 +845,183 @@ body.admin-mode .admin-body.caisse-active {
   .pending-order-card .import-btn {
     font-size: 10px;
     padding: 4px 10px;
+  }
+}
+
+/* Back-office : navigation persistante, structure type application SaaS */
+body.admin-mode {
+  background: #f6f6f7;
+}
+
+body.admin-mode .admin-panel {
+  padding-left: 248px;
+  background: #f6f6f7;
+}
+
+body.admin-mode .admin-head {
+  min-height: 72px;
+  padding: 16px 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e1e3e5;
+}
+
+body.admin-mode .admin-head h3 {
+  color: #202223;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+body.admin-mode .admin-sidebar {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 248px;
+  padding: 22px 14px;
+  transform: translateX(0);
+  background: #1f2428;
+  border-right: 1px solid #343a40;
+  box-shadow: none;
+  overflow-y: auto;
+}
+
+body.admin-mode .admin-sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px 24px;
+  color: #ffffff;
+}
+
+body.admin-mode .admin-sidebar-brand strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+body.admin-mode .admin-sidebar-brand span {
+  color: #aeb4b9;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+body.admin-mode .admin-sidebar-menu li {
+  margin-bottom: 3px;
+}
+
+body.admin-mode .admin-sidebar-menu button {
+  min-height: 42px;
+  padding: 10px 12px;
+  color: #c9cdd1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+body.admin-mode .admin-sidebar-menu button:hover {
+  color: #ffffff;
+  background: #30363b;
+  border-color: transparent;
+}
+
+body.admin-mode .admin-sidebar-menu button.active {
+  color: #ffffff;
+  background: #3a4248;
+  border-color: #59636b;
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+body.admin-mode .admin-sidebar-toggle {
+  display: none;
+}
+
+body.admin-mode .admin-body {
+  padding: 28px 34px 48px;
+  background: #f6f6f7;
+}
+
+body.admin-mode .admin-toolbar {
+  min-height: 46px;
+  margin-bottom: 22px;
+  align-items: center;
+}
+
+body.admin-mode .admin-toolbar h3 {
+  color: #202223 !important;
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+body.admin-mode .admin-stat,
+body.admin-mode .admin-product-form,
+body.admin-mode .admin-table,
+body.admin-mode .chat-wrap {
+  border: 1px solid #e1e3e5;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+body.admin-mode .admin-product-form,
+body.admin-mode .admin-stat {
+  background: #ffffff;
+}
+
+body.admin-mode .admin-table {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+body.admin-mode .admin-table th {
+  background: #f6f6f7;
+  color: #6d7175;
+  border-bottom-color: #e1e3e5;
+}
+
+body.admin-mode .admin-table td {
+  border-bottom-color: #e1e3e5;
+}
+
+body.admin-mode .btn-primary,
+body.admin-mode .btn-ghost {
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  body.admin-mode .admin-panel {
+    padding-left: 0;
+  }
+
+  body.admin-mode .admin-head {
+    min-height: 70px;
+    padding: 14px 16px 14px 76px;
+  }
+
+  body.admin-mode .admin-sidebar {
+    width: min(280px, 86vw);
+    padding: 22px 14px;
+    transform: translateX(-100%);
+    z-index: 301;
+  }
+
+  body.admin-mode .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  body.admin-mode .admin-sidebar-toggle {
+    display: flex;
+    left: 16px;
+    top: 14px;
+    z-index: 302;
+  }
+
+  body.admin-mode .admin-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 14px 34px;
   }
 }
 

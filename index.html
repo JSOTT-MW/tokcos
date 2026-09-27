@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -45,6 +46,8 @@
   .cart-btn svg{width:19px;height:19px;color:var(--white);}
   .cart-count{position:absolute;top:-4px;right:-4px;background:var(--rust);color:var(--white);font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
   .cart-hidden{display:none !important;}
+  .ecommerce-only{display:none !important;}
+  body.ecommerce-mode .ecommerce-only{display:flex !important;}
   .hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(221,165,63,0.4);color:var(--white);font-size:20px;flex-shrink:0;}
   @media(max-width:760px){ .nav-links{display:none;} .hamburger{display:flex;} }
   .mobile-menu{position:fixed;inset:0;z-index:200;background:rgba(20,10,5,0.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;}
@@ -209,10 +212,10 @@
   .btn-full-width{width:100%;}
 
   /* ---------- ADMIN ---------- */
-  .admin-overlay{position:fixed;inset:0;background:rgba(20,10,5,0.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;}
+  .admin-overlay{position:fixed;inset:0;background:rgba(20,10,5,0.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:hidden;}
   .admin-overlay.open{display:flex;}
-  .admin-panel{background:var(--cream-light);border-radius:18px;max-width:1000px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);margin-bottom:24px;display:flex;flex-direction:column;max-height:calc(100vh - 48px);}
-  .admin-body{flex:1;min-height:0;padding:24px 26px;background:var(--white);overflow-y:auto;}
+  .admin-panel{background:var(--cream-light);border-radius:18px;max-width:1000px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);margin-bottom:24px;display:flex;flex-direction:column;height:calc(100vh - 48px);max-height:calc(100vh - 48px);}
+  .admin-body{flex:1;min-height:0;padding:24px 26px;background:var(--white);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
   @media(max-width:760px){ .admin-overlay{padding:0;align-items:stretch;} .admin-panel{max-width:100%;width:100%;height:100dvh;max-height:none;border-radius:0;margin-bottom:0;} }
 
   .admin-header-actions{display:flex;align-items:center;gap:10px;}
@@ -334,10 +337,11 @@
   /* ---------- MODE PLEIN ÉCRAN ADMIN ---------- */
   body.admin-mode .hero, body.admin-mode .section#menu, body.admin-mode .section#points, body.admin-mode .section#avis{display:none !important;}
   body.admin-mode header, body.admin-mode footer{display:block !important;}
-  body.admin-mode .admin-overlay{position:fixed;inset:0;background:var(--cream-light);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;}
-  body.admin-mode .admin-panel{max-width:100%;width:100%;height:100vh;max-height:100vh;border-radius:0;margin-bottom:0;box-shadow:none;}
+  body.admin-mode .admin-overlay{position:fixed;inset:0;background:var(--cream-light);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:0;overflow:hidden;}
+  body.admin-mode .admin-panel{max-width:100%;width:100%;height:100vh;max-height:100vh;border-radius:0;margin-bottom:0;box-shadow:none;overflow:hidden;}
   body.admin-mode .admin-trigger{display:none;}
-  body.admin-mode .admin-body{flex:1;overflow-y:auto;max-height:calc(100vh - 120px);}
+  body.admin-mode .admin-body{flex:1;overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 120px);min-height:0;-webkit-overflow-scrolling:touch;}
+  body.sidebar-mode .admin-tabs{display:none !important;}
 
   .admin-sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:linear-gradient(180deg,var(--coffee-black) 0%,var(--coffee-brown) 100%);z-index:201;transform:translateX(-100%);transition:transform .3s ease;padding:80px 20px 20px;box-shadow:4px 0 12px rgba(0,0,0,0.3);}
   .admin-sidebar.open{transform:translateX(0);}
@@ -391,7 +395,7 @@
     .admin-point-bar{padding:12px 16px;}
     body.admin-mode{overflow:hidden;}
     body.admin-mode .admin-overlay{overflow:hidden;}
-    body.admin-mode .admin-body{overflow:hidden;padding:16px;}
+    body.admin-mode .admin-body{overflow-y:auto;overflow-x:hidden;padding:16px;}
     body.admin-mode .admin-body > .admin-toolbar{flex-shrink:0;}
     body.admin-mode .caisse-layout{flex:1;}
     .caisse-product-grid{gap:8px;}
@@ -423,7 +427,7 @@
     <nav class="nav-links"><a href="#menu">Menu</a><a href="#points">Points de vente</a><a href="#avis">Avis</a></nav>
     <div class="nav-right">
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
-      <button class="cart-btn" onclick="openDrawer()" aria-label="Panier">
+      <button type="button" class="cart-btn ecommerce-only" id="cartButton" aria-label="Panier">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         <span class="cart-count cart-hidden" id="cartCount">0</span>
       </button>
@@ -446,7 +450,7 @@
       <h1>Le café Touba,<br><em>servi comme il se doit.</em></h1>
       <p>Grains torréfiés, wass artisanal et jus locaux... TOK'COS réinvente le salon de thé sénégalais, une tasse à la fois.</p>
       <div class="hero-ctas">
-        <a class="btn-wa" href="https://wa.me/221777077270?text=Bonjour%20TOK'COS%2C%20je%20souhaite%20passer%20une%20commande" target="_blank" rel="noopener">
+        <a class="btn-wa ecommerce-only" href="https://wa.me/221777077270?text=Bonjour%20TOK'COS%2C%20je%20souhaite%20passer%20une%20commande" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.3A8.9 8.9 0 0 0 3.3 16.5L2 22l5.7-1.3A8.9 8.9 0 1 0 17.6 6.3zM12 20a7.3 7.3 0 0 1-3.7-1l-.3-.2-2.7.6.6-2.6-.2-.3A7.3 7.3 0 1 1 19.3 12 7.3 7.3 0 0 1 12 20z"/></svg>
           Commander sur WhatsApp
         </a>
@@ -565,6 +569,7 @@ let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.error('Supabase indisponible :', e); sb = null; }
 
 let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1;
+let STOREFRONT_MODE = 'vitrine';
 let cart = loadCart();
 function loadCart(){ try{ const raw = localStorage.getItem('tokcos_cart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; } }
 function saveCart(){ try{ localStorage.setItem('tokcos_cart', JSON.stringify(cart)); }catch(e){} }
@@ -597,6 +602,7 @@ const DEFAULT_POINTS = [
 function money(n){ return (n||0).toLocaleString('fr-FR') + ' FCFA'; }
 function toggleMobileMenu(){ document.getElementById('mobileMenu').classList.add('open'); }
 function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); }
+document.getElementById('cartButton').addEventListener('click', openDrawer);
 
 /* ---------- CHARGEMENT ---------- */
 async function loadAll(){
@@ -657,6 +663,8 @@ const PRESET_THEMES = [
   { id:'rose',  icon:'🌸', label:'Rose', colors:{ primary:'#331022', brown:'#5C2036', tan:'#A05A72', accent:'#D9487A', accentLight:'#F2B4CC', rust:'#C0443C', blush:'#E89AB4', bg:'#FCF3F6', bgCard:'#F6E2E9', ink:'#34131F' } }
 ];
 function applyStoreBranding(store){
+  STOREFRONT_MODE = store.storefront_mode === 'ecommerce' ? 'ecommerce' : 'vitrine';
+  document.body.classList.toggle('ecommerce-mode', STOREFRONT_MODE === 'ecommerce');
   if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
   if(store.logo_url){ document.querySelectorAll('.brand-mark').forEach(el=>{ el.textContent=''; el.style.background=`url("${store.logo_url}") center/cover`; }); }
   const heroCopy=document.querySelector('.hero-copy');
@@ -734,7 +742,7 @@ function renderMenu(){
     const el = document.createElement('div');
     el.className = 'menu-card ' + p.cat + (outOfStock?' out-of-stock':'');
     const visual = p.image_url ? `<img src="${p.image_url}" class="card-photo" alt="${p.name}">` : `<span class="card-icon">${p.icon||'☕'}</span>`;
-    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`;
+    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`:''}`;
     el.onclick = ()=>{ if(!outOfStock) openModal(p.id); };
     (p.cat==='cafe'?gridCafe:gridWass).appendChild(el);
   });
@@ -765,6 +773,8 @@ function openModal(id){
   document.getElementById('modalPrice').textContent = money(modalProduct.price);
   document.getElementById('modalQty').textContent = modalQty;
   document.getElementById('modalAddBtn').disabled = totalStock(modalProduct.id)<=0;
+  document.querySelector('.qty-row').classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce');
+  document.getElementById('modalAddBtn').classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce');
   document.getElementById('productOverlay').classList.add('open');
 }
 function closeModal(){ document.getElementById('productOverlay').classList.remove('open'); }
@@ -874,7 +884,9 @@ async function sendWhatsAppApprov(name, phone, pointName, lines, total, delivery
   } catch (e) { console.warn('Impossible de récupérer le téléphone du manager :', e); }
 
   // Nettoyer le numéro : garder uniquement les chiffres (format international sans le 00)
-  const cleanPhone = (managerPhone || phone || '').replace(/[^0-9]/g, '').replace(/^00/, '');
+  const selectedPoint = POINTS.find(point=>point.name===pointName);
+  const pointPhone = selectedPoint?.phone1 || selectedPoint?.phone2 || '';
+  const cleanPhone = (pointPhone || managerPhone || '').replace(/[^0-9]/g, '').replace(/^00/, '');
   const waNumber = cleanPhone || '221776165055';
 
   window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
@@ -923,6 +935,7 @@ function renderAdminSignup(){
   document.getElementById('adminBody').innerHTML=`<div class="admin-login"><p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Créer une boutique</p>
     <div class="field" style="max-width:320px;margin:16px auto;text-align:left;"><label>Nom de la boutique</label><input id="signupStoreName" placeholder="Ma boutique"></div>
     <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Identifiant public</label><input id="signupStoreSlug" placeholder="ma-boutique"></div>
+    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Type de site</label><select id="signupStoreMode"><option value="vitrine">Site vitrine — présentation sans commande</option><option value="ecommerce">Application e-commerce — panier et commande WhatsApp</option></select></div>
     <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Email</label><input type="email" id="signupEmail" placeholder="vous@exemple.com"></div>
     <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="signupPassword" placeholder="8 caractères minimum"></div>
     <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="createAdminAccount()">Créer la boutique</button></div>
@@ -930,12 +943,13 @@ function renderAdminSignup(){
 }
 async function createAdminAccount(){
   const storeName=document.getElementById('signupStoreName').value.trim(), storeSlug=document.getElementById('signupStoreSlug').value.trim(), email=document.getElementById('signupEmail').value.trim(), password=document.getElementById('signupPassword').value;
+  const storeMode=document.getElementById('signupStoreMode').value;
   if(!storeName||!storeSlug||!email||password.length<8){ alert('Renseignez tous les champs. Le mot de passe doit contenir au moins 8 caractères.'); return; }
   const {data,error}=await sb.auth.signUp({email,password});
   if(error){ alert(error.message); return; }
   if(!data.session){ alert('Compte créé. Vérifiez votre email, puis connectez-vous.'); renderAdminLogin(); return; }
   adminSession=data.session;
-  const {error:storeError}=await sb.rpc('create_store_for_current_user',{store_name:storeName,store_slug:storeSlug});
+  const {error:storeError}=await sb.rpc('create_store_for_current_user',{store_name:storeName,store_slug:storeSlug,store_mode:storeMode});
   if(storeError){ alert('Compte créé, mais la boutique n’a pas pu être créée : '+storeError.message); return; }
   await loadAdminProfile(); renderAdminShell();
 }
@@ -948,10 +962,24 @@ async function checkAdminLogin(){
   if(!adminProfile){ alert("Ce compte n'a pas de profil rattaché. Contactez le propriétaire."); await sb.auth.signOut(); return; }
   renderAdminShell();
 }
+function isOwnerRole(profile = adminProfile){
+  return profile && (profile.role === 'manager' || profile.role === 'owner');
+}
+function applyCurrentPointContext(){
+  if(!adminProfile || !adminProfile.point_id) return;
+  if(!isOwnerRole()){
+    stockSelectedPoint = adminProfile.point_id;
+    caisseSelectedPoint = adminProfile.point_id;
+    salesSelectedPoint = adminProfile.point_id;
+    chatSelectedPoint = adminProfile.point_id;
+    if(!approPoint || approPoint === 'all') approPoint = adminProfile.point_id;
+  }
+}
 async function loadAdminProfile(){
   const {data, error} = await sb.from('profiles').select('*').eq('id', adminSession.user.id).single();
   if(error){ console.error(error); adminProfile=null; return; }
   adminProfile = data;
+  applyCurrentPointContext();
   await loadActiveStore();
 }
 async function adminLogout(){
@@ -961,19 +989,26 @@ async function adminLogout(){
 }
 
 function renderAdminShell(){
-  const isManager = adminProfile.role==='manager';
-  document.getElementById('adminTitle').textContent = isManager ? "Espace propriétaire — TOK'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||''}`;
+  const isOwner = isOwnerRole();
+  if(!isOwner && adminProfile?.point_id){
+    stockSelectedPoint = adminProfile.point_id;
+    caisseSelectedPoint = adminProfile.point_id;
+    salesSelectedPoint = adminProfile.point_id;
+    chatSelectedPoint = adminProfile.point_id;
+    if(!approPoint || approPoint === 'all') approPoint = adminProfile.point_id;
+  }
+  document.getElementById('adminTitle').textContent = isOwner ? "Espace propriétaire — TOK'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||''}`;
   renderAdminStoreSelector();
   document.getElementById('adminLogoutBtn').classList.remove('admin-logout-btn-hidden');
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
-  const tabs = isManager
-    ? [['dashboard','Tableau de bord'],['compta','Comptabilité'],['appro','Approvisionnements'],['caisse','Caisse'],['produits','Produits'],['categories','Catégories'],['points','Points de vente'],['stock','Stock'],['ventes','Carnet de vente'],['clients','Clients'],['rapports','Rapports'],['boutique','Boutique'],['utilisateurs','Utilisateurs'],['assistance','Assistance']]
-    : [['dashboard','Tableau de bord'],['appro','Approvisionnement'],['compta','Caisse'],['stock','Stock'],['clients','Clients'],['assistance','Assistance']];
-  tabsEl.innerHTML = tabs.map(([key,label],i)=>`<button class="admin-tab${i===0?' active':''}" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button>`).join('');
+  const tabs = isOwner
+    ? [['appro','Approvisionnements & stocks'],['ventes','Carnet de vente'],...(STOREFRONT_MODE==='vitrine'?[['caisse','Caisse']]:[]),['produits','Produits'],['points','Points de vente'],...(STOREFRONT_MODE==='ecommerce'?[['clients','Clients']]:[]),['utilisateurs','Utilisateurs'],['assistance','Assistance']]
+    : [['appro','Approvisionnement'],['compta','Caisse'],['stock','Stock'],['clients','Clients'],['assistance','Assistance']];
+  tabsEl.innerHTML = '';
   document.body.classList.add('admin-mode');
-  if(isManager) createSidebar(tabs); else removeSidebar();
-  switchAdminTab('caisse');
+  createSidebar(tabs, isOwner ? 'Propriétaire' : 'Gérant');
+  switchAdminTab(isOwner ? 'appro' : 'compta');
 }
 function renderAdminStoreSelector(){
   let selector=document.getElementById('adminStoreSelect');
@@ -989,30 +1024,41 @@ function switchAdminTab(tab){
   document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   if(tab==='dashboard') renderAdminDashboard();
   if(tab==='compta') renderAdminCompta();
-  if(tab==='appro') renderAdminAppro();
+  if(tab==='appro') {
+    if(isOwnerRole()) renderAdminOperations();
+    else renderAdminAppro();
+  }
   if(tab==='boutique') renderAdminBoutique();
   if(tab==='categories') renderAdminCategories();
   if(tab==='clients') renderAdminCustomers();
   if(tab==='rapports') renderAdminReports();
   if(tab==='produits') renderAdminProducts();
   if(tab==='points') renderAdminPoints();
-  if(tab==='stock') renderAdminStock();
+  if(tab==='stock') {
+    if(isOwnerRole()) renderAdminOperations();
+    else renderAdminStock();
+  }
   if(tab==='ventes') renderAdminSales();
   if(tab==='caisse') renderAdminCaisse();
   if(tab==='utilisateurs') renderAdminUsers();
   if(tab==='assistance') renderAdminAssistance();
   renderAdminPointBar();
-  closeSidebar();
+  if(window.matchMedia('(max-width: 760px)').matches) closeSidebar();
+}
+function adminBackButton(){
+  const target = isOwnerRole() ? 'dashboard' : 'compta';
+  return `<button type="button" class="btn-ghost admin-back" onclick="switchAdminTab('${target}')">← Retour</button>`;
 }
 
-function createSidebar(tabs){
+function createSidebar(tabs, roleLabel){
   removeSidebar();
   document.body.classList.add('sidebar-mode');
   const toggle=document.createElement('button'); toggle.className='admin-sidebar-toggle'; toggle.innerHTML='☰'; toggle.onclick=toggleSidebar;
   const overlay=document.createElement('div'); overlay.className='admin-sidebar-overlay'; overlay.onclick=closeSidebar;
   const sidebar=document.createElement('div'); sidebar.className='admin-sidebar';
-  sidebar.innerHTML = `<ul class="admin-sidebar-menu">${tabs.map(([key,label])=>`<li><button data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button></li>`).join('')}</ul>`;
+  sidebar.innerHTML = `<div class="admin-sidebar-brand"><strong>TOK'COS</strong><span>${roleLabel}</span></div><ul class="admin-sidebar-menu">${tabs.map(([key,label])=>`<li><button type="button" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button></li>`).join('')}</ul>`;
   document.body.appendChild(toggle); document.body.appendChild(overlay); document.body.appendChild(sidebar);
+  sidebar.classList.add('open');
 }
 function removeSidebar(){ document.body.classList.remove('sidebar-mode'); document.querySelector('.admin-sidebar')?.remove(); document.querySelector('.admin-sidebar-overlay')?.remove(); document.querySelector('.admin-sidebar-toggle')?.remove(); }
 function toggleSidebar(){ const s=document.querySelector('.admin-sidebar'), o=document.querySelector('.admin-sidebar-overlay'); if(!s) return; if(s.classList.contains('open')) closeSidebar(); else { s.classList.add('open'); o.classList.add('open'); } }
@@ -1051,7 +1097,7 @@ async function renderAdminDashboard(){
   const revenue=confirmed.reduce((sum,s)=>sum+(s.total||0),0), todayRevenue=todaySales.reduce((sum,s)=>sum+(s.total||0),0);
   const lowStock=stock.filter(s=>s.quantity<=5).length;
   const pointSummary=points.map(point=>{ const rows=confirmed.filter(s=>s.point_id===point.id); return `<div class="admin-stat"><b>${money(rows.reduce((sum,s)=>sum+(s.total||0),0))}</b>${point.name}</div>`; }).join('');
-  body.innerHTML=`<div class="admin-toolbar"><div><h3 style="color:var(--coffee-black);">Tableau de bord</h3><p style="font-size:12px;color:#8A7660;">Vue de la boutique active</p></div><button class="btn-ghost" onclick="switchAdminTab('boutique')">Configurer la boutique</button></div>
+  body.innerHTML=`<div class="admin-toolbar"><div><h3 style="color:var(--coffee-black);">Tableau de bord</h3><p style="font-size:12px;color:#8A7660;">Vue de la boutique active</p></div><div>${adminBackButton()} <button class="btn-ghost" onclick="renderAdminReports()">Rapports</button> <button class="btn-primary" onclick="renderAdminBoutique()">Configurer la boutique</button></div></div>
     <div class="sales-stats-container"><div class="admin-stat"><b>${money(revenue)}</b>chiffre d'affaires</div><div class="admin-stat"><b>${money(todayRevenue)}</b>ventes du jour</div><div class="admin-stat"><b>${pending.length}</b>commandes en attente</div><div class="admin-stat"><b>${lowStock}</b>stocks faibles</div></div>
     <h4 style="margin:24px 0 12px;color:var(--coffee-black);">Ventes par point de vente</h4><div class="sales-stats-container">${pointSummary||'<p class="admin-empty">Aucun point de vente actif.</p>'}</div>`;
 }
@@ -1071,7 +1117,7 @@ async function renderAdminBoutique(){
     name:store.name||'', slug:store.slug||'', tagline:store.tagline||'', description:store.description||'',
     logo_url:store.logo_url||'', banner_url:store.banner_url||'',
     phone:store.phone||'', email:store.email||'', address:store.address||'',
-    currency:store.currency||'XOF', custom_domain:store.custom_domain||'', public_enabled:store.public_enabled!==false,
+    currency:store.currency||'XOF', storefront_mode:store.storefront_mode==='ecommerce'?'ecommerce':'vitrine', custom_domain:store.custom_domain||'', public_enabled:store.public_enabled!==false,
     opening_hours:store.opening_hours||{}, theme:Object.assign({},DEFAULT_THEME,(store.theme||{}))
   };
   shopTab='brand';
@@ -1081,7 +1127,7 @@ function renderShopShell(){
   const body=document.getElementById('adminBody');
   const publicUrl=shopDraft.custom_domain?`https://${shopDraft.custom_domain}`:`${location.origin}/${shopDraft.slug}`;
   const tabs=[['brand','Brand'],['apparence','Apparence'],['domaine','Domaine'],['horaires','Horaires']];
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3>
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Ma boutique</h3>
       <button class="btn-ghost" onclick="switchShopTab('apparence')">🎨 Personnaliser</button>
       <button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
     <div class="admin-stat" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;"><b>Site public</b><a href="${esc(publicUrl)}" target="_blank" rel="noopener" style="color:var(--rust);">${esc(publicUrl)}</a>${shopDraft.public_enabled?'':'<span style="font-size:11px;color:#A6402A;">(non publié)</span>'}</div>
@@ -1097,7 +1143,7 @@ function collectShopTab(){
     shopDraft.description=shopVal('storeDescription',shopDraft.description); shopDraft.logo_url=shopVal('storeLogo',shopDraft.logo_url);
     shopDraft.banner_url=shopVal('storeBanner',shopDraft.banner_url); shopDraft.phone=shopVal('storePhone',shopDraft.phone);
     shopDraft.email=shopVal('storeEmail',shopDraft.email); shopDraft.address=shopVal('storeAddress',shopDraft.address);
-    shopDraft.currency=shopVal('storeCurrency',shopDraft.currency);
+    shopDraft.currency=shopVal('storeCurrency',shopDraft.currency); shopDraft.storefront_mode=shopVal('storefrontMode',shopDraft.storefront_mode);
   } else if(shopTab==='apparence'){
     shopDraft.theme=shopDraft.theme||Object.assign({},DEFAULT_THEME);
     SHOP_COLORS.forEach(([k])=>shopDraft.theme[k]=shopVal('th-'+k,shopDraft.theme[k]));
@@ -1130,6 +1176,7 @@ function shopBrandPanel(panel){
     <div class="field"><label>Email</label><input id="storeEmail" value="${esc(d.email)}"></div>
     <div class="field full"><label>Adresse</label><input id="storeAddress" value="${esc(d.address)}"></div>
     <div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${d.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${d.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${d.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div>
+    <div class="field"><label>Type de site</label><select id="storefrontMode"><option value="vitrine" ${d.storefront_mode==='vitrine'?'selected':''}>Site vitrine</option><option value="ecommerce" ${d.storefront_mode==='ecommerce'?'selected':''}>Application e-commerce</option></select><p class="shop-note">Le mode e-commerce active le panier et l'envoi WhatsApp au point de vente choisi.</p></div>
   </div>`;
 }
 function previewShopLogo(url){ const p=document.getElementById('shopLogoPrev'); if(!p) return; if(url.trim()){ p.innerHTML=`<img src="${esc(url)}" alt="">`; } else { p.innerHTML=shopDraft.name?esc(shopDraft.name.charAt(0).toUpperCase()):'☕'; } }
@@ -1179,12 +1226,12 @@ async function saveStoreSettings(){
     name:shopDraft.name, slug:shopDraft.slug, tagline:shopDraft.tagline, description:shopDraft.description,
     logo_url:shopDraft.logo_url, banner_url:shopDraft.banner_url,
     phone:shopDraft.phone, email:shopDraft.email, address:shopDraft.address,
-    currency:shopDraft.currency, custom_domain:shopDraft.custom_domain, public_enabled:shopDraft.public_enabled,
+    currency:shopDraft.currency, storefront_mode:shopDraft.storefront_mode, custom_domain:shopDraft.custom_domain, public_enabled:shopDraft.public_enabled,
     opening_hours:shopDraft.opening_hours, theme:shopDraft.theme
   };
   const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID);
   if(error){ alert(error.message); return; }
-  ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); alert('Boutique enregistrée.');
+  ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); renderMenu(); renderCartBadge(); alert('Boutique enregistrée.');
 }
 
 
@@ -1195,7 +1242,7 @@ let comptaPeriod='day', comptaPoint='all';
 
 async function renderAdminCompta(){
   const body=document.getElementById('adminBody');
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Comptabilité</h3>
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Comptabilité</h3>
       <button class="btn-primary" onclick="openTransactionModal()">+ Nouvelle ligne</button></div>
     <div class="admin-product-form">
       <div class="field"><label>Période</label><select id="comptaPeriod" onchange="comptaPeriod=this.value;loadCompta()"><option value="day">Aujourd'hui</option><option value="week">Cette semaine</option><option value="month">Ce mois</option><option value="all">Tout</option></select></div>
@@ -1263,10 +1310,14 @@ async function deleteTransaction(id){ if(!confirm('Supprimer cette ligne ?')) re
    APPROVISIONNEMENTS (points de vente → boutique)
    ======================================================= */
 let approPoint='all';
+async function renderAdminOperations(){
+  document.getElementById('adminBody').innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Approvisionnements & stocks</h3></div>
+    <div class="admin-product-form"><button class="btn-primary" onclick="renderAdminAppro()">Approvisionnements</button><button class="btn-ghost" onclick="renderAdminStock();renderAdminPointBar();">Stocks</button></div>`;
+}
 async function renderAdminAppro(){
   const body=document.getElementById('adminBody');
   const pointFilter=`<option value="all">Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${approPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`;
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Approvisionnements</h3><button class="btn-primary" onclick="openApproModal()">+ Demander</button></div>
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Approvisionnements</h3><button class="btn-primary" onclick="openApproModal()">+ Demander</button></div>
     <p class="shop-note" style="margin-bottom:12px;">Demandes de marchandise des points de vente vers la boutique. Validez pour déclencher le transfert de stock.</p>
     <div class="admin-product-form"><div class="field"><label>Point</label><select id="approPoint" onchange="approPoint=this.value;loadAppro()">${pointFilter}</select></div></div>
     <table class="admin-table"><thead><tr><th>Date</th><th>Point demandeur</th><th>Détail</th><th>Total (coût)</th><th>Statut</th><th>Action</th></tr></thead><tbody id="approRows"></tbody></table>`;
@@ -1328,23 +1379,123 @@ async function saveAppro(){
 async function renderAdminCategories(){
   const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('categories').select('*').eq('store_id',ACTIVE_STORE_ID).order('name');
   if(error){body.innerHTML='<p class="admin-empty">Erreur de chargement des catégories.</p>';return;}
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Catégories</h3><button class="btn-primary" onclick="createCategory()">Ajouter</button></div><div class="admin-product-form"><div class="field"><label>Nom</label><input id="newCategoryName" placeholder="Boissons"></div></div><table class="admin-table"><thead><tr><th>Nom</th><th>Actions</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.name}</td><td><button class="admin-icon-btn danger" onclick="deleteCategory('${row.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="2" class="admin-empty">Aucune catégorie.</td></tr>'}</tbody></table>`;
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Catégories</h3><button class="btn-primary" onclick="createCategory()">Ajouter</button></div><div class="admin-product-form"><div class="field"><label>Nom</label><input id="newCategoryName" placeholder="Boissons"></div></div><table class="admin-table"><thead><tr><th>Nom</th><th>Actions</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.name}</td><td><button class="admin-icon-btn danger" onclick="deleteCategory('${row.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="2" class="admin-empty">Aucune catégorie.</td></tr>'}</tbody></table>`;
 }
 async function createCategory(){ const name=document.getElementById('newCategoryName').value.trim(); if(!name)return; const {error}=await sb.from('categories').insert({name,store_id:ACTIVE_STORE_ID}); if(error){alert(error.message);return;} renderAdminCategories(); }
 async function deleteCategory(id){ if(!confirm('Supprimer cette catégorie ?'))return; const {error}=await sb.from('categories').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} renderAdminCategories(); }
 
+function customerDebtValue(row){
+  const numeric = Number(row?.amount ?? row?.balance ?? row?.debt ?? row?.notes ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+function customerDebtStatus(row){
+  const status = String(row?.status || 'ouvert').trim().toLowerCase();
+  return ['ouvert','payé','remboursé'].includes(status) ? status : 'ouvert';
+}
+function customerDebtStatusLabel(status){
+  const labels = { ouvert:'À payer', payé:'Payé', remboursé:'Remboursé' };
+  return labels[status] || 'À payer';
+}
+function customerDebtStatusClass(status){
+  if(status==='payé') return 'active vendu';
+  if(status==='remboursé') return 'active annule';
+  return 'active';
+}
+async function recordCustomerDebtSettlement(customer, nextStatus){
+  if(!customer || customerDebtValue(customer) <= 0) return;
+  const amount = Math.abs(customerDebtValue(customer));
+  const isRefund = nextStatus === 'remboursé';
+  const type = isRefund ? 'depense' : 'encaissement';
+  const label = isRefund ? `Remboursement dette ${customer.name}` : `Paiement dette ${customer.name}`;
+  const createdAt = customer.created_at || new Date().toISOString();
+  const pointId = POINTS[0]?.id || null;
+  const {error} = await sb.from('transactions').insert({
+    store_id: ACTIVE_STORE_ID,
+    point_id: pointId,
+    type,
+    amount,
+    category: 'Dette client',
+    label,
+    created_by: adminProfile?.id || null,
+    created_at: createdAt
+  });
+  if(error){
+    alert(error.message);
+    return false;
+  }
+  return true;
+}
+async function setCustomerDebtStatus(id, nextStatus){
+  const safeStatus = ['ouvert','payé','remboursé'].includes(nextStatus) ? nextStatus : 'ouvert';
+  const {data:customer,error}=await sb.from('customers').select('*').eq('id',id).eq('store_id',ACTIVE_STORE_ID).maybeSingle();
+  if(error || !customer){ alert('Client introuvable.'); return; }
+  const currentStatus = customerDebtStatus(customer);
+  const {error:updateError}=await sb.from('customers').update({ status: safeStatus }).eq('id',id).eq('store_id',ACTIVE_STORE_ID);
+  if(updateError){ alert(updateError.message); return; }
+  if((currentStatus !== safeStatus) && (safeStatus === 'payé' || safeStatus === 'remboursé')){
+    await recordCustomerDebtSettlement(customer, safeStatus);
+  }
+  renderAdminCustomers();
+}
 async function renderAdminCustomers(){
   const body=document.getElementById('adminBody'); const {data:rows=[],error}=await sb.from('customers').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(error){body.innerHTML='<p class="admin-empty">Erreur de chargement des clients.</p>';return;}
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Clients</h3><button class="btn-primary" onclick="createCustomer()">Ajouter</button></div><div class="admin-product-form"><div class="field"><label>Nom</label><input id="customerName" placeholder="Nom du client"></div><div class="field"><label>Téléphone</label><input id="customerPhone" placeholder="77 000 00 00"></div><div class="field"><label>Email</label><input id="customerEmail" type="email"></div></div><table class="admin-table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Actions</th></tr></thead><tbody>${rows.map(row=>`<tr><td>${row.name}</td><td>${row.phone||'—'}</td><td>${row.email||'—'}</td><td><button class="admin-icon-btn danger" onclick="deleteCustomer('${row.id}')">🗑</button></td></tr>`).join('')||'<tr><td colspan="4" class="admin-empty">Aucun client.</td></tr>'}</tbody></table>`;
+  const canManage = isOwnerRole();
+  const addButton = canManage ? '<button class="btn-primary" onclick="createCustomer()">Ajouter</button>' : '';
+  const formHtml = canManage ? `<div class="admin-product-form"><div class="field"><label>Nom</label><input id="customerName" placeholder="Nom du client"></div><div class="field"><label>Téléphone</label><input id="customerPhone" placeholder="77 000 00 00"></div><div class="field"><label>Montant</label><input id="customerAmount" type="number" min="0" step="100" placeholder="0"></div></div>` : '';
+  const rowsHtml = rows.map(row=>{
+    const debt = customerDebtValue(row);
+    const status = customerDebtStatus(row);
+    const amountCell = `<td class="${debt > 0 ? 'sales-total' : ''}">${money(debt)}</td>`;
+    const statusCell = canManage ? `<td>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <label class="toggle-switch">
+          <input type="checkbox" ${status === 'payé' || status === 'remboursé' ? 'checked' : ''} onchange="setCustomerDebtStatus('${row.id}', this.checked ? 'payé' : 'ouvert')">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="status-btn ${customerDebtStatusClass(status)}" style="font-size:10px;pointer-events:none;">${customerDebtStatusLabel(status)}</span>
+      </div>
+      <div style="margin-top:6px;">
+        <button class="status-btn active annule" style="font-size:10px;" onclick="setCustomerDebtStatus('${row.id}','remboursé')">Remboursé</button>
+      </div>
+    </td>` : `<td>${customerDebtStatusLabel(status)}</td>`;
+    const actionCell = canManage ? `<td><button class="admin-icon-btn danger" onclick="deleteCustomer('${row.id}')">🗑</button></td>` : '';
+    return `<tr><td>${row.name}</td><td>${row.phone||'—'}</td>${amountCell}${statusCell}${actionCell}</tr>`;
+  }).join('') || `<tr><td colspan="${canManage ? 5 : 4}" class="admin-empty">Aucun client.</td></tr>`;
+  const tableHeaders = canManage ? '<tr><th>Nom</th><th>Téléphone</th><th>Montant</th><th>État</th><th>Actions</th></tr>' : '<tr><th>Nom</th><th>Téléphone</th><th>Montant</th><th>État</th></tr>';
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Clients</h3>${addButton}</div>${formHtml}<table class="admin-table"><thead>${tableHeaders}</thead><tbody>${rowsHtml}</tbody></table>`;
 }
-async function createCustomer(){ const name=document.getElementById('customerName').value.trim(); if(!name)return; const {error}=await sb.from('customers').insert({name,phone:document.getElementById('customerPhone').value.trim(),email:document.getElementById('customerEmail').value.trim(),store_id:ACTIVE_STORE_ID}); if(error){alert(error.message);return;} renderAdminCustomers(); }
-async function deleteCustomer(id){ if(!confirm('Supprimer ce client ?'))return; const {error}=await sb.from('customers').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert(error.message);return;} renderAdminCustomers(); }
+async function createCustomer(){
+  const name=document.getElementById('customerName').value.trim();
+  if(!name){ alert('Le nom du client est obligatoire.'); return; }
+  const amountValue = parseFloat(document.getElementById('customerAmount').value) || 0;
+  if(!isOwnerRole()){ alert('Seul le propriétaire peut créer un client.'); return; }
+  const payload = {
+    name,
+    phone: document.getElementById('customerPhone').value.trim(),
+    amount: amountValue,
+    status: 'ouvert',
+    store_id: ACTIVE_STORE_ID
+  };
+  const {error}=await sb.from('customers').insert(payload);
+  if(error){
+    alert(error.message);
+    return;
+  }
+  renderAdminCustomers();
+}
+async function deleteCustomer(id){
+  if(!isOwnerRole()){ alert('Seul le propriétaire peut supprimer un client.'); return; }
+  if(!confirm('Supprimer ce client ?'))return;
+  const {error}=await sb.from('customers').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID);
+  if(error){alert(error.message);return;}
+  renderAdminCustomers();
+}
 
 let REPORT_ROWS=[];
 async function renderAdminReports(){
   const body=document.getElementById('adminBody');
-  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Rapports comptables</h3><div><button class="btn-ghost" onclick="exportReportCSV()">CSV</button><button class="btn-primary" onclick="exportReportPDF()">PDF</button></div></div><div class="admin-product-form"><div class="field"><label>Période</label><select id="reportPeriod" onchange="loadAdminReports()"><option value="day">Journalier</option><option value="week">Hebdomadaire</option><option value="month">Mensuel</option><option value="year">Annuel</option></select></div><div class="field"><label>Point de vente</label><select id="reportPoint"><option value="all">Tous les points</option>${POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div></div><div id="reportResult" class="admin-empty">Chargement...</div>`;
+  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Rapports comptables</h3><div><button class="btn-ghost" onclick="exportReportCSV()">CSV</button><button class="btn-primary" onclick="exportReportPDF()">PDF</button></div></div><div class="admin-product-form"><div class="field"><label>Période</label><select id="reportPeriod" onchange="loadAdminReports()"><option value="day">Journalier</option><option value="week">Hebdomadaire</option><option value="month">Mensuel</option><option value="year">Annuel</option></select></div><div class="field"><label>Point de vente</label><select id="reportPoint"><option value="all">Tous les points</option>${POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div></div><div id="reportResult" class="admin-empty">Chargement...</div>`;
   document.getElementById('reportPoint').onchange=loadAdminReports; loadAdminReports();
 }
 async function loadAdminReports(){
@@ -1361,7 +1512,7 @@ function exportReportPDF(){ if(!window.jspdf){alert('Le module PDF est indisponi
 /* ---------- PRODUITS (manager) ---------- */
 function renderAdminProducts(){
   editingProductId=null; pendingPhotoData=null;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div><button class="btn-ghost" onclick="renderAdminCategories()">Gérer les catégories</button></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
   renderProductForm(); renderProductRows();
 }
 function renderProductForm(product){
@@ -1406,7 +1557,7 @@ async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock 
 /* ---------- POINTS DE VENTE (manager) ---------- */
 function renderAdminPoints(){
   editingPointId=null;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
   renderPointForm(); renderPointRows();
 }
 function renderPointForm(point){
@@ -1445,27 +1596,33 @@ async function deletePoint(id){ if(!confirm("Supprimer ce point de vente ?")) re
 
 /* ---------- STOCK (manager: tous les points / gérant: son point) ---------- */
 function renderAdminStock(){
-  const isManager = adminProfile.role==='manager';
-  if(!isManager){ stockSelectedPoint = adminProfile.point_id; } else if(!stockSelectedPoint && POINTS.length){ stockSelectedPoint = POINTS[0].id; }
+  const isOwner = isOwnerRole();
+  if(!isOwner){ stockSelectedPoint = adminProfile.point_id || stockSelectedPoint; } else if(!stockSelectedPoint && POINTS.length){ stockSelectedPoint = POINTS[0].id; }
   const lowCount = PRODUCTS.filter(p=>stockFor(stockSelectedPoint,p.id)<=5).length;
-  const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===stockSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th><th>Ajuster</th></tr></thead><tbody id="adminStockRows"></tbody></table>`;
+  const pointSelectorHtml = isOwner ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===stockSelectedPoint)?.name||''}</b>votre point de vente</div>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th>${isOwner?'<th>Ajuster</th>':'<th>Lecture seule</th>'}</tr></thead><tbody id="adminStockRows"></tbody></table>`;
   renderStockRows();
 }
 function onStockPointChange(id){ stockSelectedPoint=id; renderAdminStock(); renderAdminPointBar(); }
 function renderStockRows(){
   const tbody=document.getElementById('adminStockRows');
+  const canEdit = isOwnerRole();
   if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="4" class="admin-empty">Aucun produit.</td></tr>'; return; }
   tbody.innerHTML = PRODUCTS.map(p=>{ const qty=stockFor(stockSelectedPoint,p.id);
-    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${p.name}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td><div class="stock-adjust"><button onclick="adjustStock('${p.id}',-1)">−</button><input type="number" class="stock-input" value="${qty}" onchange="setStock('${p.id}', this.value)"><button onclick="adjustStock('${p.id}',1)">+</button></div></td></tr>`; }).join('');
+    const adjustCell = canEdit
+      ? `<div class="stock-adjust"><button onclick="adjustStock('${p.id}',-1)">−</button><input type="number" class="stock-input" value="${qty}" onchange="setStock('${p.id}', this.value)"><button onclick="adjustStock('${p.id}',1)">+</button></div>`
+      : `<span class="stock-field-disabled">Lecture seule</span>`;
+    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${p.name}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td>${adjustCell}</td></tr>`; }).join('');
 }
 async function adjustStock(productId, delta){
+  if(!isOwnerRole()){ alert('Le gérant ne peut pas modifier le stock. Il peut seulement le consulter.'); return; }
   let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
   if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:Math.max(0,delta),store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
   else { const newQty=Math.max(0,row.quantity+delta); const {error}=await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} row.quantity=newQty; }
   renderStockRows(); renderMenu();
 }
 async function setStock(productId, val){
+  if(!isOwnerRole()){ alert('Le gérant ne peut pas modifier le stock. Il peut seulement le consulter.'); return; }
   const n=parseInt(val,10), qty=isNaN(n)?0:Math.max(0,n);
   let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
   if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:qty,store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
@@ -1478,7 +1635,7 @@ function renderAdminSales(){
   const isManager = adminProfile.role==='manager';
   if(!isManager){ salesSelectedPoint = adminProfile.point_id; }
   const filterHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===salesSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}${filterHtml}<div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="renderAdminCompta()">Comptabilité</button><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
   loadAndRenderSales();
 }
 function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
@@ -1651,7 +1808,7 @@ async function validateCloture(){
 
 /* ---------- UTILISATEURS (manager uniquement) ---------- */
 function renderAdminUsers(){
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>Comptes gérants</b></div></div>
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>Comptes gérants</b></div></div>
     <p style="font-size:12.5px;color:#8A7660;margin-bottom:16px;">Pour créer un nouveau compte gérant, passez par Supabase Dashboard → Authentication → Users, puis ajoutez une ligne correspondante dans la table <code>profiles</code> (rôle, point de vente). "Retirer l'accès" ci-dessous supprime le profil applicatif (l'utilisateur perd immédiatement tout accès) mais ne supprime pas le compte de connexion lui-même.</p>
     <table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Rôle</th><th></th></tr></thead><tbody id="usersTableBody"></tbody></table>`;
   renderUsersTable();
@@ -1687,7 +1844,7 @@ function renderAdminAssistance(){
   const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>Propriétaire</b>assistance TOK'COS</div>`;
   const callHref = isManager ? `tel:${(currentPoint?.phone1||'').replace(/\s+/g,'')}` : `tel:${(window.__managerPhone||'77 707 72 70').replace(/\s+/g,'')}`;
   const callLabel = isManager ? `📞 Appeler ${currentPoint?.name||'ce point'}` : '📞 Appeler le propriétaire';
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<a class="call-btn" href="${callHref}">${callLabel}</a></div>
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}${pointSelectorHtml}<a class="call-btn" href="${callHref}">${callLabel}</a></div>
     <div class="chat-wrap"><div class="chat-messages" id="chatMessages"><div class="chat-empty">Chargement...</div></div><div class="chat-input-row"><input type="text" id="chatInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()">Envoyer</button></div></div>`;
   loadManagerPhoneIfNeeded(); loadChatMessages(); subscribeToChat();
 }
