@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TOK'COS — Touba Kawsara Coffee Shop</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
@@ -32,7 +34,7 @@
   header::after{content:"";display:block;height:4px;background:var(--flag-stripe);}
   .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:16px;}
   .brand{display:flex;align-items:center;gap:10px;color:var(--white);}
-  .brand-mark{width:38px;height:38px;border-radius:50%;background:conic-gradient(from 200deg, var(--gold), var(--rust), var(--coffee-brown), var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:14px;color:var(--coffee-black);flex-shrink:0;}
+  .brand-logo{width:46px;height:46px;object-fit:contain;flex-shrink:0;}
   .brand-name{font-size:17px;font-weight:600;color:var(--white);}
   .brand-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-light);}
   .nav-links{display:flex;gap:26px;font-size:14px;color:var(--white);}
@@ -46,8 +48,7 @@
   .cart-btn svg{width:19px;height:19px;color:var(--white);}
   .cart-count{position:absolute;top:-4px;right:-4px;background:var(--rust);color:var(--white);font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
   .cart-hidden{display:none !important;}
-  .ecommerce-only{display:none !important;}
-  body.ecommerce-mode .ecommerce-only{display:flex !important;}
+  .ecommerce-only{display:flex !important;}
   .hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(221,165,63,0.4);color:var(--white);font-size:20px;flex-shrink:0;}
   @media(max-width:760px){ .nav-links{display:none;} .hamburger{display:flex;} }
   .mobile-menu{position:fixed;inset:0;z-index:200;background:rgba(20,10,5,0.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;}
@@ -214,8 +215,8 @@
   /* ---------- ADMIN ---------- */
   .admin-overlay{position:fixed;inset:0;background:rgba(20,10,5,0.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:hidden;}
   .admin-overlay.open{display:flex;}
-  .admin-panel{background:var(--cream-light);border-radius:18px;max-width:1000px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);margin-bottom:24px;display:flex;flex-direction:column;height:calc(100vh - 48px);max-height:calc(100vh - 48px);}
-  .admin-body{flex:1;min-height:0;padding:24px 26px;background:var(--white);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+  .admin-panel{background:var(--cream-light);border-radius:18px;max-width:1000px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.5);margin-bottom:24px;display:flex;flex-direction:column;height:calc(100vh - 48px);max-height:calc(100vh - 48px);min-height:0;}
+  .admin-body{flex:1;min-height:0;padding:24px 26px;background:var(--white);overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   @media(max-width:760px){ .admin-overlay{padding:0;align-items:stretch;} .admin-panel{max-width:100%;width:100%;height:100dvh;max-height:none;border-radius:0;margin-bottom:0;} }
 
   .admin-header-actions{display:flex;align-items:center;gap:10px;}
@@ -305,6 +306,7 @@
 
 
   #photoChoiceOverlay{z-index:300;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   input#cameraInput, input#galleryInput{position:fixed !important;left:-9999px !important;top:0 !important;width:1px !important;height:1px !important;opacity:0 !important;pointer-events:none !important;}
 
   .toggle-switch{position:relative;display:inline-block;width:52px;height:28px;cursor:pointer;}
@@ -338,9 +340,9 @@
   body.admin-mode .hero, body.admin-mode .section#menu, body.admin-mode .section#points, body.admin-mode .section#avis{display:none !important;}
   body.admin-mode header, body.admin-mode footer{display:block !important;}
   body.admin-mode .admin-overlay{position:fixed;inset:0;background:var(--cream-light);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:0;overflow:hidden;}
-  body.admin-mode .admin-panel{max-width:100%;width:100%;height:100vh;max-height:100vh;border-radius:0;margin-bottom:0;box-shadow:none;overflow:hidden;}
+  body.admin-mode .admin-panel{max-width:100%;width:100%;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;border-radius:0;margin-bottom:0;box-shadow:none;overflow:hidden;min-height:0;}
   body.admin-mode .admin-trigger{display:none;}
-  body.admin-mode .admin-body{flex:1;overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 120px);min-height:0;-webkit-overflow-scrolling:touch;}
+  body.admin-mode .admin-body{flex:1 1 0%;height:0;max-height:none;min-height:0;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   body.sidebar-mode .admin-tabs{display:none !important;}
 
   .admin-sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:linear-gradient(180deg,var(--coffee-black) 0%,var(--coffee-brown) 100%);z-index:201;transform:translateX(-100%);transition:transform .3s ease;padding:80px 20px 20px;box-shadow:4px 0 12px rgba(0,0,0,0.3);}
@@ -356,10 +358,10 @@
   .admin-sidebar-overlay.open{display:block;opacity:1;}
 
   /* ---------- CAISSE (POS) ---------- */
-  .caisse-layout{display:flex;flex-direction:column;height:100%;min-height:0;gap:16px;position:relative;}
-  .caisse-left{flex:1;overflow:hidden;padding-right:0;min-height:0;display:flex;flex-direction:column;}
-  .caisse-product-grid{flex:1;min-height:0;overflow-y:auto;align-content:start;grid-template-columns:repeat(3,minmax(0,1fr));}
-  .caisse-right{width:100%;flex-shrink:0;position:static;height:36vh;min-height:250px;max-height:380px;overflow:hidden;background:var(--cream);border:2px solid rgba(110,59,30,0.15);padding:16px;box-shadow:0 -4px 12px rgba(0,0,0,0.08);display:flex;flex-direction:column;border-radius:14px;}
+  .caisse-layout{display:flex;flex-direction:column;height:auto;min-height:0;gap:16px;position:relative;}
+  .caisse-left{flex:1;overflow:visible;padding-right:0;min-height:0;display:flex;flex-direction:column;}
+  .caisse-product-grid{flex:initial;min-height:0;overflow:visible;align-content:start;grid-template-columns:repeat(3,minmax(0,1fr));}
+  .caisse-right{width:100%;flex-shrink:0;position:static;height:auto;min-height:250px;max-height:none;overflow:visible;background:var(--cream);border:2px solid rgba(110,59,30,0.15);padding:16px;box-shadow:0 -4px 12px rgba(0,0,0,0.08);display:flex;flex-direction:column;border-radius:14px;}
   .caisse-cart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid rgba(110,59,30,0.15);}
   .caisse-cart-header h4{font-size:16px;color:var(--coffee-black);}
   .caisse-cart-header .cart-badge{background:var(--rust);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
@@ -368,9 +370,7 @@
   .caisse-cart-icon-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--cream);border:1px solid rgba(110,59,30,0.2);font-size:20px;}
   .caisse-cart-icon-btn .cart-badge{position:absolute;top:-4px;right:-4px;background:var(--rust);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;}
   .caisse-footer-actions{margin-top:20px;}
-  .admin-caisse-body{display:flex;flex-direction:column;overflow:hidden !important;}
-  .admin-caisse-body .admin-toolbar{flex-shrink:0;}
-  .admin-caisse-body .pending-orders-banner{flex-shrink:0;}
+  .admin-caisse-body{display:block;overflow-y:auto !important;overflow-x:auto !important;}
   .pending-orders-banner{background:var(--cream);border:2px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:20px;}
   .pending-orders-section{margin-bottom:28px;}
   .pending-orders-section .section-title{font-size:14px;font-weight:700;color:var(--coffee-black);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
@@ -388,7 +388,6 @@
 
   @media(max-width:900px){
     .caisse-layout{gap:12px;}
-    .caisse-right{height:38vh;min-height:240px;max-height:360px;}
   }
   @media(max-width:760px){
     body.sidebar-mode .admin-tabs{display:none !important;}
@@ -397,7 +396,8 @@
     body.admin-mode .admin-overlay{overflow:hidden;}
     body.admin-mode .admin-body{overflow-y:auto;overflow-x:hidden;padding:16px;}
     body.admin-mode .admin-body > .admin-toolbar{flex-shrink:0;}
-    body.admin-mode .caisse-layout{flex:1;}
+    body.admin-mode .admin-table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+    body.admin-mode .caisse-layout{flex:initial;}
     .caisse-product-grid{gap:8px;}
     .caisse-product-grid .menu-card{min-width:0;padding:10px 6px;border-radius:10px;}
     .caisse-product-grid .menu-card .card-icon{font-size:26px;}
@@ -405,7 +405,7 @@
     .caisse-product-grid .menu-card .card-price{font-size:11px;}
     .caisse-product-grid .menu-card .card-add{font-size:10px;padding:5px 8px;}
     .caisse-product-grid .menu-card > div[style]{font-size:10px !important;}
-    .caisse-right{min-height:220px;height:36vh;max-height:300px;padding:12px;}
+    .caisse-right{min-height:220px;height:auto;max-height:none;padding:12px;}
     .wrap{padding:0 16px;}
     .hero-copy{padding:48px 20px 40px;}
     .section{padding:48px 0;}
@@ -421,7 +421,7 @@
 <header>
   <div class="wrap nav">
     <div class="brand">
-      <div class="brand-mark">TK</div>
+      <img class="brand-logo" src="logo.png" alt="Logo TOK'COS">
       <div><div class="brand-name">TOK'COS</div><div class="brand-sub">Touba Kawsara Coffee Shop</div></div>
     </div>
     <nav class="nav-links"><a href="#menu">Menu</a><a href="#points">Points de vente</a><a href="#avis">Avis</a></nav>
@@ -450,10 +450,6 @@
       <h1>Le café Touba,<br><em>servi comme il se doit.</em></h1>
       <p>Grains torréfiés, wass artisanal et jus locaux... TOK'COS réinvente le salon de thé sénégalais, une tasse à la fois.</p>
       <div class="hero-ctas">
-        <a class="btn-wa ecommerce-only" href="https://wa.me/221777077270?text=Bonjour%20TOK'COS%2C%20je%20souhaite%20passer%20une%20commande" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.3A8.9 8.9 0 0 0 3.3 16.5L2 22l5.7-1.3A8.9 8.9 0 1 0 17.6 6.3zM12 20a7.3 7.3 0 0 1-3.7-1l-.3-.2-2.7.6.6-2.6-.2-.3A7.3 7.3 0 1 1 19.3 12 7.3 7.3 0 0 1 12 20z"/></svg>
-          Commander sur WhatsApp
-        </a>
         <a class="btn-outline" href="#menu">Voir le menu</a>
       </div>
     </div>
@@ -499,7 +495,7 @@
   <div class="footer-stripe"></div>
   <div class="wrap footer-inner">
     <div class="foot-main">
-      <div class="foot-brand"><div class="brand-mark">TK</div><div><div class="brand-name">TOK'COS</div><div class="brand-sub">Touba Kawsara Coffee Shop</div></div></div>
+      <div class="foot-brand"><img class="brand-logo" src="logo.png" alt="Logo TOK'COS"><div><div class="brand-name">TOK'COS</div><div class="brand-sub">Touba Kawsara Coffee Shop</div></div></div>
       <div class="foot-contact"><span class="foot-location">📍 QG Ouakam, Cité Avion</span><span class="foot-phone">📞 77 707 72 70</span><span class="foot-phone">📞 76 634 56 39</span></div>
     </div>
     <div class="foot-bottom">
@@ -534,7 +530,7 @@
 <div class="admin-overlay" id="adminOverlay" onclick="if(event.target===this) closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
-      <h3 id="adminTitle">Espace gérant</h3>
+      <h3 id="adminTitle">Espace de gestion TOK'COS</h3>
       <div class="admin-header-actions">
         <button class="admin-logout-btn admin-logout-btn-hidden" id="adminLogoutBtn" onclick="adminLogout()">Déconnexion</button>
         <button class="admin-close" onclick="closeAdmin()">✕</button>
@@ -569,15 +565,18 @@ let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.error('Supabase indisponible :', e); sb = null; }
 
 let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1;
-let STOREFRONT_MODE = 'vitrine';
+let profileSection = 'profil', pendingAvatarFile = null, editingManagerId = null;
+let STOREFRONT_MODE = 'ecommerce';
 let cart = loadCart();
 function loadCart(){ try{ const raw = localStorage.getItem('tokcos_cart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; } }
 function saveCart(){ try{ localStorage.setItem('tokcos_cart', JSON.stringify(cart)); }catch(e){} }
 let OFFLINE = false;
 let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
 let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null;
-let salesSelectedPoint = 'all', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
-let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null, ACTIVE_STORES = [];
+let STOCK_DRAFT = new Map();
+let salesSelectedPoint = 'all', salesPeriod = 'day', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
+let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null;
+let caisseOrderId = null, pendingOrdersTimer = null, registerStatusTimer = null, registerStatus = null;
 
 /* ---------- DONNÉES PAR DÉFAUT (menu & points affichés SANS connexion, même si Supabase est indisponible) ---------- */
 const DEFAULT_PRODUCTS = [
@@ -616,32 +615,31 @@ async function loadAll(){
 async function loadActiveStore(){
   if(!sb) return;
   if(adminSession?.user?.id){
-    const {data:memberships}=await sb.from('store_members').select('store_id,stores(*)').eq('user_id',adminSession.user.id).order('created_at');
-    ACTIVE_STORES=(memberships||[]).map(member=>member.stores).filter(Boolean);
-    if(ACTIVE_STORES.length){ ACTIVE_STORE_ID=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID)?.id||ACTIVE_STORES[0].id; ACTIVE_STORE=ACTIVE_STORES.find(store=>store.id===ACTIVE_STORE_ID); }
+    ACTIVE_STORE_ID=null;
+    ACTIVE_STORE=null;
+    const {data:memberships,error}=await sb.from('store_members').select('store_id,stores(*)').eq('user_id',adminSession.user.id).order('created_at');
+    if(error){
+      console.error('Impossible de charger les accès TOK\'COS :',error);
+      return;
+    }
+    const stores=(memberships||[]).map(member=>member.stores).flat().filter(Boolean);
+    if(stores.length){
+      ACTIVE_STORE=stores[0];
+      ACTIVE_STORE_ID=ACTIVE_STORE.id;
+    }else{
+      console.warn('Ce compte ne dispose d’aucun accès à l’espace TOK\'COS.');
+      return;
+    }
   }
   if(!ACTIVE_STORE_ID){
-    const publicStoreKey=getPublicStoreKey();
-    let publicQuery=sb.from('stores').select('*').eq('active',true).eq('public_enabled',true);
-    if(publicStoreKey.type==='domain') publicQuery=publicQuery.ilike('custom_domain',publicStoreKey.value);
-    if(publicStoreKey.type==='slug') publicQuery=publicQuery.eq('slug',publicStoreKey.value);
-    let result=await publicQuery.limit(1).maybeSingle();
-    if(!result.data && publicStoreKey.type!=='default') result=await sb.from('stores').select('*').eq('active',true).eq('public_enabled',true).order('created_at').limit(1).maybeSingle();
-    if(result.error) console.error('Boutique active introuvable :',result.error); ACTIVE_STORE=result.data; ACTIVE_STORE_ID=result.data?.id||null; ACTIVE_STORES=result.data?[result.data]:[];
+    const result=await sb.from('stores').select('*').eq('active',true).eq('public_enabled',true).order('created_at').limit(1).maybeSingle();
+    if(result.error) console.error('Espace TOK\'COS public introuvable :',result.error);
+    ACTIVE_STORE=result.data;
+    ACTIVE_STORE_ID=result.data?.id||null;
   }
   if(ACTIVE_STORE_ID && !ACTIVE_STORE){ const {data}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single(); ACTIVE_STORE=data; }
-  if(!ACTIVE_STORE_ID) console.warn('Aucune boutique active : exécutez la migration SaaS 002.');
+  if(!ACTIVE_STORE_ID) console.warn('Aucun espace TOK\'COS actif n’a été trouvé.');
   if(ACTIVE_STORE) applyStoreBranding(ACTIVE_STORE);
-}
-function getPublicStoreKey(){
-  const host=window.location.hostname.toLowerCase();
-  const queryStore=new URLSearchParams(window.location.search).get('store');
-  const pathStore=window.location.pathname.split('/').filter(Boolean)[0];
-  const reserved=['index.html','favicon.ico'];
-  if(host && !host.includes('vercel.app') && host!=='localhost' && host!=='127.0.0.1') return {type:'domain',value:host};
-  if(queryStore) return {type:'slug',value:queryStore.toLowerCase()};
-  if(pathStore && !reserved.includes(pathStore.toLowerCase())) return {type:'slug',value:pathStore.toLowerCase()};
-  return {type:'default',value:''};
 }
 const THEME_KEYS = {
   primary:'--coffee-black', brown:'--coffee-brown', tan:'--coffee-tan',
@@ -663,10 +661,21 @@ const PRESET_THEMES = [
   { id:'rose',  icon:'🌸', label:'Rose', colors:{ primary:'#331022', brown:'#5C2036', tan:'#A05A72', accent:'#D9487A', accentLight:'#F2B4CC', rust:'#C0443C', blush:'#E89AB4', bg:'#FCF3F6', bgCard:'#F6E2E9', ink:'#34131F' } }
 ];
 function applyStoreBranding(store){
-  STOREFRONT_MODE = store.storefront_mode === 'ecommerce' ? 'ecommerce' : 'vitrine';
-  document.body.classList.toggle('ecommerce-mode', STOREFRONT_MODE === 'ecommerce');
+  STOREFRONT_MODE = 'ecommerce';
+  document.body.classList.add('ecommerce-mode');
   if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
-  if(store.logo_url){ document.querySelectorAll('.brand-mark').forEach(el=>{ el.textContent=''; el.style.background=`url("${store.logo_url}") center/cover`; }); }
+  const logoUrl=store.logo_url||'logo.png';
+  document.querySelectorAll('.brand-logo,.admin-brand-logo').forEach(image=>{image.src=logoUrl;image.alt=`Logo ${store.name||"TOK'COS"}`;});
+  document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach(icon=>{icon.href=logoUrl;});
+  const footerContact=document.querySelector('.foot-contact');
+  if(footerContact){
+    const fallback=['<span class="foot-location">📍 QG Ouakam, Cité Avion</span>','<span class="foot-phone">📞 77 707 72 70</span>','<span class="foot-phone">📞 76 634 56 39</span>'];
+    const entries=[];
+    if(store.address) entries.push(`<span class="foot-location">📍 ${esc(store.address)}</span>`);
+    if(store.phone) entries.push(`<a class="foot-phone" href="tel:${esc(store.phone.replace(/[^0-9+]/g,''))}">📞 ${esc(store.phone)}</a>`);
+    if(store.email) entries.push(`<a class="foot-phone" href="mailto:${esc(store.email)}">✉️ ${esc(store.email)}</a>`);
+    footerContact.innerHTML=entries.length?entries.join(''):fallback.join('');
+  }
   const heroCopy=document.querySelector('.hero-copy');
   if(heroCopy && store.tagline){ const h1=heroCopy.querySelector('h1'); if(h1) h1.innerHTML=store.tagline.split('|').map(part=>part.trim()).join('<br>'); }
   const heroDesc=document.querySelector('.hero-copy p'); if(heroDesc && store.description) heroDesc.textContent=store.description;
@@ -723,12 +732,12 @@ async function loadStock(){
   STOCK = (data && data.length) ? data : [];
 }
 function totalStock(productId){
-  if(OFFLINE || STOCK.length===0){ return 20; }
+  if(OFFLINE){ return 20; }
   const rows = STOCK.filter(s=>s.product_id===productId);
   return rows.length ? rows.reduce((sum,s)=>sum+s.quantity,0) : 0;
 }
 function stockFor(pointId, productId){
-  if(OFFLINE || STOCK.length===0){ return 20; }
+  if(OFFLINE){ return 20; }
   const row = STOCK.find(s=>s.point_id===pointId && s.product_id===productId);
   return row ? row.quantity : 0;
 }
@@ -808,7 +817,7 @@ function renderDrawer(){
       <div class="field"><label>Nom du responsable</label><input type="text" id="ckName" placeholder="Ex : Aïssatou Diop"></div>
       <div class="field"><label>Numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
       <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Livraison boutique" class="active">Livraison boutique</button><button type="button" data-val="Retrait au point">Retrait au point</button></div></div>
-      <div class="checkout-note">La boutique prépare la marchandise et vous livre le point de vente. Aucun paiement en ligne.</div>`;
+      <div class="checkout-note">Votre commande sera préparée au point choisi. Le paiement se fera sur place.</div>`;
     foot.innerHTML = `<div class="drawer-total"><span>Total estimé</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Envoyer la demande</button></div>`;
     setupSegButtons();
   }
@@ -821,7 +830,7 @@ function cartRemove(id){ cart=cart.filter(c=>c.id!==id); saveCart(); renderDrawe
 function goCheckout(){ checkoutStep='checkout'; renderDrawer(); }
 function backToCart(){ checkoutStep='cart'; renderDrawer(); }
 
-/* Demande d'approvisionnement d'un point de vente vers la boutique (channel appro). */
+/* Commande client en ligne, enregistrée pour préparation et encaissement au point choisi. */
 async function submitOrder(){
   if(submitting) return;
   const name=document.getElementById('ckName').value.trim(), phone=document.getElementById('ckPhone').value.trim(), pointId=document.getElementById('ckPoint').value;
@@ -833,20 +842,23 @@ async function submitOrder(){
   submitting=true; const btn=document.getElementById('submitOrderBtn'); if(btn){btn.disabled=true;btn.textContent='Envoi...';}
   const total = lines.reduce((s,l)=>s+l.sub,0);
   try{
-    const pointName = POINTS.find(p=>p.id===pointId)?.name || '';
     if(sb && !OFFLINE){
-      const {data:head, error:headError} = await sb.from('approvisionnements').insert({
-        point_id: pointId, note:`${name} — ${phone}`, status:'demande', total, store_id:ACTIVE_STORE_ID
-      }).select().single();
-      if(headError) throw headError;
-      const itemsPayload = lines.map(l=>({approvisionnement_id:head.id, product_id:l.id, product_name:l.name, qty:l.qty, cost:l.price}));
-      const {error:itemsError} = await sb.from('approvisionnement_items').insert(itemsPayload); if(itemsError) throw itemsError;
+      const {error}=await sb.rpc('submit_online_order',{
+        p_store_id:ACTIVE_STORE_ID,
+        p_point_id:pointId,
+        p_client_name:name,
+        p_client_phone:phone,
+        p_delivery_mode:delivery,
+        p_items:lines.map(line=>({product_id:line.id,qty:line.qty}))
+      });
+      if(error) throw error;
+    }else{
+      throw new Error('La connexion est nécessaire pour enregistrer une commande.');
     }
-    sendWhatsAppApprov(name, phone, pointName, lines, total, delivery);
     cart=[]; saveCart(); renderCartBadge();
-    alert(`Demande d'approvisionnement envoyée pour ${pointName}.`);
+    alert(`Commande envoyée pour ${POINTS.find(p=>p.id===pointId)?.name||'le point choisi'}. Le paiement se fera sur place.`);
     closeDrawer(); renderMenu();
-  } catch(err){ console.error(err); alert("Une erreur est survenue lors de l'envoi de la demande."); } finally { submitting=false; }
+  } catch(err){ console.error(err); alert(`La commande n'a pas été envoyée : ${err.message||'erreur inattendue'}`); } finally { submitting=false; }
 }
 
 function generatePDF(name, phone, delivery, payment, pointName, lines, total){
@@ -906,52 +918,50 @@ async function openAdmin(){
   document.getElementById('adminOverlay').classList.add('open');
   if(!sb){ alert("L'espace gérant nécessite une connexion à la base de données. Vérifiez votre connexion internet."); document.getElementById('adminOverlay').classList.remove('open'); return; }
   const {data:{session}} = await sb.auth.getSession();
-  if(session){ adminSession=session; await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }
+  if(session){ adminSession=session; if(isInviteSetupLink()||(session.user.invited_at&&!session.user.last_sign_in_at)){ renderInvitePasswordSetup(); return; } await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }
+}
+function isInviteSetupLink(){return new URLSearchParams(location.hash.replace(/^#/,'')).get('type')==='invite';}
+function renderInvitePasswordSetup(){
+  document.getElementById('adminTitle').textContent="Activer votre compte TOK'COS";
+  document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
+  document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
+  document.getElementById('adminBody').innerHTML=`<div class="admin-login"><img class="admin-login-logo" src="logo.png" alt="TOK'COS"><p class="admin-login-title">Choisissez votre mot de passe</p><div class="field admin-login-form"><label>Nouveau mot de passe</label><input type="password" id="invitePassword" minlength="8" autocomplete="new-password"></div><button class="btn-primary admin-login-btn" onclick="activateInvitedAccount()">Activer mon compte</button></div>`;
+}
+async function activateInvitedAccount(){
+  const password=document.getElementById('invitePassword').value;
+  if(password.length<8){alert('Le mot de passe doit contenir au moins 8 caractères.');return;}
+  const {error}=await sb.auth.updateUser({password});
+  if(error){console.error('Activation du compte impossible :',error);alert(`Le mot de passe n'a pas pu être enregistré : ${error.message}`);return;}
+  history.replaceState(null,'',location.pathname+location.search);
+  adminSession=(await sb.auth.getSession()).data.session;
+  await loadAdminProfile();
+  if(!adminProfile){alert("Le profil du compte n'a pas été créé. Contactez le propriétaire.");return;}
+  renderAdminShell();
 }
 function closeAdmin(){
+  if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
+  if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
   document.getElementById('adminOverlay').classList.remove('open');
   document.body.classList.remove('admin-mode');
   removeSidebar();
   unsubscribeChat();
 }
 function renderAdminLogin(){
-  document.getElementById('adminTitle').textContent = 'Espace gérant';
+  document.getElementById('adminTitle').textContent = "Espace de gestion TOK'COS";
   document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
   document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
   document.body.classList.remove('admin-mode');
   removeSidebar();
   document.getElementById('adminBody').innerHTML = `
     <div class="admin-login">
+      <img class="admin-login-logo" src="logo.png" alt="TOK'COS">
       <p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Connexion</p>
       <div class="field" style="max-width:280px;margin:16px auto;text-align:left;"><label>Email</label><input type="email" id="adminEmail" placeholder="admin@tokcos.sn"></div>
       <div class="field" style="max-width:280px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="adminPassword" placeholder="••••••••"></div>
       <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="checkAdminLogin()">Se connecter</button></div>
-      <button class="btn-ghost" style="margin-top:14px;" onclick="renderAdminSignup()">Créer ma boutique</button>
-      <p>Propriétaire ou gérant d'un point de vente.</p>
+      <p>Accès réservé au propriétaire et aux gérants TOK'COS.</p>
     </div>`;
   document.getElementById('adminPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAdminLogin(); });
-}
-function renderAdminSignup(){
-  document.getElementById('adminBody').innerHTML=`<div class="admin-login"><p style="font-weight:700;color:var(--coffee-black);font-size:15px;">Créer une boutique</p>
-    <div class="field" style="max-width:320px;margin:16px auto;text-align:left;"><label>Nom de la boutique</label><input id="signupStoreName" placeholder="Ma boutique"></div>
-    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Identifiant public</label><input id="signupStoreSlug" placeholder="ma-boutique"></div>
-    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Type de site</label><select id="signupStoreMode"><option value="vitrine">Site vitrine — présentation sans commande</option><option value="ecommerce">Application e-commerce — panier et commande WhatsApp</option></select></div>
-    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Email</label><input type="email" id="signupEmail" placeholder="vous@exemple.com"></div>
-    <div class="field" style="max-width:320px;margin:0 auto 16px;text-align:left;"><label>Mot de passe</label><input type="password" id="signupPassword" placeholder="8 caractères minimum"></div>
-    <div><button class="btn-primary" style="display:inline-block;padding:11px 26px;" onclick="createAdminAccount()">Créer la boutique</button></div>
-    <button class="btn-ghost" style="margin-top:14px;" onclick="renderAdminLogin()">Retour</button></div>`;
-}
-async function createAdminAccount(){
-  const storeName=document.getElementById('signupStoreName').value.trim(), storeSlug=document.getElementById('signupStoreSlug').value.trim(), email=document.getElementById('signupEmail').value.trim(), password=document.getElementById('signupPassword').value;
-  const storeMode=document.getElementById('signupStoreMode').value;
-  if(!storeName||!storeSlug||!email||password.length<8){ alert('Renseignez tous les champs. Le mot de passe doit contenir au moins 8 caractères.'); return; }
-  const {data,error}=await sb.auth.signUp({email,password});
-  if(error){ alert(error.message); return; }
-  if(!data.session){ alert('Compte créé. Vérifiez votre email, puis connectez-vous.'); renderAdminLogin(); return; }
-  adminSession=data.session;
-  const {error:storeError}=await sb.rpc('create_store_for_current_user',{store_name:storeName,store_slug:storeSlug,store_mode:storeMode});
-  if(storeError){ alert('Compte créé, mais la boutique n’a pas pu être créée : '+storeError.message); return; }
-  await loadAdminProfile(); renderAdminShell();
 }
 async function checkAdminLogin(){
   const email=document.getElementById('adminEmail').value.trim(), password=document.getElementById('adminPassword').value;
@@ -976,14 +986,20 @@ function applyCurrentPointContext(){
   }
 }
 async function loadAdminProfile(){
+  if(!adminProfile) STOCK_DRAFT.clear();
   const {data, error} = await sb.from('profiles').select('*').eq('id', adminSession.user.id).single();
   if(error){ console.error(error); adminProfile=null; return; }
   adminProfile = data;
+  document.body.classList.toggle('admin-dark-mode', isOwnerRole() && adminProfile.preferences?.dark_mode===true);
   applyCurrentPointContext();
   await loadActiveStore();
+  if(!ACTIVE_STORE_ID){ adminProfile=null; return; }
+  await Promise.all([loadProducts(),loadPoints(),loadStock()]);
+  renderMenu();
+  renderPointCards();
 }
 async function adminLogout(){
-  if(sb){ await sb.auth.signOut(); } adminSession=null; adminProfile=null; unsubscribeChat();
+  if(sb){ await sb.auth.signOut(); } adminSession=null; adminProfile=null; STOCK_DRAFT.clear(); unsubscribeChat();
   document.body.classList.remove('admin-mode'); removeSidebar();
   closeAdmin();
 }
@@ -997,66 +1013,122 @@ function renderAdminShell(){
     chatSelectedPoint = adminProfile.point_id;
     if(!approPoint || approPoint === 'all') approPoint = adminProfile.point_id;
   }
-  document.getElementById('adminTitle').textContent = isOwner ? "Espace propriétaire — TOK'COS" : `Espace gérant — ${POINTS.find(p=>p.id===adminProfile.point_id)?.name||''}`;
-  renderAdminStoreSelector();
+  document.getElementById('adminTitle').innerHTML = `<img class="admin-brand-logo" src="logo.png" alt="TOK'COS">`;
   document.getElementById('adminLogoutBtn').classList.remove('admin-logout-btn-hidden');
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
-  const tabs = isOwner
-    ? [['appro','Approvisionnements & stocks'],['ventes','Carnet de vente'],...(STOREFRONT_MODE==='vitrine'?[['caisse','Caisse']]:[]),['produits','Produits'],['points','Points de vente'],...(STOREFRONT_MODE==='ecommerce'?[['clients','Clients']]:[]),['utilisateurs','Utilisateurs'],['assistance','Assistance']]
-    : [['appro','Approvisionnement'],['compta','Caisse'],['stock','Stock'],['clients','Clients'],['assistance','Assistance']];
+  const tabs = [['caisse','Caisse'],['ventes','Ventes'],['stock','Inventaire'],['compta','Comptabilité']];
+  if(isOwner) tabs.push(['profile','Profil']);
   tabsEl.innerHTML = '';
   document.body.classList.add('admin-mode');
-  createSidebar(tabs, isOwner ? 'Propriétaire' : 'Gérant');
-  switchAdminTab(isOwner ? 'appro' : 'compta');
+  createSidebar(tabs);
+  switchAdminTab('caisse');
 }
-function renderAdminStoreSelector(){
-  let selector=document.getElementById('adminStoreSelect');
-  if(!selector){ selector=document.createElement('select'); selector.id='adminStoreSelect'; selector.className='admin-store-select'; document.querySelector('.admin-header-actions').prepend(selector); }
-  selector.innerHTML=ACTIVE_STORES.map(store=>`<option value="${store.id}" ${store.id===ACTIVE_STORE_ID?'selected':''}>${store.name}</option>`).join(''); selector.style.display=ACTIVE_STORES.length>1?'block':'none'; selector.onchange=()=>switchActiveStore(selector.value);
-}
-async function switchActiveStore(storeId){ ACTIVE_STORE_ID=storeId; ACTIVE_STORE=ACTIVE_STORES.find(store=>store.id===storeId)||null; caisseCart=[]; await loadAll(); renderAdminShell(); }
-
 function switchAdminTab(tab){
+  if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
+  if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
+  if(caisseOrderId && tab!=='caisse'){
+    alert('Terminez ou annulez la commande importée avant de quitter la caisse.');
+    tab='caisse';
+  }
   adminActiveTab = tab; unsubscribeChat();
   document.getElementById('adminBody').classList.remove('admin-caisse-body');
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.admin-sidebar-menu button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   if(tab==='dashboard') renderAdminDashboard();
   if(tab==='compta') renderAdminCompta();
-  if(tab==='appro') {
-    if(isOwnerRole()) renderAdminOperations();
-    else renderAdminAppro();
-  }
+  if(tab==='appro') renderAdminAppro();
   if(tab==='boutique') renderAdminBoutique();
   if(tab==='categories') renderAdminCategories();
   if(tab==='clients') renderAdminCustomers();
   if(tab==='rapports') renderAdminReports();
   if(tab==='produits') renderAdminProducts();
   if(tab==='points') renderAdminPoints();
-  if(tab==='stock') {
-    if(isOwnerRole()) renderAdminOperations();
-    else renderAdminStock();
-  }
+  if(tab==='stock') renderAdminStock();
   if(tab==='ventes') renderAdminSales();
   if(tab==='caisse') renderAdminCaisse();
   if(tab==='utilisateurs') renderAdminUsers();
+  if(tab==='profile') renderAdminProfile();
   if(tab==='assistance') renderAdminAssistance();
   renderAdminPointBar();
   if(window.matchMedia('(max-width: 760px)').matches) closeSidebar();
 }
 function adminBackButton(){
-  const target = isOwnerRole() ? 'dashboard' : 'compta';
-  return `<button type="button" class="btn-ghost admin-back" onclick="switchAdminTab('${target}')">← Retour</button>`;
+  return `<button type="button" class="btn-ghost admin-back" onclick="switchAdminTab('caisse')">← Retour à la caisse</button>`;
 }
 
-function createSidebar(tabs, roleLabel){
+function profileNavMarkup(active){
+  const sections=[['profil','Mon profil'],['boutique','Boutique'],['points','Points de vente'],['gerants','Gérants']];
+  return `<nav class="profile-nav" aria-label="Sections du profil">${sections.map(([key,label])=>`<button type="button" class="${active===key?'active':''}" onclick="switchProfileSection('${key}')">${label}</button>`).join('')}</nav>`;
+}
+function switchProfileSection(section){
+  profileSection=section;
+  if(section==='profil') renderAdminProfile();
+  if(section==='boutique') renderAdminBoutique();
+  if(section==='points') renderAdminPoints();
+  if(section==='gerants') renderAdminUsers();
+  if(window.matchMedia('(max-width: 760px)').matches) closeSidebar();
+}
+function renderAdminProfile(){
+  profileSection='profil';
+  const prefs=adminProfile.preferences||{};
+  const name=adminProfile.display_name||'';
+  const image=adminProfile.avatar_url||'';
+  document.getElementById('adminBody').innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Mon profil</h3></div>${profileNavMarkup('profil')}
+    <div class="profile-panel">
+      <div class="profile-avatar-editor"><div class="profile-avatar-preview" id="profileAvatarPreview">${image?`<img src="${esc(image)}" alt="Photo de profil">`:esc(name.trim().charAt(0).toUpperCase()||'P')}</div>
+        <div><label class="btn-ghost profile-upload-label" for="profileAvatarInput">Modifier la photo</label><input id="profileAvatarInput" class="profile-file-input" type="file" accept="image/jpeg,image/png,image/webp" onchange="selectProfileAvatar(event)"><p class="shop-note">Image JPG, PNG ou WebP (5 Mo maximum).</p></div></div>
+      <div class="field"><label for="profileDisplayName">Nom ou pseudo</label><input id="profileDisplayName" maxlength="80" value="${esc(name)}" placeholder="Votre nom"></div>
+      <div class="field"><label for="profileEmail">Adresse e-mail</label><input id="profileEmail" value="${esc(adminProfile.email||'')}" disabled></div>
+      <label class="profile-dark-toggle"><input id="profileDarkMode" type="checkbox" ${prefs.dark_mode===true?'checked':''} onchange="previewAdminDarkMode(this.checked)"> Mode sombre dans l’espace de gestion</label>
+      <div class="profile-actions"><button class="btn-primary" type="button" onclick="saveOwnerProfile()">Enregistrer mon profil</button></div>
+    </div>`;
+}
+function selectProfileAvatar(event){
+  const file=event.target.files?.[0];
+  if(!file) return;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){event.target.value='';alert('Choisissez une image JPG, PNG ou WebP de 5 Mo maximum.');return;}
+  pendingAvatarFile=file;
+  const preview=document.getElementById('profileAvatarPreview');
+  if(preview){const reader=new FileReader();reader.onload=()=>{preview.innerHTML=`<img src="${reader.result}" alt="Aperçu de la photo de profil">`;};reader.onerror=()=>alert("Impossible de lire cette image.");reader.readAsDataURL(file);}
+}
+function previewAdminDarkMode(enabled){document.body.classList.toggle('admin-dark-mode',enabled);}
+async function saveOwnerProfile(){
+  const displayName=document.getElementById('profileDisplayName').value.trim();
+  if(!displayName){alert('Saisissez votre nom ou pseudo.');return;}
+  let avatarUrl=adminProfile.avatar_url||null;
+  if(pendingAvatarFile){
+    const {data:upload,error:uploadError}=await sb.storage.from('profile-avatars').upload(`${adminSession.user.id}/avatar`,pendingAvatarFile,{upsert:true,contentType:pendingAvatarFile.type});
+    if(uploadError){console.error('Téléversement de la photo impossible :',uploadError);alert(`La photo n'a pas été enregistrée : ${uploadError.message}`);return;}
+    const {data:publicUrl}=sb.storage.from('profile-avatars').getPublicUrl(upload.path);
+    avatarUrl=`${publicUrl.publicUrl}?v=${Date.now()}`;
+  }
+  const preferences=Object.assign({},adminProfile.preferences||{},{dark_mode:document.getElementById('profileDarkMode').checked});
+  const {data,error}=await sb.from('profiles').update({display_name:displayName,avatar_url:avatarUrl,preferences}).eq('id',adminProfile.id).select('*').single();
+  if(error){console.error('Mise à jour du profil impossible :',error);alert(`Le profil n'a pas été enregistré : ${error.message}`);return;}
+  adminProfile=data;pendingAvatarFile=null;
+  previewAdminDarkMode(preferences.dark_mode);
+  refreshSidebarProfile();
+  alert('Profil enregistré.');
+  renderAdminProfile();
+}
+function refreshSidebarProfile(){
+  const brand=document.querySelector('.admin-sidebar-brand');
+  if(!brand) return;
+  const name=adminProfile?.display_name||adminProfile?.email||'Mon profil';
+  const avatar=adminProfile?.avatar_url?`<img src="${esc(adminProfile.avatar_url)}" alt="">`:`<span>${esc(name.trim().charAt(0).toUpperCase()||'P')}</span>`;
+  brand.innerHTML=`<div class="admin-sidebar-avatar">${avatar}</div><strong>${esc(name)}</strong><span>${isOwnerRole()?'Propriétaire':'Gérant'}</span>`;
+}
+
+function createSidebar(tabs){
   removeSidebar();
   document.body.classList.add('sidebar-mode');
   const toggle=document.createElement('button'); toggle.className='admin-sidebar-toggle'; toggle.innerHTML='☰'; toggle.onclick=toggleSidebar;
   const overlay=document.createElement('div'); overlay.className='admin-sidebar-overlay'; overlay.onclick=closeSidebar;
   const sidebar=document.createElement('div'); sidebar.className='admin-sidebar';
-  sidebar.innerHTML = `<div class="admin-sidebar-brand"><strong>TOK'COS</strong><span>${roleLabel}</span></div><ul class="admin-sidebar-menu">${tabs.map(([key,label])=>`<li><button type="button" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button></li>`).join('')}</ul>`;
+  const name=adminProfile?.display_name||adminProfile?.email||'Mon profil';
+  const avatar=adminProfile?.avatar_url?`<img src="${esc(adminProfile.avatar_url)}" alt="">`:`<span>${esc(name.trim().charAt(0).toUpperCase()||'P')}</span>`;
+  sidebar.innerHTML = `<div class="admin-sidebar-brand"><div class="admin-sidebar-avatar">${avatar}</div><strong>${esc(name)}</strong><span>${isOwnerRole()?'Propriétaire':'Gérant'}</span></div><ul class="admin-sidebar-menu${isOwnerRole()?' owner-sidebar-menu':''}">${tabs.map(([key,label])=>`<li><button type="button" data-tab="${key}" onclick="switchAdminTab('${key}')">${label}</button></li>`).join('')}</ul>`;
   document.body.appendChild(toggle); document.body.appendChild(overlay); document.body.appendChild(sidebar);
   sidebar.classList.add('open');
 }
@@ -1067,11 +1139,18 @@ function closeSidebar(){ document.querySelector('.admin-sidebar')?.classList.rem
 function renderAdminPointBar(){
   const bar=document.getElementById('adminPointBar');
   if(!bar) return;
-  const isManager=adminProfile?.role==='manager';
-  const pointTabs=['caisse','stock','ventes','assistance'];
-  if(!isManager || !pointTabs.includes(adminActiveTab)){ bar.innerHTML=''; bar.style.display='none'; return; }
+  const isOwner=isOwnerRole();
+  if(adminActiveTab==='caisse'){
+    const selectedPoint=isOwner?caisseSelectedPoint:adminProfile?.point_id;
+    const pointOptions=POINTS.filter(point=>isOwner||point.id===adminProfile?.point_id)
+      .map(point=>`<option value="${point.id}" ${point.id===selectedPoint?'selected':''}>${esc(point.name)}</option>`).join('');
+    bar.innerHTML=`<div class="caisse-point-row"><div class="field admin-toolbar-field"><label for="caissePointSelect">Point de vente</label><select id="caissePointSelect" onchange="onCaissePointChange(this.value)" ${isOwner?'':'disabled'}>${pointOptions}</select></div><button type="button" class="caisse-orders-toggle" aria-label="Afficher les commandes clients à préparer" aria-expanded="false" onclick="togglePendingOrders()"><span aria-hidden="true">🛒</span><span class="cart-badge" id="pendingCount">0</span></button></div><section class="pending-orders-banner" id="pendingOrdersPanel" hidden><div class="pending-orders-section"><h4 class="section-title">Commandes en ligne à préparer</h4><div id="pendingOrdersList"></div></div></section>`;
+    bar.style.display='block';
+    return;
+  }
+  const pointTabs=['stock','ventes','assistance'];
+  if(!isOwner || !pointTabs.includes(adminActiveTab)){ bar.innerHTML=''; bar.style.display='none'; return; }
   const config={
-    caisse:{id:'caissePointSelect',label:'Point de vente',value:caisseSelectedPoint,change:'onCaissePointChange'},
     stock:{id:'stockPointSelect',label:'Point de vente',value:stockSelectedPoint,change:'onStockPointChange'},
     ventes:{id:'salesPointFilter',label:'Filtrer par point de vente',value:salesSelectedPoint,change:'onSalesFilterChange',all:true},
     assistance:{id:'chatPointSelect',label:'Conversation avec',value:chatSelectedPoint,change:'onChatPointChange'}
@@ -1088,12 +1167,12 @@ async function renderAdminDashboard(){
   body.innerHTML='<div class="admin-login"><p>Chargement du tableau de bord...</p></div>';
   const today=new Date(); today.setHours(0,0,0,0);
   const [{data:sales=[]},{data:pending=[]},{data:stock=[]},{data:points=[]}]=await Promise.all([
-    sb.from('sales').select('total,status,point_id,created_at').eq('store_id',ACTIVE_STORE_ID),
+    sb.from('sales').select('total,status,point_id,created_at,channel,fulfilled').eq('store_id',ACTIVE_STORE_ID),
     sb.from('sales').select('id').eq('store_id',ACTIVE_STORE_ID).eq('channel','en_ligne').eq('fulfilled',false).eq('status','vendu'),
     sb.from('stock').select('quantity,point_id,product_id').eq('store_id',ACTIVE_STORE_ID),
     sb.from('points_de_vente').select('id,name').eq('store_id',ACTIVE_STORE_ID).eq('active',true)
   ]);
-  const confirmed=sales.filter(s=>s.status==='vendu'), todaySales=confirmed.filter(s=>new Date(s.created_at)>=today);
+  const confirmed=sales.filter(s=>s.status==='vendu'&&(s.channel!=='en_ligne'||s.fulfilled)), todaySales=confirmed.filter(s=>new Date(s.created_at)>=today);
   const revenue=confirmed.reduce((sum,s)=>sum+(s.total||0),0), todayRevenue=todaySales.reduce((sum,s)=>sum+(s.total||0),0);
   const lowStock=stock.filter(s=>s.quantity<=5).length;
   const pointSummary=points.map(point=>{ const rows=confirmed.filter(s=>s.point_id===point.id); return `<div class="admin-stat"><b>${money(rows.reduce((sum,s)=>sum+(s.total||0),0))}</b>${point.name}</div>`; }).join('');
@@ -1102,7 +1181,8 @@ async function renderAdminDashboard(){
     <h4 style="margin:24px 0 12px;color:var(--coffee-black);">Ventes par point de vente</h4><div class="sales-stats-container">${pointSummary||'<p class="admin-empty">Aucun point de vente actif.</p>'}</div>`;
 }
 
-let shopDraft = null, shopTab = 'brand';
+let shopDraft = null, shopTab = 'brand', pendingShopLogo = null, pendingShopBanner = null;
+const SHOP_WEEKDAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const SHOP_COLORS=[['primary','Couleur principale (fond sombre)'],['brown','Brun / dégradé sombre'],['tan','Accent secondaire'],['accent','Accent — boutons & liens'],['accentLight','Accent clair'],['rust','Rouge — prix & alertes'],['blush','Rose doux'],['bg','Fond de page'],['bgCard','Fond des cartes'],['ink','Texte']];
 const SHOP_DISPLAY_FONTS=[["'Fraunces', serif","Fraunces"],["'Playfair Display', serif","Playfair Display"],["'Georgia', serif","Georgia"],["'Poppins', sans-serif","Poppins"]];
 const SHOP_BODY_FONTS=[["'Inter', sans-serif","Inter"],["'Open Sans', sans-serif","Open Sans"],["'Rubik', sans-serif","Rubik"],["'Poppins', sans-serif","Poppins"],["'Georgia', serif","Georgia"]];
@@ -1114,55 +1194,64 @@ async function renderAdminBoutique(){
   const {data:store,error}=await sb.from('stores').select('*').eq('id',ACTIVE_STORE_ID).single();
   if(error||!store){ body.innerHTML='<p class="admin-empty">Boutique introuvable.</p>'; return; }
   shopDraft={
-    name:store.name||'', slug:store.slug||'', tagline:store.tagline||'', description:store.description||'',
+    name:store.name||'', tagline:store.tagline||'', description:store.description||'',
     logo_url:store.logo_url||'', banner_url:store.banner_url||'',
     phone:store.phone||'', email:store.email||'', address:store.address||'',
-    currency:store.currency||'XOF', storefront_mode:store.storefront_mode==='ecommerce'?'ecommerce':'vitrine', custom_domain:store.custom_domain||'', public_enabled:store.public_enabled!==false,
+    currency:store.currency||'XOF',
     opening_hours:store.opening_hours||{}, theme:Object.assign({},DEFAULT_THEME,(store.theme||{}))
   };
+  pendingShopLogo=null;pendingShopBanner=null;
   shopTab='brand';
   renderShopShell();
 }
 function renderShopShell(){
   const body=document.getElementById('adminBody');
-  const publicUrl=shopDraft.custom_domain?`https://${shopDraft.custom_domain}`:`${location.origin}/${shopDraft.slug}`;
-  const tabs=[['brand','Brand'],['apparence','Apparence'],['domaine','Domaine'],['horaires','Horaires']];
-  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Ma boutique</h3>
-      <button class="btn-ghost" onclick="switchShopTab('apparence')">🎨 Personnaliser</button>
+  const tabs=[['brand','Informations'],['apparence','Apparence'],['horaires','Horaires']];
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Ma boutique</h3>
       <button class="btn-primary" onclick="saveStoreSettings()">Enregistrer</button></div>
-    <div class="admin-stat" style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;"><b>Site public</b><a href="${esc(publicUrl)}" target="_blank" rel="noopener" style="color:var(--rust);">${esc(publicUrl)}</a>${shopDraft.public_enabled?'':'<span style="font-size:11px;color:#A6402A;">(non publié)</span>'}</div>
+    ${adminActiveTab==='profile'?profileNavMarkup('boutique'):''}
     <div class="shop-subtabs" id="shopSubtabs">${tabs.map(([k,l])=>`<button class="shop-subtab${shopTab===k?' active':''}" onclick="switchShopTab('${k}')">${l}</button>`).join('')}</div>
     <div id="shopPanel"></div>`;
   renderShopTab();
 }
-function switchShopTab(tab){ collectShopTab(); shopTab=tab; renderShopShell(); }
+function switchShopTab(tab){ if(!collectShopTab()) return; shopTab=tab; renderShopShell(); }
 function collectShopTab(){
-  if(!shopDraft) return;
+  if(!shopDraft) return true;
   if(shopTab==='brand'){
     shopDraft.name=shopVal('storeName',shopDraft.name); shopDraft.tagline=shopVal('storeTagline',shopDraft.tagline);
-    shopDraft.description=shopVal('storeDescription',shopDraft.description); shopDraft.logo_url=shopVal('storeLogo',shopDraft.logo_url);
-    shopDraft.banner_url=shopVal('storeBanner',shopDraft.banner_url); shopDraft.phone=shopVal('storePhone',shopDraft.phone);
+    shopDraft.description=shopVal('storeDescription',shopDraft.description); shopDraft.phone=shopVal('storePhone',shopDraft.phone);
     shopDraft.email=shopVal('storeEmail',shopDraft.email); shopDraft.address=shopVal('storeAddress',shopDraft.address);
-    shopDraft.currency=shopVal('storeCurrency',shopDraft.currency); shopDraft.storefront_mode=shopVal('storefrontMode',shopDraft.storefront_mode);
+    shopDraft.currency=shopVal('storeCurrency',shopDraft.currency);
   } else if(shopTab==='apparence'){
     shopDraft.theme=shopDraft.theme||Object.assign({},DEFAULT_THEME);
     SHOP_COLORS.forEach(([k])=>shopDraft.theme[k]=shopVal('th-'+k,shopDraft.theme[k]));
     shopDraft.theme.fontDisplay=shopVal('thDisplayFont',shopDraft.theme.fontDisplay);
     shopDraft.theme.fontBody=shopVal('thBodyFont',shopDraft.theme.fontBody);
-  } else if(shopTab==='domaine'){
-    shopDraft.slug=shopVal('storeSlug',shopDraft.slug); shopDraft.custom_domain=shopVal('storeDomain',shopDraft.custom_domain);
-    const en=document.getElementById('storePublic'); if(en) shopDraft.public_enabled=en.checked;
   } else if(shopTab==='horaires'){
-    const h=document.getElementById('storeHours');
-    if(h){ try{ shopDraft.opening_hours=JSON.parse(h.value||'{}'); }catch(e){ alert('Les horaires doivent être un JSON valide.'); } }
+    const hours={};
+    let invalidDay='';
+    SHOP_WEEKDAYS.forEach(day=>{
+      const open=document.getElementById(`hours-${day}-open`);
+      const start=document.getElementById(`hours-${day}-start`);
+      const end=document.getElementById(`hours-${day}-end`);
+      if(open&&start&&end){
+        if(open.checked&&(!start.value||!end.value)){
+          invalidDay=day;
+          return;
+        }
+        hours[day]=open.checked?`${start.value} – ${end.value}`:'Fermé';
+      }
+    });
+    if(invalidDay){alert(`Sélectionnez les heures d'ouverture et de fermeture pour ${invalidDay}, ou indiquez que le point est fermé.`);return false;}
+    if(Object.keys(hours).length) shopDraft.opening_hours=hours;
   }
+  return true;
 }
 function renderShopTab(){
   const panel=document.getElementById('shopPanel'); if(!panel) return;
   if(shopTab==='brand'){ shopBrandPanel(panel); }
   else if(shopTab==='apparence'){ shopAppearancePanel(panel); }
-  else if(shopTab==='domaine'){ shopDomainPanel(panel); }
-  else { shopHoursPanel(panel); }
+  else if(shopTab==='horaires'){ shopHoursPanel(panel); }
 }
 function shopBrandPanel(panel){
   const d=shopDraft;
@@ -1170,17 +1259,28 @@ function shopBrandPanel(panel){
     <div class="field"><label>Nom de la boutique</label><input id="storeName" value="${esc(d.name)}" placeholder="Ma boutique"></div>
     <div class="field"><label>Slogan</label><input id="storeTagline" value="${esc(d.tagline)}" placeholder="Le café Touba, servi comme il se doit."></div>
     <div class="field full"><label>Description (accroche sous le titre)</label><textarea id="storeDescription">${esc(d.description)}</textarea></div>
-    <div class="field full"><label>Logo</label><div class="shop-logos-row"><div class="shop-logo-preview" id="shopLogoPrev">${d.logo_url?'':(d.name?esc(d.name.charAt(0).toUpperCase()):'☕')}</div><input id="storeLogo" value="${esc(d.logo_url)}" placeholder="https://... (URL du logo)" oninput="previewShopLogo(this.value)"></div><p class="shop-note">Collez l'adresse d'une image hébergée. L'aperçu ci-contre illustre l'affichage en rond dans l'en-tête.</p></div>
-    <div class="field full"><label>Bannière d'accueil</label><div class="shop-banner-preview" id="shopBannerPrev" style="${d.banner_url?`background-image:url(&quot;${esc(d.banner_url)}&quot;)`:''}"></div><input id="storeBanner" value="${esc(d.banner_url)}" placeholder="https://... (URL de la bannière)" oninput="previewShopBanner(this.value)"></div>
+    <div class="field full"><label for="storeLogoFile">Logo de la boutique</label><div class="shop-logos-row"><div class="shop-logo-preview" id="shopLogoPrev">${d.logo_url?`<img src="${esc(d.logo_url)}" alt="Logo actuel">`:(d.name?esc(d.name.charAt(0).toUpperCase()):'☕')}</div><label class="btn-ghost shop-upload-label" for="storeLogoFile">Importer une image</label><input class="shop-file-input" id="storeLogoFile" type="file" accept="image/jpeg,image/png,image/webp" onchange="previewShopImage(event,'logo')"></div><p class="shop-note">Importez une image JPG, PNG ou WebP. Elle remplacera le logo du site et du pied de page.</p></div>
+    <div class="field full"><label for="storeBannerFile">Bannière d'accueil</label><div class="shop-banner-preview" id="shopBannerPrev">${d.banner_url?`<img src="${esc(d.banner_url)}" alt="Bannière actuelle">`:'<span>Aperçu de la bannière</span>'}</div><label class="btn-ghost shop-upload-label" for="storeBannerFile">Importer une bannière</label><input class="shop-file-input" id="storeBannerFile" type="file" accept="image/jpeg,image/png,image/webp" onchange="previewShopImage(event,'banner')"><p class="shop-note">Importez une image JPG, PNG ou WebP (5 Mo maximum). Elle sera recadrée comme le bandeau affiché sur ordinateur et mobile; une image horizontale est recommandée.</p></div>
     <div class="field"><label>Téléphone</label><input id="storePhone" value="${esc(d.phone)}"></div>
     <div class="field"><label>Email</label><input id="storeEmail" value="${esc(d.email)}"></div>
     <div class="field full"><label>Adresse</label><input id="storeAddress" value="${esc(d.address)}"></div>
     <div class="field"><label>Devise</label><select id="storeCurrency"><option value="XOF" ${d.currency==='XOF'?'selected':''}>FCFA (XOF)</option><option value="EUR" ${d.currency==='EUR'?'selected':''}>Euro (EUR)</option><option value="USD" ${d.currency==='USD'?'selected':''}>Dollar (USD)</option></select></div>
-    <div class="field"><label>Type de site</label><select id="storefrontMode"><option value="vitrine" ${d.storefront_mode==='vitrine'?'selected':''}>Site vitrine</option><option value="ecommerce" ${d.storefront_mode==='ecommerce'?'selected':''}>Application e-commerce</option></select><p class="shop-note">Le mode e-commerce active le panier et l'envoi WhatsApp au point de vente choisi.</p></div>
   </div>`;
 }
-function previewShopLogo(url){ const p=document.getElementById('shopLogoPrev'); if(!p) return; if(url.trim()){ p.innerHTML=`<img src="${esc(url)}" alt="">`; } else { p.innerHTML=shopDraft.name?esc(shopDraft.name.charAt(0).toUpperCase()):'☕'; } }
-function previewShopBanner(url){ const p=document.getElementById('shopBannerPrev'); if(!p) return; if(url.trim()){ p.style.backgroundImage=`url("${esc(url)}")`; } else { p.style.backgroundImage=''; } }
+function previewShopImage(event,type){
+  const file=event.target.files?.[0];
+  if(!file) return;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){event.target.value='';alert('Choisissez une image JPG, PNG ou WebP de 5 Mo maximum.');return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const preview=document.getElementById(type==='logo'?'shopLogoPrev':'shopBannerPrev');
+    if(preview) preview.innerHTML=`<img src="${reader.result}" alt="Aperçu ${type==='logo'?'du logo':'de la bannière'}">`;
+  };
+  reader.onerror=()=>alert("Impossible de lire cette image.");
+  reader.readAsDataURL(file);
+  if(type==='logo') pendingShopLogo=file;
+  else pendingShopBanner=file;
+}
 
 function shopAppearancePanel(panel){
   const t=shopDraft.theme;
@@ -1207,31 +1307,52 @@ function previewShopTheme(){
   applyStoreBranding(Object.assign({},ACTIVE_STORE,{name:shopDraft.name,tagline:shopDraft.tagline,description:shopDraft.description,logo_url:shopDraft.logo_url,banner_url:shopDraft.banner_url,theme:shopDraft.theme}));
   alert('Aperçu appliqué sur la boutique (non enregistré).');
 }
-function shopDomainPanel(panel){
-  const d=shopDraft;
-  panel.innerHTML=`<div class="shop-grid">
-    <div class="field"><label>Adresse de la boutique (slug)</label><input id="storeSlug" value="${esc(d.slug)}" placeholder="ma-boutique"><p class="shop-note">Partout où il n'y a pas de domaine personnalisé, l'adresse sera ${esc(location.origin)}/<b>${esc(d.slug||'votre-slug')}</b></p></div>
-    <div class="field"><label>Domaine personnalisé</label><input id="storeDomain" value="${esc(d.custom_domain)}" placeholder="boutique.exemple.com"><p class="shop-note">Pointez ensuite ce domaine vers votre site (configuration DNS).</p></div>
-    <div class="field full shop-toggle"><label><input type="checkbox" id="storePublic" ${d.public_enabled?'checked':''}> Boutique publique en ligne</label><p class="shop-note">Activez pour que la boutique soit accessible publiquement via son slug ou domaine.</p></div>
-  </div>`;
+function openingTimeRange(value){
+  if(value&&typeof value==='object'&&!Array.isArray(value)) return {start:value.open||'08:00',end:value.close||'17:00',isOpen:value.closed!==true};
+  const match=String(value||'').match(/(\d{1,2}:\d{2})\s*(?:–|-|à)\s*(\d{1,2}:\d{2})/);
+  if(match) return {start:match[1].padStart(5,'0'),end:match[2].padStart(5,'0'),isOpen:true};
+  return {start:'08:00',end:'17:00',isOpen:!value||!String(value).toLowerCase().includes('ferm')};
 }
 function shopHoursPanel(panel){
   const d=shopDraft;
-  panel.innerHTML=`<div class="field"><label>Horaires d'ouverture (JSON)</label><textarea id="storeHours" rows="8" style="font-family:ui-monospace,monospace;font-size:12px;">${esc(JSON.stringify(d.opening_hours||{},null,2))}</textarea>
-    <p class="shop-note">Exemple : ${esc(JSON.stringify({Lundi:'08:00 – 22:00',Mardi:'08:00 – 22:00',Samedi:'09:00 – 23:00',Dimanche:'Fermé'}))}</p></div>`;
+  const rows=SHOP_WEEKDAYS.map(day=>{
+    const schedule=openingTimeRange(d.opening_hours?.[day]);
+    return `<div class="shop-hours-row"><label class="shop-hours-day"><input type="checkbox" id="hours-${day}-open" ${schedule.isOpen?'checked':''} onchange="toggleShopHours('${day}',this.checked)"><span>${day}</span></label><label class="shop-hours-time"><span>Ouverture</span><input type="time" id="hours-${day}-start" value="${esc(schedule.start)}" ${schedule.isOpen?'':'disabled'}></label><label class="shop-hours-time"><span>Fermeture</span><input type="time" id="hours-${day}-end" value="${esc(schedule.end)}" ${schedule.isOpen?'':'disabled'}></label></div>`;
+  }).join('');
+  panel.innerHTML=`<div class="shop-hours-calendar"><h4>Calendrier des horaires</h4><p class="shop-note">Cochez les jours d'ouverture et choisissez les heures sur l'horloge. Les horaires s'appliquent chaque semaine.</p>${rows}</div>`;
+}
+function toggleShopHours(day,isOpen){
+  const start=document.getElementById(`hours-${day}-start`),end=document.getElementById(`hours-${day}-end`);
+  if(start) start.disabled=!isOpen;
+  if(end) end.disabled=!isOpen;
+}
+async function uploadShopImage(file,kind){
+  const {data,error}=await sb.storage.from('store-assets').upload(`${ACTIVE_STORE_ID}/${kind}`,file,{upsert:true,contentType:file.type,cacheControl:'0'});
+  if(error) throw error;
+  const {data:publicUrl}=sb.storage.from('store-assets').getPublicUrl(data.path);
+  return `${publicUrl.publicUrl}?v=${Date.now()}`;
 }
 async function saveStoreSettings(){
-  collectShopTab();
+  if(!collectShopTab()) return;
+  try{
+    if(pendingShopLogo) shopDraft.logo_url=await uploadShopImage(pendingShopLogo,'logo');
+    if(pendingShopBanner) shopDraft.banner_url=await uploadShopImage(pendingShopBanner,'banner');
+  }catch(error){
+    console.error('Import de l’image de boutique impossible :',error);
+    alert(`L’image n'a pas pu être enregistrée : ${error.message}`);
+    return;
+  }
   const payload={
     name:shopDraft.name, slug:shopDraft.slug, tagline:shopDraft.tagline, description:shopDraft.description,
     logo_url:shopDraft.logo_url, banner_url:shopDraft.banner_url,
     phone:shopDraft.phone, email:shopDraft.email, address:shopDraft.address,
-    currency:shopDraft.currency, storefront_mode:shopDraft.storefront_mode, custom_domain:shopDraft.custom_domain, public_enabled:shopDraft.public_enabled,
-    opening_hours:shopDraft.opening_hours, theme:shopDraft.theme
+    currency:shopDraft.currency, opening_hours:shopDraft.opening_hours, theme:shopDraft.theme
   };
   const {error}=await sb.from('stores').update(payload).eq('id',ACTIVE_STORE_ID);
-  if(error){ alert(error.message); return; }
-  ACTIVE_STORE={...ACTIVE_STORE,...payload}; applyStoreBranding(ACTIVE_STORE); renderMenu(); renderCartBadge(); alert('Boutique enregistrée.');
+  if(error){ console.error('Enregistrement des paramètres boutique impossible :',error);alert(`Les paramètres n'ont pas été enregistrés : ${error.message}`);return; }
+  pendingShopLogo=null;pendingShopBanner=null;
+  shopDraft.logo_url=payload.logo_url;shopDraft.banner_url=payload.banner_url;
+  ACTIVE_STORE={...ACTIVE_STORE,...payload};applyStoreBranding(ACTIVE_STORE);renderMenu();renderCartBadge();renderShopShell();alert('Boutique enregistrée.');
 }
 
 
@@ -1240,72 +1361,135 @@ async function saveStoreSettings(){
    ======================================================= */
 let comptaPeriod='day', comptaPoint='all';
 
+function getPeriodRange(period){
+  const start=new Date();
+  start.setHours(0,0,0,0);
+  if(period==='week'){
+    start.setDate(start.getDate()-((start.getDay()+6)%7));
+  }else if(period==='month'){
+    start.setDate(1);
+  }else if(period==='year'){
+    start.setMonth(0,1);
+  }
+  if(period==='all') return null;
+  const end=new Date(start);
+  if(period==='day') end.setDate(end.getDate()+1);
+  else if(period==='week') end.setDate(end.getDate()+7);
+  else if(period==='month') end.setMonth(end.getMonth()+1);
+  else if(period==='year') end.setFullYear(end.getFullYear()+1);
+  return {start,end};
+}
+
 async function renderAdminCompta(){
+  const isOwner=isOwnerRole();
+  if(!isOwner) comptaPoint=adminProfile.point_id;
+  const pointOptions=isOwner
+    ? `<option value="all" ${comptaPoint==='all'?'selected':''}>Tous les points</option>${POINTS.map(p=>`<option value="${p.id}" ${comptaPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`
+    : POINTS.filter(p=>p.id===adminProfile.point_id).map(p=>`<option value="${p.id}" selected>${p.name}</option>`).join('');
   const body=document.getElementById('adminBody');
-  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Comptabilité</h3>
-      <button class="btn-primary" onclick="openTransactionModal()">+ Nouvelle ligne</button></div>
+  body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Comptabilité</h3>
+      <button type="button" class="btn-primary compta-add-btn" aria-label="Ajouter une ligne comptable" title="Ajouter une ligne" onclick="openTransactionModal()">+</button></div>
     <div class="admin-product-form">
-      <div class="field"><label>Période</label><select id="comptaPeriod" onchange="comptaPeriod=this.value;loadCompta()"><option value="day">Aujourd'hui</option><option value="week">Cette semaine</option><option value="month">Ce mois</option><option value="all">Tout</option></select></div>
-      <div class="field"><label>Point de vente</label><select id="comptaPoint" onchange="comptaPoint=this.value;loadCompta()"><option value="all">Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${comptaPoint===p.id?'selected':''}>${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Période</label><select id="comptaPeriod" onchange="comptaPeriod=this.value;loadCompta()"><option value="day" ${comptaPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${comptaPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${comptaPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${comptaPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${comptaPeriod==='all'?'selected':''}>Tout</option></select></div>
+      <div class="field"><label>Point de vente</label><select id="comptaPoint" onchange="comptaPoint=this.value;loadCompta()" ${isOwner?'':'disabled'}>${pointOptions}</select></div>
     </div>
     <div id="comptaSummary" class="sales-stats-container"></div>
     <table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Type</th><th>Libellé</th><th>Montant</th><th>Actions</th></tr></thead><tbody id="comptaRows"></tbody></table>`;
   await loadCompta();
 }
 async function loadCompta(){
-  const now=new Date(), start=new Date(now);
-  if(comptaPeriod==='day'){ start.setHours(0,0,0,0); }
-  else if(comptaPeriod==='week'){ start.setDate(now.getDate()-now.getDay()+1); start.setHours(0,0,0,0); }
-  else if(comptaPeriod==='month'){ start.setDate(1); start.setHours(0,0,0,0); }
-  let q=sb.from('transactions').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
-  if(comptaPeriod!=='all') q=q.gte('created_at',start.toISOString());
-  if(comptaPoint!=='all') q=q.eq('point_id',comptaPoint);
-  const {data=[],error}=await q;
+  if(!isOwnerRole()) comptaPoint=adminProfile.point_id;
+  const range=getPeriodRange(comptaPeriod);
+  let transactionsQuery=sb.from('transactions').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
+  let salesQuery=sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('status','vendu').eq('fulfilled',true);
+  if(range){
+    transactionsQuery=transactionsQuery.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
+    salesQuery=salesQuery.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
+  }
+  if(comptaPoint!=='all'){
+    transactionsQuery=transactionsQuery.eq('point_id',comptaPoint);
+    salesQuery=salesQuery.eq('point_id',comptaPoint);
+  }
+  const [transactionsResult,salesResult]=await Promise.all([transactionsQuery,salesQuery]);
+  const {data=[],error}=transactionsResult, {data:cashSales=[],error:salesError}=salesResult;
   const sumEl=document.getElementById('comptaSummary'), rowsEl=document.getElementById('comptaRows');
-  if(error){ if(rowsEl) rowsEl.innerHTML=`<tr><td colspan="6" class="admin-empty">${error.message}</td></tr>`; return; }
+  if(error||salesError){
+    const message=error?.message||salesError.message;
+    if(rowsEl) rowsEl.innerHTML=`<tr><td colspan="6" class="admin-empty">${esc(message)}</td></tr>`;
+    if(sumEl) sumEl.innerHTML=`<p class="admin-empty">Impossible de charger toute la comptabilité : ${esc(message)}</p>`;
+    return;
+  }
   if(rowsEl){
     rowsEl.innerHTML=data.length?data.map(t=>{ const point=POINTS.find(p=>p.id===t.point_id)?.name||'—';
       const sign=(t.type==='depense'||t.type==='achat'||t.type==='sortie')?'− ':'';
       const badge=t.type==='encaissement'||t.type==='apport'?'active vendu':'active annule';
       return `<tr>
         <td>${new Date(t.created_at).toLocaleString('fr-FR')}</td>
-        <td>${point}</td>
+        <td>${esc(point)}</td>
         <td><span class="status-btn ${badge}" style="font-size:10px;">${t.type}</span></td>
         <td>${t.category?`<b>${esc(t.category)}</b><br>`:''}${esc(t.label||'')}</td>
         <td style="font-weight:700;">${sign}${money(t.amount)}</td>
-        <td><button class="admin-icon-btn danger" onclick="deleteTransaction('${t.id}')">🗑</button></td>
+        <td><div class="admin-row-actions"><button type="button" class="admin-icon-btn" aria-label="Modifier cette ligne" title="Modifier" onclick="editTransaction('${t.id}')">✎</button><button type="button" class="admin-icon-btn danger" aria-label="Supprimer cette ligne" title="Supprimer" onclick="deleteTransaction('${t.id}')">🗑</button></div></td>
       </tr>`; }).join('') : '<tr><td colspan="6" class="admin-empty">Aucune ligne sur cette période.</td></tr>';
   }
   const encaisse=data.filter(t=>t.type==='encaissement'||t.type==='apport').reduce((s,t)=>s+Number(t.amount||0),0);
   const sorties=data.filter(t=>t.type==='depense'||t.type==='achat'||t.type==='sortie').reduce((s,t)=>s+Number(t.amount||0),0);
-  const solde=encaisse-sorties;
-  if(sumEl) sumEl.innerHTML=`<div class="admin-stat"><b>${money(encaisse)}</b>encaissé</div><div class="admin-stat"><b>${money(sorties)}</b>sorties</div><div class="admin-stat"><b style="color:${solde<0?'var(--rust)':'#2E7D46'};">${money(solde)}</b>solde</div>`;
+  const ventesCaisse=cashSales.reduce((sum,sale)=>sum+Number(sale.total||0),0);
+  const solde=ventesCaisse+encaisse-sorties;
+  if(sumEl) sumEl.innerHTML=`<div class="admin-stat"><b>${money(ventesCaisse)}</b>ventes en caisse</div><div class="admin-stat"><b>${money(encaisse)}</b>autres encaissements</div><div class="admin-stat"><b>${money(sorties)}</b>sorties</div><div class="admin-stat"><b style="color:${solde<0?'var(--rust)':'#2E7D46'};">${money(solde)}</b>solde</div>`;
 }
-function openTransactionModal(){
-  const pointOptions=POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+let editingTransactionId=null;
+async function editTransaction(id){
+  if(!isOwnerRole()&&adminProfile?.point_id!==comptaPoint){alert('Vous ne pouvez modifier que la comptabilité de votre point de vente.');return;}
+  let query=sb.from('transactions').select('*').eq('id',id).eq('store_id',ACTIVE_STORE_ID);
+  if(!isOwnerRole())query=query.eq('point_id',adminProfile.point_id);
+  const {data,error}=await query.single();
+  if(error){console.error('Impossible de charger la ligne comptable :',error);alert(`La ligne n'a pas pu être chargée : ${error.message}`);return;}
+  editingTransactionId=data.id;
+  openTransactionModal(data);
+}
+function openTransactionModal(transaction=null){
+  const isOwner=isOwnerRole();
+  const allowedPoints=isOwner?POINTS:POINTS.filter(p=>p.id===adminProfile.point_id);
+  const defaultPoint=transaction?.point_id||(comptaPoint!=='all'?comptaPoint:adminProfile?.point_id)||allowedPoints[0]?.id;
+  const pointOptions=allowedPoints.map(p=>`<option value="${p.id}" ${p.id===defaultPoint?'selected':''}>${esc(p.name)}</option>`).join('');
+  const types=[['encaissement','💵 Encaissement (vente)'],['apport','💰 Apport de fonds'],['achat','📦 Achat de marchandise'],['depense','💸 Dépense (loyer, salaire…)'],['sortie','Sortie']];
   document.getElementById('adminBody').insertAdjacentHTML('beforeend', `<div class="overlay" id="txOverlay" onclick="if(event.target===this) closeTransactionModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact">
-    <h3 class="modal-title-small">Nouvelle ligne</h3>
-    <div class="field"><label>Type</label><select id="txType"><option value="encaissement">💵 Encaissement (vente)</option><option value="apport">💰 Apport de fonds</option><option value="achat">📦 Achat de marchandise</option><option value="depense">💸 Dépense (loyer, salaire…)</option></select></div>
-    <div class="field"><label>Point de vente</label><select id="txPoint">${pointOptions}</select></div>
-    <div class="field"><label>Montant (FCFA)</label><input type="number" id="txAmount" min="0" placeholder="0"></div>
-    <div class="field"><label>Catégorie</label><input id="txCategory" placeholder="Ex: Fournisseur, Loyer, Salaires…"></div>
-    <div class="field"><label>Libellé</label><input id="txLabel" placeholder="Description"></div>
-    <button class="btn-primary btn-full-width" onclick="saveTransaction()">Enregistrer</button>
+    <h3 class="modal-title-small">${transaction?'Modifier la ligne':'Nouvelle ligne'}</h3>
+    <div class="field"><label>Type</label><select id="txType">${types.map(([value,label])=>`<option value="${value}" ${transaction?.type===value?'selected':''}>${label}</option>`).join('')}</select></div>
+    <div class="field"><label>Point de vente</label><select id="txPoint" ${isOwner?'':'disabled'}>${pointOptions}</select></div>
+    <div class="field"><label>Montant (FCFA)</label><input type="number" id="txAmount" min="0" step="1" placeholder="0" value="${transaction?.amount??''}"></div>
+    <div class="field"><label>Catégorie</label><input id="txCategory" placeholder="Ex: Fournisseur, Loyer, Salaires…" value="${esc(transaction?.category||'')}"></div>
+    <div class="field"><label>Libellé</label><input id="txLabel" placeholder="Description" value="${esc(transaction?.label||'')}"></div>
+    <button class="btn-primary btn-full-width" onclick="saveTransaction()">${transaction?'Enregistrer':'Valider'}</button>
     <button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeTransactionModal()">Annuler</button>
   </div></div></div>`);
   document.getElementById('txOverlay').classList.add('open');
 }
-function closeTransactionModal(){ const o=document.getElementById('txOverlay'); if(o) o.classList.remove('open'); }
+function closeTransactionModal(){ const o=document.getElementById('txOverlay'); if(o) o.remove(); editingTransactionId=null; }
 async function saveTransaction(){
   const type=document.getElementById('txType').value, point=document.getElementById('txPoint').value,
-    amount=parseInt(document.getElementById('txAmount').value)||0,
+    amount=Number(document.getElementById('txAmount').value),
     category=document.getElementById('txCategory').value.trim(), label=document.getElementById('txLabel').value.trim();
-  if(amount<=0){ alert('Saisissez un montant valide.'); return; }
-  const {error}=await sb.from('transactions').insert({store_id:ACTIVE_STORE_ID, point_id:point, type, amount, category, label, created_by:adminProfile?.id||null});
+  if(!Number.isInteger(amount)||amount<=0){ alert('Saisissez un montant entier supérieur à zéro.'); return; }
+  if(!isOwnerRole()&&point!==adminProfile.point_id){alert('Vous ne pouvez enregistrer une ligne que pour votre point de vente.');return;}
+  const payload={store_id:ACTIVE_STORE_ID, point_id:point, type, amount, category, label, created_by:adminProfile?.id||null};
+  let request=editingTransactionId
+    ? sb.from('transactions').update({point_id:point,type,amount,category,label}).eq('id',editingTransactionId).eq('store_id',ACTIVE_STORE_ID)
+    : sb.from('transactions').insert(payload);
+  if(!isOwnerRole()&&editingTransactionId)request=request.eq('point_id',adminProfile.point_id);
+  const {error}=await request;
   if(error){ alert(error.message); return; }
   closeTransactionModal(); loadCompta();
 }
-async function deleteTransaction(id){ if(!confirm('Supprimer cette ligne ?')) return; const {error}=await sb.from('transactions').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(!error) loadCompta(); else alert(error.message); }
+async function deleteTransaction(id){
+  if(!confirm('Supprimer cette ligne comptable ?'))return;
+  let query=sb.from('transactions').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID);
+  if(!isOwnerRole())query=query.eq('point_id',adminProfile.point_id);
+  const {error}=await query;
+  if(error){console.error('Suppression de la ligne comptable impossible :',error);alert(error.message);return;}
+  await loadCompta();
+}
 /* =======================================================
    APPROVISIONNEMENTS (points de vente → boutique)
    ======================================================= */
@@ -1316,14 +1500,19 @@ async function renderAdminOperations(){
 }
 async function renderAdminAppro(){
   const body=document.getElementById('adminBody');
-  const pointFilter=`<option value="all">Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${approPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`;
-  body.innerHTML=`<div class="admin-toolbar">${adminBackButton()}<h3 style="color:var(--coffee-black);">Approvisionnements</h3><button class="btn-primary" onclick="openApproModal()">+ Demander</button></div>
-    <p class="shop-note" style="margin-bottom:12px;">Demandes de marchandise des points de vente vers la boutique. Validez pour déclencher le transfert de stock.</p>
-    <div class="admin-product-form"><div class="field"><label>Point</label><select id="approPoint" onchange="approPoint=this.value;loadAppro()">${pointFilter}</select></div></div>
+  const isOwner=isOwnerRole();
+  if(!isOwner) approPoint=adminProfile.point_id;
+  const pointFilter=isOwner
+    ? `<option value="all" ${approPoint==='all'?'selected':''}>Tous</option>${POINTS.map(p=>`<option value="${p.id}" ${approPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`
+    : POINTS.filter(p=>p.id===adminProfile.point_id).map(p=>`<option value="${p.id}" selected>${p.name}</option>`).join('');
+  body.innerHTML=`<div class="admin-toolbar"><button type="button" class="btn-ghost admin-back" onclick="switchAdminTab('stock')">← Retour à l'inventaire</button><button type="button" class="btn-primary appro-open-btn" onclick="openApproModal()">+ Approvisionner</button></div>
+    <p class="shop-note" style="margin-bottom:12px;">Une livraison validée met à jour l'inventaire du point de vente choisi.</p>
+    <div class="admin-product-form"><div class="field"><label>Point de vente</label><select id="approPoint" onchange="approPoint=this.value;loadAppro()" ${isOwner?'':'disabled'}>${pointFilter}</select></div></div>
     <table class="admin-table"><thead><tr><th>Date</th><th>Point demandeur</th><th>Détail</th><th>Total (coût)</th><th>Statut</th><th>Action</th></tr></thead><tbody id="approRows"></tbody></table>`;
   await loadAppro();
 }
 async function loadAppro(){
+  if(!isOwnerRole()) approPoint=adminProfile.point_id;
   const rowsEl=document.getElementById('approRows');
   let q=sb.from('approvisionnements').select('*, approvisionnement_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(approPoint!=='all') q=q.eq('point_id',approPoint);
@@ -1332,48 +1521,73 @@ async function loadAppro(){
   if(rowsEl) rowsEl.innerHTML=data.map(a=>{ const point=POINTS.find(p=>p.id===a.point_id)?.name||'—';
     const det=(a.approvisionnement_items||[]).map(l=>`${esc(l.product_name||'?')} ×${l.qty}`).join('<br>');
     const statusLabel={demande:'<span class="status-btn active">Demandé</span>',livre:'<span class="status-btn active vendu">Livré</span>',annule:'<span class="status-btn active annule">Annulé</span>'}[a.status]||esc(a.status);
-    const action=a.status==='demande'?`<button class="status-btn active vendu" onclick="validerAppro('${a.id}')">✔ Livrer</button> <button class="status-btn active annule" onclick="annulerAppro('${a.id}')">✕</button>`:'—';
+    const action=a.status==='demande'?`${isOwnerRole()?`<button class="admin-icon-btn" aria-label="Modifier l'approvisionnement" title="Modifier" onclick="editAppro('${a.id}')">✎</button><button class="status-btn active vendu" aria-label="Valider la livraison" title="Valider la livraison" onclick="validerAppro('${a.id}')">✔</button>`:''} <button class="admin-icon-btn danger" aria-label="Supprimer l'approvisionnement" title="Supprimer" onclick="deleteAppro('${a.id}')">🗑</button>`:'—';
     return `<tr><td>${new Date(a.created_at).toLocaleString('fr-FR')}</td><td>${point}</td><td>${det}</td><td>${money(a.total)}</td><td>${statusLabel}</td><td>${action}</td></tr>`;
   }).join('') || '<tr><td colspan="6" class="admin-empty">Aucune demande.</td></tr>';
 }
 async function validerAppro(id){
   if(!confirm('Valider la livraison ? Le stock sera transféré de la boutique vers le point de vente.')) return;
-  const {data:a,error}=await sb.from('approvisionnements').select('*, approvisionnement_items(*)').eq('id',id).eq('store_id',ACTIVE_STORE_ID).maybeSingle();
-  if(error||!a) return alert((error&&error.message)||'Demande introuvable.');
-  if((a.approvisionnement_items||[]).length===0){ alert('Cette demande ne contient aucun article.'); return; }
-  for(const l of a.approvisionnement_items){ if(!l.product_id) continue;
-    let row=STOCK.find(s=>s.point_id===a.point_id && s.product_id===l.product_id);
-    const newQty=Number(row?row.quantity:0)+Number(l.qty);
-    if(row){ await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
-    else { await sb.from('stock').insert({point_id:a.point_id,product_id:l.product_id,quantity:l.qty,store_id:ACTIVE_STORE_ID}); }
-  }
-  const {error:up}=await sb.from('approvisionnements').update({status:'livre'}).eq('id',id).eq('store_id',ACTIVE_STORE_ID);
-  if(up) alert(up.message); else alert('Demande livrée.');
+  const {error}=await sb.rpc('fulfill_approvisionnement',{p_approvisionnement_id:id});
+  if(error){ console.error('Livraison approvisionnement impossible :',error); alert(`La livraison n'a pas été enregistrée : ${error.message}`); return; }
+  alert('Demande livrée et inventaire du point mis à jour.');
+  await loadStock();
+  renderMenu();
+  renderCaisseProductGrid();
   await loadAppro();
 }
-async function annulerAppro(id){ if(!confirm('Annuler cette demande ?')) return; const {error}=await sb.from('approvisionnements').update({status:'annule'}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(!error) loadAppro(); else alert(error.message); }
-function openApproModal(){
+async function annulerAppro(id){ if(!confirm('Annuler cette demande ?')) return; const {error}=await sb.from('approvisionnements').update({status:'annule'}).eq('id',id).eq('store_id',ACTIVE_STORE_ID).eq('status','demande'); if(!error) loadAppro(); else alert(error.message); }
+async function deleteAppro(id){
+  if(!isOwnerRole()){alert('Seul le propriétaire peut supprimer un approvisionnement.');return;}
+  if(!confirm('Supprimer définitivement cet approvisionnement en attente ?'))return;
+  const {error}=await sb.rpc('delete_approvisionnement_request',{p_approvisionnement_id:id});
+  if(error){console.error('Suppression de l’approvisionnement impossible :',error);alert(error.message);return;}
+  await loadAppro();
+}
+let editingApproId=null;
+async function editAppro(id){
+  if(!isOwnerRole()){alert('Seul le propriétaire peut modifier un approvisionnement.');return;}
+  const {data,error}=await sb.from('approvisionnements').select('*, approvisionnement_items(*)').eq('id',id).eq('store_id',ACTIVE_STORE_ID).eq('status','demande').single();
+  if(error){console.error('Chargement de l’approvisionnement impossible :',error);alert(error.message);return;}
+  editingApproId=id;
+  openApproModal(data);
+}
+function openApproModal(request=null){
   const body=document.getElementById('adminBody');
-  const pointOptions=POINTS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  const productRows=PRODUCTS.map(p=>`<div class="shop-color-row"><label>${esc(p.name)}</label><input type="number" id="appro-${p.id}" min="0" value="0" style="width:80px;"></div>`).join('');
+  if(!isOwnerRole()) approPoint=adminProfile.point_id;
+  const allowedPoints=isOwnerRole()?POINTS:POINTS.filter(p=>p.id===adminProfile.point_id);
+  if(request) approPoint=request.point_id;
+  const pointOptions=allowedPoints.map(p=>`<option value="${p.id}" ${p.id===(request?.point_id||approPoint)?'selected':''}>${p.name}</option>`).join('');
+  const requestItems=new Map((request?.approvisionnement_items||[]).map(item=>[item.product_id,Number(item.qty)]));
+  const productRows=PRODUCTS.map(p=>`<div class="shop-color-row"><label>${esc(p.name)}</label><input type="number" id="appro-${p.id}" min="0" value="${requestItems.get(p.id)||0}" style="width:80px;"></div>`).join('');
   body.insertAdjacentHTML('beforeend', `<div class="overlay" id="approModal" onclick="if(event.target===this) closeApproModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact">
-    <h3 class="modal-title-small">Demande d'approvisionnement</h3>
-    <div class="field"><label>Point de vente demandeur</label><select id="apPoint">${pointOptions}</select></div>
+    <h3 class="modal-title-small">${request?'Modifier l’approvisionnement':'Approvisionner un point de vente'}</h3>
+    <div class="field"><label>Point de vente</label><select id="apPoint" ${request?'disabled':''}>${pointOptions}</select></div>
     <div style="max-height:40vh;overflow-y:auto;border:1px solid rgba(110,59,30,0.12);border-radius:10px;padding:8px 12px;">${productRows}</div>
-    <button class="btn-primary btn-full-width" style="margin-top:12px;" onclick="saveAppro()">Envoyer la demande</button>
+    <button class="btn-primary btn-full-width" style="margin-top:12px;" onclick="saveAppro()">${request?'Enregistrer les modifications':'Valider'}</button>
     <button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeApproModal()">Annuler</button></div></div>`);
   document.getElementById('approModal').classList.add('open');
 }
-function closeApproModal(){ const o=document.getElementById('approModal'); if(o) o.classList.remove('open'); }
+function closeApproModal(){ const o=document.getElementById('approModal'); if(o) o.remove(); editingApproId=null; }
 async function saveAppro(){
   const point=document.getElementById('apPoint').value;
+  if(!isOwnerRole() && point!==adminProfile.point_id){ alert('Vous ne pouvez demander un approvisionnement que pour votre point de vente.'); return; }
   const items=PRODUCTS.map(p=>({ product_id:p.id, product_name:p.name, qty:parseInt(document.getElementById('appro-'+p.id).value)||0, cost:p.price||0 })).filter(l=>l.qty>0);
   if(items.length===0){ alert('Sélectionnez au moins un produit avec une quantité.'); return; }
   const total=items.reduce((s,l)=>s+(l.cost*l.qty),0);
-  const {data:head,error}=await sb.from('approvisionnements').insert({store_id:ACTIVE_STORE_ID, point_id:point, status:'demande', total}).select().single();
-  if(error){ alert(error.message); return; }
-  const {error:itErr}=await sb.from('approvisionnement_items').insert(items.map(l=>({approvisionnement_id:head.id, product_id:l.product_id, product_name:l.product_name, qty:l.qty, cost:l.cost})));
-  if(itErr){ alert(itErr.message); return; }
+  if(editingApproId){
+    const {error}=await sb.rpc('update_approvisionnement_request',{p_approvisionnement_id:editingApproId,p_items:items.map(l=>({product_id:l.product_id,qty:l.qty,cost:l.cost}))});
+    if(error){console.error('Modification de l’approvisionnement impossible :',error);alert(error.message);return;}
+  }else{
+    const {data:head,error}=await sb.from('approvisionnements').insert({store_id:ACTIVE_STORE_ID, point_id:point, status:'demande', total}).select().single();
+    if(error){ alert(error.message); return; }
+    const {error:itErr}=await sb.from('approvisionnement_items').insert(items.map(l=>({approvisionnement_id:head.id, product_id:l.product_id, product_name:l.product_name, qty:l.qty, cost:l.cost})));
+    if(itErr){
+      const {error:cleanupError}=await sb.from('approvisionnements').delete().eq('id',head.id).eq('store_id',ACTIVE_STORE_ID);
+      if(cleanupError) console.error('La demande incomplète n’a pas pu être supprimée :',cleanupError);
+      alert(`Les articles de la demande n'ont pas pu être enregistrés : ${itErr.message}`);
+      return;
+    }
+  }
   closeApproModal(); loadAppro();
 }
 async function renderAdminCategories(){
@@ -1501,7 +1715,7 @@ async function renderAdminReports(){
 async function loadAdminReports(){
   const period=document.getElementById('reportPeriod')?.value||'day', point=document.getElementById('reportPoint')?.value||'all'; const now=new Date(), start=new Date(now);
   if(period==='day') start.setHours(0,0,0,0); if(period==='week'){start.setDate(now.getDate()-now.getDay()+1);start.setHours(0,0,0,0);} if(period==='month'){start.setDate(1);start.setHours(0,0,0,0);} if(period==='year'){start.setMonth(0,1);start.setHours(0,0,0,0);}
-  let query=sb.from('sales').select('created_at,total,status,channel,point_id').eq('store_id',ACTIVE_STORE_ID).gte('created_at',start.toISOString()).lte('created_at',now.toISOString()).order('created_at',{ascending:false}); if(point!=='all')query=query.eq('point_id',point);
+  let query=sb.from('sales').select('created_at,total,status,channel,fulfilled,point_id').eq('store_id',ACTIVE_STORE_ID).gte('created_at',start.toISOString()).lte('created_at',now.toISOString()).order('created_at',{ascending:false}); if(point!=='all')query=query.eq('point_id',point);
   const {data=[],error}=await query; if(error){document.getElementById('reportResult').textContent=error.message;return;} REPORT_ROWS=data;
   const confirmed=data.filter(s=>s.status==='vendu'), refunds=data.filter(s=>s.status==='rembourse'), cancelled=data.filter(s=>s.status==='annule'); const total=confirmed.reduce((sum,s)=>sum+(s.total||0),0), refundTotal=refunds.reduce((sum,s)=>sum+(s.total||0),0);
   document.getElementById('reportResult').innerHTML=`<div class="sales-stats-container"><div class="admin-stat"><b>${money(total)}</b>CA confirmé</div><div class="admin-stat"><b>${confirmed.length}</b>ventes</div><div class="admin-stat"><b>${money(refundTotal)}</b>remboursements</div><div class="admin-stat"><b>${cancelled.length}</b>annulations</div></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Total</th><th>Statut</th></tr></thead><tbody>${data.map(s=>`<tr><td>${new Date(s.created_at).toLocaleString('fr-FR')}</td><td>${POINTS.find(p=>p.id===s.point_id)?.name||'—'}</td><td>${s.channel}</td><td>${money(s.total)}</td><td>${s.status}</td></tr>`).join('')||'<tr><td colspan="5" class="admin-empty">Aucune vente sur cette période.</td></tr>'}</tbody></table>`;
@@ -1557,7 +1771,7 @@ async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock 
 /* ---------- POINTS DE VENTE (manager) ---------- */
 function renderAdminPoints(){
   editingPointId=null;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `${adminActiveTab==='profile'?profileNavMarkup('points'):''}<div class="admin-toolbar">${adminActiveTab==='profile'?'':adminBackButton()}<div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
   renderPointForm(); renderPointRows();
 }
 function renderPointForm(point){
@@ -1594,57 +1808,85 @@ function renderPointRows(){
 function editPointById(id){ renderPointForm(POINTS.find(p=>p.id===id)); document.getElementById('adminPointForm').scrollIntoView({behavior:'smooth'}); }
 async function deletePoint(id){ if(!confirm("Supprimer ce point de vente ?")) return; const {error}=await sb.from('points_de_vente').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadPoints(); await loadStock(); renderPointCards(); renderAdminPoints(); }
 
-/* ---------- STOCK (manager: tous les points / gérant: son point) ---------- */
+/* ---------- INVENTAIRE (propriétaire: tous les points / gérant: son point) ---------- */
 function renderAdminStock(){
   const isOwner = isOwnerRole();
   if(!isOwner){ stockSelectedPoint = adminProfile.point_id || stockSelectedPoint; } else if(!stockSelectedPoint && POINTS.length){ stockSelectedPoint = POINTS[0].id; }
   const lowCount = PRODUCTS.filter(p=>stockFor(stockSelectedPoint,p.id)<=5).length;
   const pointSelectorHtml = isOwner ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===stockSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th>${isOwner?'<th>Ajuster</th>':'<th>Lecture seule</th>'}</tr></thead><tbody id="adminStockRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div><button class="btn-ghost" onclick="renderAdminAppro()">Approvisionnements</button></div><div class="admin-toolbar"><span id="stockSaveStatus" class="shop-note">Les modifications restent en attente jusqu'à leur enregistrement.</span><button class="btn-primary" id="saveStockBtn" onclick="savePointInventory()">Enregistrer l'inventaire</button></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th><th>Nouvelle quantité</th></tr></thead><tbody id="adminStockRows"></tbody></table>`;
   renderStockRows();
+  updateStockSaveButton();
 }
 function onStockPointChange(id){ stockSelectedPoint=id; renderAdminStock(); renderAdminPointBar(); }
 function renderStockRows(){
   const tbody=document.getElementById('adminStockRows');
-  const canEdit = isOwnerRole();
+  if(!tbody) return;
   if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="4" class="admin-empty">Aucun produit.</td></tr>'; return; }
-  tbody.innerHTML = PRODUCTS.map(p=>{ const qty=stockFor(stockSelectedPoint,p.id);
-    const adjustCell = canEdit
-      ? `<div class="stock-adjust"><button onclick="adjustStock('${p.id}',-1)">−</button><input type="number" class="stock-input" value="${qty}" onchange="setStock('${p.id}', this.value)"><button onclick="adjustStock('${p.id}',1)">+</button></div>`
-      : `<span class="stock-field-disabled">Lecture seule</span>`;
-    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${p.name}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td>${adjustCell}</td></tr>`; }).join('');
+  tbody.innerHTML = PRODUCTS.map(p=>{ const key=`${stockSelectedPoint}:${p.id}`, qty=stockFor(stockSelectedPoint,p.id), draft=STOCK_DRAFT.has(key)?STOCK_DRAFT.get(key):qty;
+    const adjustCell = `<div class="stock-adjust"><button type="button" aria-label="Diminuer ${esc(p.name)}" onclick="adjustStock('${p.id}',-1)">−</button><input type="number" min="0" step="1" class="stock-input" value="${draft}" onchange="setStock('${p.id}', this.value)"><button type="button" aria-label="Augmenter ${esc(p.name)}" onclick="adjustStock('${p.id}',1)">+</button></div>`;
+    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb" alt="">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${esc(p.name)}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td>${adjustCell}</td></tr>`; }).join('');
 }
-async function adjustStock(productId, delta){
-  if(!isOwnerRole()){ alert('Le gérant ne peut pas modifier le stock. Il peut seulement le consulter.'); return; }
-  let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
-  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:Math.max(0,delta),store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
-  else { const newQty=Math.max(0,row.quantity+delta); const {error}=await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} row.quantity=newQty; }
-  renderStockRows(); renderMenu();
+function adjustStock(productId, delta){
+  const key=`${stockSelectedPoint}:${productId}`, current=STOCK_DRAFT.has(key)?STOCK_DRAFT.get(key):stockFor(stockSelectedPoint,productId);
+  setStock(productId,current+delta);
 }
-async function setStock(productId, val){
-  if(!isOwnerRole()){ alert('Le gérant ne peut pas modifier le stock. Il peut seulement le consulter.'); return; }
-  const n=parseInt(val,10), qty=isNaN(n)?0:Math.max(0,n);
-  let row=STOCK.find(s=>s.point_id===stockSelectedPoint && s.product_id===productId);
-  if(!row){ const {data,error}=await sb.from('stock').insert({point_id:stockSelectedPoint,product_id:productId,quantity:qty,store_id:ACTIVE_STORE_ID}).select().single(); if(error){console.error(error);return;} STOCK.push(data); }
-  else { const {error}=await sb.from('stock').update({quantity:qty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} row.quantity=qty; }
-  renderStockRows(); renderMenu();
+function setStock(productId, val){
+  const qty=Number(val);
+  if(!Number.isInteger(qty)||qty<0){ alert('Saisissez une quantité entière égale ou supérieure à zéro.'); renderStockRows(); return; }
+  const key=`${stockSelectedPoint}:${productId}`, current=stockFor(stockSelectedPoint,productId);
+  if(qty===current) STOCK_DRAFT.delete(key); else STOCK_DRAFT.set(key,qty);
+  renderStockRows();
+  updateStockSaveButton();
+}
+function updateStockSaveButton(){
+  const button=document.getElementById('saveStockBtn');
+  if(!button) return;
+  const hasDraft=[...STOCK_DRAFT.keys()].some(key=>key.startsWith(`${stockSelectedPoint}:`));
+  button.disabled=!hasDraft;
+}
+async function savePointInventory(){
+  const pointId=stockSelectedPoint;
+  const entries=[...STOCK_DRAFT.entries()].filter(([key])=>key.startsWith(`${pointId}:`));
+  if(!pointId||entries.length===0) return;
+  const items=entries.map(([key,quantity])=>({product_id:key.slice(pointId.length+1),quantity}));
+  const button=document.getElementById('saveStockBtn');
+  if(button){button.disabled=true;button.textContent='Enregistrement...';}
+  const {error}=await sb.rpc('save_point_inventory',{p_point_id:pointId,p_items:items});
+  if(error){
+    console.error('Enregistrement inventaire impossible :',error);
+    alert(`L'inventaire n'a pas été enregistré : ${error.message}`);
+    if(button){button.disabled=false;button.textContent="Enregistrer l'inventaire";}
+    return;
+  }
+  entries.forEach(([key])=>STOCK_DRAFT.delete(key));
+  await loadStock();
+  renderStockRows();
+  renderCaisseProductGrid();
+  renderMenu();
+  updateStockSaveButton();
+  if(button) button.textContent="Enregistrer l'inventaire";
+  const status=document.getElementById('stockSaveStatus');
+  if(status) status.textContent='Inventaire enregistré pour ce point de vente.';
 }
 
 /* ---------- CARNET DE VENTE (manager: tous / gérant: son point) ---------- */
 function renderAdminSales(){
-  const isManager = adminProfile.role==='manager';
+  const isManager = isOwnerRole();
   if(!isManager){ salesSelectedPoint = adminProfile.point_id; }
   const filterHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===salesSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}${filterHtml}<div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="renderAdminCompta()">Comptabilité</button><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div class="field admin-toolbar-field"><label>Période</label><select id="salesPeriod" onchange="salesPeriod=this.value;loadAndRenderSales()"><option value="day" ${salesPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${salesPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${salesPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${salesPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${salesPeriod==='all'?'selected':''}>Tout</option></select></div><div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
   loadAndRenderSales();
 }
 function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
 async function loadAndRenderSales(){
   let query = sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(salesSelectedPoint!=='all') query = query.eq('point_id', salesSelectedPoint);
+  const range=getPeriodRange(salesPeriod);
+  if(range) query=query.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
   const {data, error} = await query; if(error){console.error(error);return;}
   SALES_CACHE = data;
-  const vendu = SALES_CACHE.filter(v=>v.status==='vendu');
+  const vendu = SALES_CACHE.filter(v=>v.status==='vendu'&&(v.channel!=='en_ligne'||v.fulfilled));
   const totalRevenue = vendu.reduce((s,v)=>s+v.total,0);
   const statsEl = document.getElementById('salesStats');
   if(statsEl){ statsEl.innerHTML = `<div class="admin-stat"><b>${SALES_CACHE.length}</b>commandes</div><div class="admin-stat"><b>${money(totalRevenue)}</b>CA net confirmé</div><div class="admin-stat"><b>${SALES_CACHE.filter(v=>v.channel==='en_ligne' && !v.fulfilled).length}</b>en attente (en ligne)</div>`; }
@@ -1654,8 +1896,8 @@ function renderSalesRows(){
   const tbody=document.getElementById('adminSalesRows');
   if(SALES_CACHE.length===0){ tbody.innerHTML='<tr><td colspan="9" class="admin-empty">Aucune vente.</td></tr>'; return; }
   tbody.innerHTML = SALES_CACHE.map(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||'—';
-    return `<tr><td>${new Date(v.created_at).toLocaleString('fr-FR')}</td><td>${pointName}</td><td>${v.channel==='caisse'?'Comptoir':'En ligne'+(v.fulfilled?'':' ⏳')}</td><td>${v.client_name}<br><span class="sales-phone">${v.client_phone}</span></td><td>${v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join('<br>')}</td><td>${v.delivery_mode}</td><td>${v.payment_method}</td><td class="sales-total">${money(v.total)}</td>
-    <td><div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div></td></tr>`; }).join('');
+    return `<tr><td>${new Date(v.created_at).toLocaleString('fr-FR')}</td><td>${esc(pointName)}</td><td>${v.channel==='caisse'?'Comptoir':'En ligne'+(v.fulfilled?'':' ⏳')}</td><td>${esc(v.client_name||'')}<br><span class="sales-phone">${esc(v.client_phone||'')}</span></td><td>${v.sale_items.map(l=>`${esc(l.product_name)} x${l.qty}`).join('<br>')}</td><td>${esc(v.delivery_mode||'')}</td><td>${esc(v.payment_method||'')}</td><td class="sales-total">${money(v.total)}</td>
+    <td>${v.channel==='en_ligne'&&!v.fulfilled?'<span class="status-btn active">En attente de règlement</span>':`<div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div>`}</td></tr>`; }).join('');
 }
 async function setSaleStatus(id, status){ const {error}=await sb.from('sales').update({status}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales(); }
 function exportSalesCSV(){
@@ -1666,23 +1908,22 @@ function exportSalesCSV(){
   const a=document.createElement('a'); a.href=url; a.download=`TOKCOS-ventes-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
 }
 
-/* ---------- CAISSE (manager: choisit un point / gérant: son point) ---------- */
+/* ---------- CAISSE (propriétaire: choisit un point / gérant: son point) ---------- */
 function renderAdminCaisse(){
-  const isManager = adminProfile.role==='manager';
-  if(!isManager){ caisseSelectedPoint = adminProfile.point_id; } else if(!caisseSelectedPoint && POINTS.length){ caisseSelectedPoint = POINTS[0].id; }
-  const pointSelectorHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===caisseSelectedPoint)?.name||''}</b>votre point de vente</div>`;
+  if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
+  if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
+  const isOwner = isOwnerRole();
+  if(!isOwner){ caisseSelectedPoint = adminProfile.point_id; } else if(!caisseSelectedPoint && POINTS.length){ caisseSelectedPoint = POINTS[0].id; }
   const adminBody=document.getElementById('adminBody');
   adminBody.classList.add('admin-caisse-body');
   adminBody.innerHTML = `
-    <div class="admin-toolbar">${pointSelectorHtml}<button class="caisse-cart-icon-btn" aria-label="Afficher le panier" onclick="document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth'})">🛒 <span class="cart-badge" id="caisseCartIconBadge">${caisseCart.length}</span></button></div>
-    <div class="pending-orders-banner"><div class="pending-orders-section"><div class="section-title">📋 Commandes en ligne à préparer <span class="count-badge" id="pendingCount">0</span></div><div id="pendingOrdersList"></div></div></div>
     <div class="caisse-layout">
       <div class="caisse-left">
-        <h4 style="margin-bottom:12px;">Produits</h4>
+        <h4 style="margin-bottom:12px;">Produits disponibles</h4>
         <div class="card-grid caisse-product-grid" id="caisseProductGrid"></div>
       </div>
       <div class="caisse-right">
-        <div class="caisse-cart-header"><h4>Panier</h4><span class="cart-badge" id="caisseCartBadge">${caisseCart.length}</span></div>
+        <div class="caisse-cart-header"><h4>Caisse</h4><span class="cart-badge" id="caisseCartBadge">${caisseCart.length}</span>${caisseOrderId?'<button type="button" class="cancel-import-btn" onclick="cancelImportedOrder()">Annuler la prise en charge</button>':''}</div>
         <div class="caisse-cart-body" id="caisseCartItems"></div>
         <div class="caisse-cart-footer">
           <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;color:var(--rust);margin:12px 0;"><span>Total</span><span id="caisseTotal">0 FCFA</span></div>
@@ -1692,148 +1933,268 @@ function renderAdminCaisse(){
         </div>
       </div>
     </div>
-    <div class="caisse-footer-actions"><button class="btn-ghost btn-full-width" onclick="showClotureModal()">🔒 Clôture de caisse</button></div>`;
-  renderCaisseProductGrid(); renderCaisseCart(); setupCaissePaymentButtons(); loadPendingOrders();
+    <div class="caisse-footer-actions" id="registerActions"></div>`;
+  renderAdminPointBar();
+  renderCaisseProductGrid(); renderCaisseCart(); setupCaissePaymentButtons();
+  loadPendingOrders();
+  pendingOrdersTimer=setInterval(loadPendingOrders,30000);
+  loadRegisterStatus();
+  registerStatusTimer=setInterval(loadRegisterStatus,30000);
 }
-function onCaissePointChange(id){ caisseSelectedPoint=id; caisseCart=[]; renderAdminCaisse(); renderAdminPointBar(); }
+function onCaissePointChange(id){
+  if(caisseOrderId){ alert('Terminez la commande importée avant de changer de point de vente.'); document.getElementById('caissePointSelect').value=caisseSelectedPoint; return; }
+  if(caisseCart.length && !confirm('Changer de point de vente videra la caisse en cours. Continuer ?')){document.getElementById('caissePointSelect').value=caisseSelectedPoint;return;}
+  caisseSelectedPoint=id;
+  caisseCart=[];
+  CACHED_PENDING_ORDERS=[];
+  renderAdminCaisse();
+}
 
-/* commandes en ligne pas encore préparées pour ce point */
+function togglePendingOrders(){
+  const panel=document.getElementById('pendingOrdersPanel'),button=document.querySelector('.caisse-orders-toggle');
+  if(!panel||!button) return;
+  panel.hidden=!panel.hidden;
+  button.setAttribute('aria-expanded',String(!panel.hidden));
+  if(!panel.hidden) loadPendingOrders();
+}
 async function loadPendingOrders(){
+  if(!caisseSelectedPoint) return;
   const {data, error} = await sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('channel','en_ligne').eq('fulfilled', false).eq('status','vendu').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
   CACHED_PENDING_ORDERS = data || [];
   renderPendingOrders();
+  renderCaisseProductGrid();
 }
 function renderPendingOrders(){
   const container=document.getElementById('pendingOrdersList'); const badge=document.getElementById('pendingCount');
   if(!container) return; if(badge) badge.textContent = CACHED_PENDING_ORDERS.length;
   if(CACHED_PENDING_ORDERS.length===0){ container.innerHTML='<p style="text-align:center;color:#8A7660;font-size:12px;padding:12px 0;">Aucune commande en attente</p>'; return; }
-  container.innerHTML = CACHED_PENDING_ORDERS.map(o=>`<div class="pending-order-card"><div class="order-info"><div class="order-client">${o.client_name}</div><div class="order-detail">${o.sale_items.map(i=>i.product_name+' x'+i.qty).join(', ')}</div><div class="order-time">${new Date(o.created_at).toLocaleString('fr-FR')}</div></div><div class="order-right"><div class="order-total">${money(o.total)}</div><button class="import-btn" onclick="markOrderFulfilled('${o.id}')">✓ Remise au client</button></div></div>`).join('');
+  container.innerHTML = CACHED_PENDING_ORDERS.map(o=>{
+    const claimedByOther=o.processing_by&&o.processing_by!==adminProfile.id;
+    const items=(o.sale_items||[]).map(i=>`${esc(i.product_name)} ×${i.qty}`).join(', ');
+    return `<article class="pending-order-card"><div class="order-info"><div class="order-client">${esc(o.client_name||'Client')}</div><div class="order-detail">${items}</div><div class="order-time">${new Date(o.created_at).toLocaleString('fr-FR')}</div></div><div class="order-right"><div class="order-total">${money(o.total)}</div><button class="import-btn" onclick="claimOnlineOrder('${o.id}')" ${claimedByOther?'disabled':''}>${claimedByOther?'En préparation':'Prendre en charge'}</button></div></article>`;
+  }).join('');
 }
-/* Marque la commande comme remise — ne touche PAS au stock ni ne crée de nouvelle vente (déjà fait au moment de la commande en ligne) */
-async function markOrderFulfilled(orderId){
+async function claimOnlineOrder(orderId){
   const order = CACHED_PENDING_ORDERS.find(o=>o.id===orderId); if(!order) return;
-  if(!confirm(`Confirmer la remise de la commande de ${order.client_name} (${money(order.total)}) ?`)) return;
-  const {error} = await sb.from('sales').update({fulfilled:true}).eq('id', orderId);
-  if(error){ console.error(error); alert("Erreur."); return; }
-  loadPendingOrders();
+  if(order.point_id!==caisseSelectedPoint){alert('Cette commande appartient à un autre point de vente.');return;}
+  if(caisseCart.length&&!caisseOrderId&&!confirm('Remplacer les articles actuellement dans la caisse par cette commande ?')) return;
+  const {error}=await sb.rpc('claim_online_order',{p_order_id:orderId});
+  if(error){console.error('Impossible de prendre la commande :',error);alert(error.message);await loadPendingOrders();return;}
+  caisseOrderId=order.id;
+  caisseCart=(order.sale_items||[]).map(item=>({id:item.product_id,qty:Number(item.qty),price:Number(item.price),name:item.product_name}));
+  const clientInput=document.getElementById('caisseClientName');
+  if(clientInput){clientInput.value=order.client_name||'';clientInput.readOnly=true;}
+  document.getElementById('pendingOrdersPanel').hidden=true;
+  document.querySelector('.caisse-orders-toggle')?.setAttribute('aria-expanded','false');
+  renderCaisseCart();renderCaisseProductGrid();
+  document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+async function releaseClaimedOnlineOrder(){
+  if(!caisseOrderId)return;
+  const {error}=await sb.rpc('release_online_order_claim',{p_order_id:caisseOrderId});
+  if(error){console.error('Impossible de libérer la commande prise en charge :',error);alert(error.message);return false;}
+  caisseOrderId=null;
+  return true;
+}
+async function cancelImportedOrder(){
+  if(!caisseOrderId||!confirm('Annuler la prise en charge et remettre cette commande dans la liste ?'))return;
+  if(!await releaseClaimedOnlineOrder())return;
+  caisseCart=[];
+  const clientInput=document.getElementById('caisseClientName');
+  if(clientInput){clientInput.value='';clientInput.readOnly=false;}
+  renderAdminCaisse();
 }
 
 function renderCaisseProductGrid(){
   const grid=document.getElementById('caisseProductGrid'); if(!grid) return;
-  grid.innerHTML = PRODUCTS.filter(p=>p.active && stockFor(caisseSelectedPoint,p.id)>0).map(p=>{ const qty=stockFor(caisseSelectedPoint,p.id);
+  grid.innerHTML = PRODUCTS.filter(p=>p.active && availableStockFor(p.id)>0).map(p=>{ const qty=availableStockFor(p.id);
     return `<div class="menu-card ${p.cat}" onclick="addToCaisse('${p.id}')">${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add">Ajouter</button></div>`; }).join('');
   if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit en stock sur ce point.</div>';
 }
+function availableStockFor(productId){
+  const reserved=CACHED_PENDING_ORDERS.reduce((sum,order)=>sum+(order.sale_items||[]).filter(item=>item.product_id===productId).reduce((itemSum,item)=>itemSum+Number(item.qty||0),0),0);
+  return Math.max(0,stockFor(caisseSelectedPoint,productId)-reserved);
+}
 function addToCaisse(productId){
-  const existing=caisseCart.find(c=>c.id===productId); const max=stockFor(caisseSelectedPoint,productId);
+  if(caisseOrderId){alert('Une commande client est importée. Terminez-la avant d’ajouter une autre vente.');return;}
+  const existing=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId);
   if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
   renderCaisseCart(); renderCaisseProductGrid();
 }
-function removeFromCaisse(productId){ caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
-function changeCaisseQty(productId, delta){ const it=caisseCart.find(c=>c.id===productId); const max=stockFor(caisseSelectedPoint,productId); it.qty=Math.max(1,Math.min(max,it.qty+delta)); renderCaisseCart(); renderCaisseProductGrid(); }
+function removeFromCaisse(productId){ if(caisseOrderId)return; caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
+function changeCaisseQty(productId, delta){ if(caisseOrderId)return; const it=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId); it.qty=Math.max(1,Math.min(max,it.qty+delta)); renderCaisseCart(); renderCaisseProductGrid(); }
 function renderCaisseCart(){
   const container=document.getElementById('caisseCartItems'), totalEl=document.getElementById('caisseTotal'), badge=document.getElementById('caisseCartBadge'), iconBadge=document.getElementById('caisseCartIconBadge');
   if(!container) return;
   if(badge) badge.textContent = caisseCart.length;
   if(iconBadge) iconBadge.textContent = caisseCart.length;
   if(caisseCart.length===0){ container.innerHTML='<p style="text-align:center;color:#8A7660;padding:20px 0;">Panier vide</p>'; if(totalEl) totalEl.textContent='0 FCFA'; return; }
-  container.innerHTML = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id);
-    return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(110,59,30,0.1);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${p.name}</div><div style="font-size:12px;color:#8A7660;">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div></div><div style="display:flex;align-items:center;gap:4px;"><button onclick="changeCaisseQty('${c.id}',-1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">−</button><span style="min-width:20px;text-align:center;font-weight:700;">${c.qty}</span><button onclick="changeCaisseQty('${c.id}',1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">+</button><button onclick="removeFromCaisse('${c.id}')" style="color:var(--rust);font-size:11px;margin-left:4px;">✕</button></div></div>`; }).join('');
-  const total = caisseCart.reduce((s,c)=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return s+p.price*c.qty; },0);
+  container.innerHTML = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id),price=c.price??p?.price??0,name=c.name||p?.name||'Produit';
+    const actions=caisseOrderId?'':`<button onclick="changeCaisseQty('${c.id}',-1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">−</button><span style="min-width:20px;text-align:center;font-weight:700;">${c.qty}</span><button onclick="changeCaisseQty('${c.id}',1)" style="width:22px;height:22px;border-radius:50%;background:var(--white);font-weight:700;">+</button><button onclick="removeFromCaisse('${c.id}')" style="color:var(--rust);font-size:11px;margin-left:4px;">✕</button>`;
+    return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(110,59,30,0.1);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${esc(name)}</div><div style="font-size:12px;color:#8A7660;">${money(price)} × ${c.qty} = ${money(price*c.qty)}</div></div><div style="display:flex;align-items:center;gap:4px;">${actions}</div></div>`; }).join('');
+  const total = caisseCart.reduce((s,c)=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return s+(c.price??p?.price??0)*c.qty; },0);
   if(totalEl) totalEl.textContent = money(total);
 }
 function setupCaissePaymentButtons(){ document.querySelectorAll('#caissePayment button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('#caissePayment button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; }); }
 
 /* Vente comptoir : channel='caisse', fulfilled=true, décrémente le stock immédiatement */
 async function validerVenteCaisse(){
+  if(submitting) return;
   if(caisseCart.length===0){ alert('Panier vide.'); return; }
+  if(!caisseSelectedPoint){ alert('Sélectionnez un point de vente avant de valider la vente.'); return; }
   const clientName = document.getElementById('caisseClientName').value.trim() || 'Client comptoir';
-  const payment = document.querySelector('#caissePayment button.active').dataset.val;
-  const lines = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return {id:p.id,name:p.name,qty:c.qty,price:p.price,sub:p.price*c.qty}; });
+  const payment = document.querySelector('#caissePayment button.active')?.dataset.val;
+  if(!payment){ alert('Sélectionnez un moyen de paiement.'); return; }
+  const lines = caisseCart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); return p?{id:p.id,name:c.name||p.name,qty:c.qty,price:c.price??p.price,sub:(c.price??p.price)*c.qty}:null; });
+  if(lines.some(line=>!line)){ alert('Un produit du panier n’existe plus. Videz puis reconstituez le panier.'); return; }
   const total = lines.reduce((s,l)=>s+l.sub,0);
   if(!confirm(`Valider la vente de ${money(total)} ?`)) return;
+  submitting=true;
+  const button=document.querySelector('#adminBody .caisse-cart-footer .btn-primary');
+  if(button){button.disabled=true;button.textContent='Enregistrement...';}
   try{
-    for(const l of lines){ const row=STOCK.find(s=>s.point_id===caisseSelectedPoint && s.product_id===l.id); const newQty=row.quantity-l.qty; await sb.from('stock').update({quantity:newQty}).eq('id',row.id).eq('store_id',ACTIVE_STORE_ID); row.quantity=newQty; }
-    const {data:saleRow, error} = await sb.from('sales').insert({ point_id:caisseSelectedPoint, client_name:clientName, client_phone:'Comptoir', delivery_mode:'Sur place', payment_method:payment, total, status:'vendu', channel:'caisse', fulfilled:true, store_id:ACTIVE_STORE_ID }).select().single();
+    const {error}=caisseOrderId
+      ? await sb.rpc('settle_online_order',{p_sale_id:caisseOrderId,p_payment_method:payment})
+      : await sb.rpc('record_pos_sale',{
+        p_point_id:caisseSelectedPoint,
+        p_client_name:clientName,
+        p_payment_method:payment,
+        p_items:lines.map(line=>({product_id:line.id,qty:line.qty}))
+      });
     if(error) throw error;
-    const itemsPayload = lines.map(l=>({sale_id:saleRow.id, product_id:l.id, product_name:l.name, qty:l.qty, price:l.price, subtotal:l.sub}));
-    await sb.from('sale_items').insert(itemsPayload);
+    await loadStock();
     caisseCart = [];
+    caisseOrderId = null;
+    const clientInput=document.getElementById('caisseClientName');
+    if(clientInput){clientInput.value='';clientInput.readOnly=false;}
+    await loadPendingOrders();
     renderCaisseCart(); renderCaisseProductGrid();
+    renderMenu();
     alert('Vente enregistrée !');
-  } catch(err){ console.error(err); alert("Erreur lors de l'enregistrement de la vente."); }
+  } catch(err){ console.error("Erreur lors de l'enregistrement de la vente :",err); alert(`La vente n'a pas été enregistrée : ${err.message||'erreur inattendue'}`); }
+  finally{ submitting=false; if(button){button.disabled=false;button.textContent='Valider la vente';} }
 }
 
 /* ---------- CLÔTURE DE CAISSE ---------- */
 function showClotureModal(){
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><button class="btn-ghost" onclick="renderAdminCaisse()">← Retour à la caisse</button></div>
-    <div style="max-width:500px;margin:20px auto;padding:24px;background:var(--cream);border-radius:14px;">
-      <h3 style="margin-bottom:20px;color:var(--coffee-black);">🔒 Clôture de caisse — ${POINTS.find(p=>p.id===caisseSelectedPoint)?.name||''}</h3>
-      <div class="field"><label>Montant d'ouverture (FCFA)</label><input type="number" id="clotureOpening" value="0" min="0"></div>
-      <div class="field"><label>Montant de fermeture compté (FCFA)</label><input type="number" id="clotureClosing" min="0"></div>
-      <div style="background:var(--white);padding:16px;border-radius:10px;margin-bottom:20px;">
-        <div style="font-size:13px;color:#8A7660;margin-bottom:8px;">Résumé du jour (ce point de vente)</div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span>Total ventes confirmées :</span><span id="clotureTotalSales" style="font-weight:700;">0 FCFA</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;"><span>Nombre de transactions :</span><span id="clotureTxCount" style="font-weight:700;">0</span></div>
-      </div>
-      <button class="btn-primary btn-full-width" onclick="validateCloture()">Valider la clôture</button>
-    </div>`;
-  loadClotureData();
+  document.getElementById('adminBody').innerHTML=`<div class="admin-toolbar"><button class="btn-ghost" onclick="switchAdminTab('caisse')">← Retour à la caisse</button></div>
+    <div class="register-close-card"><h3>Clôture journalière TOK'COS</h3>
+      <p>Cette clôture concerne tous les points de vente et arrête les ventes et opérations comptables jusqu'à la réouverture.</p>
+      <div class="register-summary"><span>Ventes confirmées · tous les points</span><strong>${money(registerStatus?.sales_total||0)}</strong><span>Nombre de ventes réglées</span><strong>${registerStatus?.sale_count||0}</strong></div>
+      <div class="field"><label>Fonds d'ouverture total (FCFA)</label><input type="number" id="clotureOpening" value="0" min="0" step="1"></div>
+      <div class="field"><label>Fonds comptés à la fermeture — tous les points (FCFA)</label><input type="number" id="clotureClosing" value="0" min="0" step="1"></div>
+      <button class="btn-primary btn-full-width" onclick="validateCloture()">Clôturer tous les points</button></div>`;
 }
-async function loadClotureData(){
-  const today = new Date().toISOString().split('T')[0];
-  const {data, error} = await sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
-  if(error){ console.error(error); return; }
-  const totalSales = data.reduce((s,v)=>s+v.total,0);
-  document.getElementById('clotureTotalSales').textContent = money(totalSales);
-  document.getElementById('clotureTxCount').textContent = data.length;
+async function loadRegisterStatus(){
+  if(!ACTIVE_STORE_ID)return;
+  const {data,error}=await sb.rpc('get_tokcos_register_status',{p_store_id:ACTIVE_STORE_ID});
+  if(error){console.error('Impossible de vérifier l’état de la caisse :',error);registerStatus=null;updateRegisterActions(`État de la caisse indisponible : ${esc(error.message)}`);return;}
+  registerStatus=data;
+  updateRegisterActions();
+}
+function updateRegisterActions(errorMessage=''){
+  const container=document.getElementById('registerActions');
+  if(!container)return;
+  const saleButton=document.querySelector('.caisse-cart-footer .btn-primary');
+  if(errorMessage){container.innerHTML=`<p class="admin-empty">${errorMessage}</p>`;if(saleButton)saleButton.disabled=true;return;}
+  if(!registerStatus){container.innerHTML='<p class="admin-empty">Vérification de la caisse…</p>';if(saleButton)saleButton.disabled=true;return;}
+  if(registerStatus.is_open){
+    if(saleButton)saleButton.disabled=false;
+    container.innerHTML=`<p class="register-open-status">Caisse ouverte · clôture automatique à 04:00</p><button class="btn-ghost btn-full-width" onclick="showClotureModal()">🔒 Clôture journalière de tous les points</button>`;
+  }else{
+    const reopenButton=registerStatus.can_reopen?'<button class="btn-primary btn-full-width" onclick="reopenTokcosRegister()">Réouvrir la caisse</button>':'';
+    container.innerHTML=`<p class="register-closed-status">${esc(registerStatus.message||'Caisse fermée')}</p>${reopenButton}`;
+    if(saleButton)saleButton.disabled=true;
+  }
 }
 async function validateCloture(){
-  const opening = parseInt(document.getElementById('clotureOpening').value)||0;
-  const closing = parseInt(document.getElementById('clotureClosing').value)||0;
-  const today = new Date().toISOString().split('T')[0];
-  const {data, error} = await sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('status','vendu').gte('created_at', today);
-  if(error){ console.error(error); return; }
-  const totalSales = data.reduce((s,v)=>s+v.total,0);
-  const expected = totalSales + opening;
-  if(closing !== expected){
-    if(!confirm(`Le montant compté (${money(closing)}) ne correspond pas au montant attendu (${money(expected)} = ventes ${money(totalSales)} + ouverture ${money(opening)}).\n\nValider quand même ?`)) return;
-  }
-  const {error:insertError} = await sb.from('caisse_cloture').insert({ point_id: caisseSelectedPoint, opening_amount:opening, closing_amount:closing, total_sales:totalSales, date:today, created_by: adminProfile.id, store_id:ACTIVE_STORE_ID });
-  if(insertError){ console.error(insertError); alert("Erreur lors de l'enregistrement de la clôture."); return; }
-  alert('Clôture enregistrée !');
-  renderAdminCaisse();
+  const opening=Number(document.getElementById('clotureOpening').value),closing=Number(document.getElementById('clotureClosing').value);
+  if(!Number.isInteger(opening)||opening<0||!Number.isInteger(closing)||closing<0){alert('Saisissez des montants entiers égaux ou supérieurs à zéro.');return;}
+  if(!confirm('Clôturer la journée comptable pour tous les points de vente TOK\'COS ?'))return;
+  const {error}=await sb.rpc('close_tokcos_register',{p_store_id:ACTIVE_STORE_ID,p_opening_amount:opening,p_closing_amount:closing});
+  if(error){console.error('Clôture journalière impossible :',error);alert(`La clôture n'a pas été enregistrée : ${error.message}`);return;}
+  registerStatus=null;
+  alert('La journée comptable est clôturée pour tous les points de vente.');
+  switchAdminTab('caisse');
+}
+async function reopenTokcosRegister(){
+  if(!isOwnerRole()){alert('Seul le propriétaire peut réouvrir la caisse.');return;}
+  if(!confirm('Réouvrir la caisse TOK\'COS pour tous les points de vente ?'))return;
+  const {error}=await sb.rpc('reopen_tokcos_register',{p_store_id:ACTIVE_STORE_ID});
+  if(error){console.error('Réouverture de caisse impossible :',error);alert(`La caisse n'a pas été réouverte : ${error.message}`);return;}
+  await loadRegisterStatus();
 }
 
 /* ---------- UTILISATEURS (manager uniquement) ---------- */
 function renderAdminUsers(){
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>Comptes gérants</b></div></div>
-    <p style="font-size:12.5px;color:#8A7660;margin-bottom:16px;">Pour créer un nouveau compte gérant, passez par Supabase Dashboard → Authentication → Users, puis ajoutez une ligne correspondante dans la table <code>profiles</code> (rôle, point de vente). "Retirer l'accès" ci-dessous supprime le profil applicatif (l'utilisateur perd immédiatement tout accès) mais ne supprime pas le compte de connexion lui-même.</p>
-    <table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Rôle</th><th></th></tr></thead><tbody id="usersTableBody"></tbody></table>`;
+  editingManagerId=null;
+  document.getElementById('adminBody').innerHTML = `${adminActiveTab==='profile'?profileNavMarkup('gerants'):''}<div class="admin-toolbar">${adminActiveTab==='profile'?'':adminBackButton()}<div class="admin-stat"><b>Gérants et points attribués</b></div></div>
+    <div class="admin-product-form manager-invite-form">
+      <h4 class="full">Inviter un gérant</h4>
+      <div class="field"><label>Nom ou pseudo</label><input id="managerInviteName" maxlength="80" placeholder="Nom du gérant"></div>
+      <div class="field"><label>E-mail d'invitation</label><input id="managerInviteEmail" type="email" autocomplete="email" placeholder="gerant@exemple.com"></div>
+      <div class="field"><label>Téléphone</label><input id="managerInvitePhone" type="tel" placeholder="Téléphone"></div>
+      <div class="field"><label>Point de vente</label><select id="managerInvitePoint">${POINTS.filter(point=>point.active).map(point=>`<option value="${point.id}">${esc(point.name)}</option>`).join('')}</select></div>
+      <div class="full admin-form-actions"><button class="btn-primary" type="button" onclick="inviteManager()">Envoyer l'invitation</button><span class="shop-note">Le gérant recevra un e-mail pour activer son compte et définir son mot de passe.</span></div>
+    </div><div id="managerEditor"></div>
+    <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>`;
   renderUsersTable();
 }
 async function renderUsersTable(){
   const tbody = document.getElementById('usersTableBody'); if(!tbody) return;
-  const {data:profiles, error} = await sb.from('profiles').select('*').order('created_at');
-  if(error){ console.error(error); tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Erreur de chargement.</td></tr>'; return; }
-  if(profiles.length===0){ tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">Aucun utilisateur.</td></tr>'; return; }
-  tbody.innerHTML = profiles.map(u=>{ const pointName = POINTS.find(p=>p.id===u.point_id)?.name || (u.role==='manager'?'Tous les points':'—');
-    return `<tr><td><strong>${u.display_name||'—'}</strong></td><td>${u.email||'—'}</td><td>${u.phone||'—'}</td><td>${pointName}</td><td><select onchange="updateUserRole('${u.id}',this.value)">${['manager','gerant','cashier','viewer'].map(role=>`<option value="${role}" ${u.role===role?'selected':''}>${role}</option>`).join('')}</select></td><td>${u.role!=='manager'?`<button class="admin-icon-btn danger" onclick="deleteUserProfile('${u.id}')">🗑</button>`:''}</td></tr>`; }).join('');
+  const {data:profiles, error} = await sb.from('profiles').select('*').eq('organization_id',adminProfile.organization_id).order('created_at');
+  if(error){ console.error(error); tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">Erreur de chargement.</td></tr>'; return; }
+  const managers=(profiles||[]).filter(user=>user.id!==adminProfile.id&&user.role!=='manager'&&user.role!=='owner');
+  if(managers.length===0){ tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">Aucun gérant enregistré.</td></tr>'; return; }
+  tbody.innerHTML = managers.map(user=>{ const pointName=POINTS.find(point=>point.id===user.point_id)?.name||'—';
+    return `<tr><td><strong>${esc(user.display_name||'—')}</strong></td><td>${esc(user.email||'—')}</td><td>${esc(user.phone||'—')}</td><td>${esc(pointName)}</td><td><div class="admin-row-actions"><button class="admin-icon-btn" aria-label="Modifier ${esc(user.display_name||'le gérant')}" onclick="editManagedManager('${user.id}')">✎</button><button class="admin-icon-btn danger" aria-label="Retirer ${esc(user.display_name||'le gérant')}" onclick="deleteUserProfile('${user.id}')">🗑</button></div></td></tr>`; }).join('');
 }
-  async function updateUserRole(userId, role){
-    const mappedRole=role==='manager'?'manager':'gerant', storeRole=role==='manager'?'owner':(role==='cashier'?'cashier':'viewer');
-    const {error}=await sb.from('profiles').update({role:mappedRole}).eq('id',userId).eq('organization_id',adminProfile.organization_id);
-    if(error){alert(error.message);return;}
-    const {error:memberError}=await sb.from('store_members').update({role:storeRole}).eq('store_id',ACTIVE_STORE_ID).eq('user_id',userId);
-    if(memberError){alert(memberError.message);return;} renderUsersTable();
-  }
+async function inviteManager(){
+  const displayName=document.getElementById('managerInviteName').value.trim();
+  const email=document.getElementById('managerInviteEmail').value.trim();
+  const phone=document.getElementById('managerInvitePhone').value.trim();
+  const pointId=document.getElementById('managerInvitePoint').value;
+  if(!displayName||!email||!pointId){alert('Renseignez le nom, l’e-mail et le point de vente.');return;}
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){alert('Votre session a expiré. Reconnectez-vous avant d’inviter un gérant.');return;}
+  const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'invite',display_name:displayName,email,phone,point_id:pointId},headers:{Authorization:`Bearer ${session.access_token}`}});
+  if(error){console.error('Invitation du gérant impossible :',error);alert(`L'invitation n'a pas été envoyée : ${error.message}`);return;}
+  alert(data?.message||'Invitation envoyée.');
+  document.getElementById('managerInviteName').value='';
+  document.getElementById('managerInviteEmail').value='';
+  document.getElementById('managerInvitePhone').value='';
+  await renderUsersTable();
+}
+function editManagedManager(userId){
+  sb.from('profiles').select('*').eq('id',userId).eq('organization_id',adminProfile.organization_id).single().then(({data,error})=>{
+    if(error){console.error('Chargement du profil gérant impossible :',error);alert(`Impossible de charger le gérant : ${error.message}`);return;}
+    const editor=document.getElementById('managerEditor');if(!editor)return;
+    editingManagerId=data.id;
+    editor.innerHTML=`<div class="admin-product-form manager-edit-form"><h4 class="full">Modifier le gérant</h4>
+      <div class="field"><label>Nom ou pseudo</label><input id="managedName" maxlength="80" value="${esc(data.display_name||'')}"></div>
+      <div class="field"><label>Téléphone</label><input id="managedPhone" type="tel" value="${esc(data.phone||'')}"></div>
+      <div class="field"><label>Point de vente</label><select id="managedPoint">${POINTS.filter(point=>point.active||point.id===data.point_id).map(point=>`<option value="${point.id}" ${point.id===data.point_id?'selected':''}>${esc(point.name)}</option>`).join('')}</select></div>
+      <div class="full admin-form-actions"><button class="btn-primary" onclick="saveManagedManager()">Enregistrer</button><button class="btn-ghost" onclick="cancelManagedManagerEdit()">Annuler</button></div></div>`;
+    editor.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+}
+async function saveManagedManager(){
+  const displayName=document.getElementById('managedName').value.trim(),phone=document.getElementById('managedPhone').value.trim(),pointId=document.getElementById('managedPoint').value;
+  if(!displayName||!pointId){alert('Renseignez le nom et le point de vente.');return;}
+  const {error}=await sb.from('profiles').update({display_name:displayName,phone,point_id:pointId}).eq('id',editingManagerId).eq('organization_id',adminProfile.organization_id);
+  if(error){console.error('Modification du gérant impossible :',error);alert(`Le gérant n'a pas été modifié : ${error.message}`);return;}
+  editingManagerId=null;document.getElementById('managerEditor').innerHTML='';await renderUsersTable();
+}
+function cancelManagedManagerEdit(){editingManagerId=null;document.getElementById('managerEditor').innerHTML='';}
 async function deleteUserProfile(userId){
-  if(!confirm("Retirer l'accès de ce gérant ? Son profil applicatif sera supprimé (accès révoqué immédiatement).")) return;
-  const {error} = await sb.from('profiles').delete().eq('id', userId);
-  if(error){ console.error(error); alert("Erreur : " + error.message); return; }
-  await sb.from('store_members').delete().eq('store_id',ACTIVE_STORE_ID).eq('user_id',userId);
-  alert('Accès retiré.'); renderUsersTable();
+  if(!confirm("Supprimer le compte de ce gérant et révoquer tous ses accès ? Cette action est définitive.")) return;
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){alert('Votre session a expiré. Reconnectez-vous avant de retirer un gérant.');return;}
+  const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'remove',user_id:userId},headers:{Authorization:`Bearer ${session.access_token}`}});
+  if(error){console.error('Suppression du compte gérant impossible :',error);alert(`Le gérant n'a pas été supprimé : ${error.message}`);return;}
+  alert(data?.message||'Compte gérant supprimé.');
+  await renderUsersTable();
 }
 
 /* ---------- ASSISTANCE (chat temps réel + appel) ---------- */
@@ -1885,6 +2246,7 @@ renderPointCards();
 renderCartBadge();
 /* Charge ensuite les données réelles en arrière-plan (remplace les valeurs par défaut si disponibles) */
 loadAll();
+if(isInviteSetupLink()) openAdmin();
 </script>
 </body>
 </html>
