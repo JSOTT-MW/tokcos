@@ -1378,6 +1378,8 @@ body.admin-mode .caisse-point-row {
   display: flex;
   align-items: flex-end;
   gap: 10px;
+  /* Remonte la ligne "Point de vente" (caisse uniquement) : réduit l'espace au-dessus. */
+  margin-top: -8px;
 }
 
 body.admin-mode .caisse-point-row .admin-toolbar-field {
@@ -1618,5 +1620,207 @@ body.admin-mode .register-summary strong {
   body.admin-mode .caisse-right .caisse-cart-body {
     max-height: 22dvh !important;
     overflow-y: auto !important;
+  }
+}
+
+/* Caisse : regroupe les commandes en une ligne compacte et réserve trois rangées aux produits. */
+body.admin-mode .admin-panel:has(.admin-caisse-body) {
+  position: relative;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
+  z-index: 24;
+  height: 3vh;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+  background: var(--cream);
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
+  top: 26px;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-brand-logo {
+  width: 48px;
+  height: 48px;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
+  position: absolute;
+  top: 26px;
+  right: 24px;
+  z-index: 23;
+  justify-content: flex-end;
+  transform: translateY(-50%);
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-point-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 248px;
+  z-index: 22;
+  height: 64px;
+  padding: 0 24px;
+  border: 0;
+  background: var(--cream);
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row {
+  position: relative;
+  height: 100%;
+  align-items: center;
+  margin: 0;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .admin-toolbar-field {
+  flex: 0 0 280px;
+  align-self: center;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field label {
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row select {
+  min-height: 32px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
+  position: absolute;
+  top: 50%;
+  right: 190px;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+body.admin-mode .admin-caisse-body {
+  flex: 1 1 0%;
+  height: 0;
+  padding: 50px 24px 10dvh;
+  overflow: hidden;
+}
+
+body.admin-mode .caisse-layout {
+  flex: 1 1 auto;
+  align-items: stretch;
+  gap: 14px;
+}
+
+body.admin-mode .caisse-left {
+  display: flex;
+  flex-direction: column;
+}
+
+body.admin-mode .caisse-left > h4 {
+  flex: 0 0 auto;
+  margin-bottom: 8px !important;
+}
+
+body.admin-mode .caisse-product-grid {
+  flex: 0 1 auto;
+  grid-auto-rows: 142px;
+  max-height: min(470px, calc(100dvh - 175px));
+  padding: 2px 4px 4px 2px;
+}
+
+body.admin-mode .caisse-product-grid .menu-card {
+  height: 142px;
+  overflow: hidden;
+  padding: 8px;
+}
+
+body.admin-mode .caisse-product-grid .menu-card .card-photo {
+  height: 38px;
+  object-fit: contain;
+}
+
+body.admin-mode .caisse-product-grid .menu-card .card-icon {
+  margin-bottom: 2px;
+  font-size: 24px;
+}
+
+body.admin-mode .caisse-product-grid .menu-card .card-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+body.admin-mode .caisse-product-grid .menu-card .card-price {
+  font-size: 11px;
+}
+
+body.admin-mode .caisse-product-grid .menu-card .card-add {
+  padding: 4px 10px;
+  font-size: 10px;
+}
+
+body.admin-mode .caisse-footer-actions {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
+    height: auto;
+    min-height: 56px;
+    padding: 8px 16px 8px 76px;
+  }
+
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    transform: translate(-50%, -50%);
+  }
+
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
+    right: 16px;
+  }
+
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-point-bar {
+    position: sticky;
+    left: auto;
+    height: auto;
+    padding: 8px 16px;
+    background: var(--cream);
+    border-bottom: 1px solid rgba(110, 59, 30, 0.12);
+  }
+
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row {
+    min-height: 42px;
+  }
+
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+  }
+
+  body.admin-mode .admin-caisse-body {
+    height: auto;
+    padding: 16px 14px 10dvh;
+    overflow: auto;
+  }
+
+  body.admin-mode .caisse-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: min(42dvh, 360px);
   }
 }

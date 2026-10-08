@@ -154,6 +154,17 @@
   .overlay.open{display:flex;}
   .modal{background:var(--cream-light);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.4);max-height:90vh;overflow-y:auto;}
   .modal.modal-small{max-width:300px;}
+  .modal.modal-appro{max-width:460px;width:calc(100% - 40px);border-radius:22px;}
+  .modal-appro .modal-body-compact{padding:26px 26px 22px;}
+  .appro-title{font-family:var(--font-display);font-size:23px;line-height:1.2;color:var(--coffee-black);margin-bottom:14px;font-weight:700;}
+  .appro-list{max-height:38vh;overflow-y:auto;border:1px solid rgba(110,59,30,0.12);border-radius:12px;padding:6px 14px;background:var(--cream-light);}
+  .appro-list::-webkit-scrollbar{width:8px;} .appro-list::-webkit-scrollbar-thumb{background:rgba(110,59,30,0.25);border-radius:8px;} .appro-list::-webkit-scrollbar-track{background:transparent;}
+  .appro-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(110,59,30,0.08);}
+  .appro-row:last-child{border-bottom:none;}
+  .appro-row label{flex:1;font-size:13.5px;font-weight:600;color:var(--coffee-black);line-height:1.3;}
+  .appro-row input{width:92px;flex-shrink:0;text-align:center;padding:7px 8px;border-radius:8px;border:1px solid rgba(110,59,30,0.3);font-family:inherit;font-size:13px;background:var(--white);color:var(--ink);}
+  .appro-row input:focus{outline:2px solid var(--gold);border-color:var(--gold);}
+  .modal-appro .btn-primary,.modal-appro .btn-ghost{border-radius:10px;}
   .modal-visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--white);overflow:hidden;}
   .modal-visual img{width:100%;height:100%;object-fit:cover;}
   .modal-visual.cafe{background:linear-gradient(155deg,var(--coffee-brown),var(--coffee-black));}
@@ -572,7 +583,7 @@ function loadCart(){ try{ const raw = localStorage.getItem('tokcos_cart'); retur
 function saveCart(){ try{ localStorage.setItem('tokcos_cart', JSON.stringify(cart)); }catch(e){} }
 let OFFLINE = false;
 let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
-let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null;
+let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null, productEditorReturnToInventory = false;
 let STOCK_DRAFT = new Map();
 let salesSelectedPoint = 'all', salesPeriod = 'day', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
 let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null;
@@ -802,9 +813,15 @@ function closeDrawer(){
   if(drawer){ drawer.classList.remove('open'); drawer.style.transform=''; }
   if(overlay){ overlay.classList.remove('open'); overlay.style.display=''; }
 }
-function cartTotal(){ return cart.reduce((s,c)=>{const p=PRODUCTS.find(pp=>pp.id===c.id);return s+p.price*c.qty;},0); }
+function cartTotal(){ return cart.reduce((s,c)=>{const p=PRODUCTS.find(pp=>pp.id===c.id); if(!p) return s; return s+(Number(p.price)||0)*c.qty;},0); }
 
 function renderDrawer(){
+  /* Purge les lignes dont le produit n'existe plus (seulement une fois le catalogue chargé). */
+  if(PRODUCTS.length>0){
+    const before=cart.length;
+    cart=cart.filter(c=>PRODUCTS.some(p=>p.id===c.id));
+    if(cart.length!==before){ saveCart(); renderCartBadge(); }
+  }
   const body=document.getElementById('drawerBody'), foot=document.getElementById('drawerFoot');
   document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Demande d\'approvisionnement';
   if(checkoutStep==='cart'){
@@ -918,25 +935,7 @@ async function openAdmin(){
   document.getElementById('adminOverlay').classList.add('open');
   if(!sb){ alert("L'espace gérant nécessite une connexion à la base de données. Vérifiez votre connexion internet."); document.getElementById('adminOverlay').classList.remove('open'); return; }
   const {data:{session}} = await sb.auth.getSession();
-  if(session){ adminSession=session; if(isInviteSetupLink()||(session.user.invited_at&&!session.user.last_sign_in_at)){ renderInvitePasswordSetup(); return; } await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }
-}
-function isInviteSetupLink(){return new URLSearchParams(location.hash.replace(/^#/,'')).get('type')==='invite';}
-function renderInvitePasswordSetup(){
-  document.getElementById('adminTitle').textContent="Activer votre compte TOK'COS";
-  document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
-  document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
-  document.getElementById('adminBody').innerHTML=`<div class="admin-login"><img class="admin-login-logo" src="logo.png" alt="TOK'COS"><p class="admin-login-title">Choisissez votre mot de passe</p><div class="field admin-login-form"><label>Nouveau mot de passe</label><input type="password" id="invitePassword" minlength="8" autocomplete="new-password"></div><button class="btn-primary admin-login-btn" onclick="activateInvitedAccount()">Activer mon compte</button></div>`;
-}
-async function activateInvitedAccount(){
-  const password=document.getElementById('invitePassword').value;
-  if(password.length<8){alert('Le mot de passe doit contenir au moins 8 caractères.');return;}
-  const {error}=await sb.auth.updateUser({password});
-  if(error){console.error('Activation du compte impossible :',error);alert(`Le mot de passe n'a pas pu être enregistré : ${error.message}`);return;}
-  history.replaceState(null,'',location.pathname+location.search);
-  adminSession=(await sb.auth.getSession()).data.session;
-  await loadAdminProfile();
-  if(!adminProfile){alert("Le profil du compte n'a pas été créé. Contactez le propriétaire.");return;}
-  renderAdminShell();
+  if(session){ adminSession=session; await loadAdminProfile(); if(adminProfile){ renderAdminShell(); } else { renderAdminLogin(); } } else { renderAdminLogin(); }
 }
 function closeAdmin(){
   if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
@@ -949,6 +948,9 @@ function closeAdmin(){
 function renderAdminLogin(){
   document.getElementById('adminTitle').textContent = "Espace de gestion TOK'COS";
   document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
+  const pointBar=document.getElementById('adminPointBar');
+  pointBar.innerHTML='';
+  pointBar.style.display='none';
   document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
   document.body.classList.remove('admin-mode');
   removeSidebar();
@@ -1017,14 +1019,20 @@ function renderAdminShell(){
   document.getElementById('adminLogoutBtn').classList.remove('admin-logout-btn-hidden');
   const tabsEl = document.getElementById('adminTabs');
   tabsEl.classList.remove('admin-tabs-hidden');
-  const tabs = [['caisse','Caisse'],['ventes','Ventes'],['stock','Inventaire'],['compta','Comptabilité']];
-  if(isOwner) tabs.push(['profile','Profil']);
+  const tabs = [['caisse','Caisse'],['ventes','Ventes'],['stock','Inventaire']];
+  /* La comptabilité reste réservée au propriétaire : aucun onglet pour le gérant. */
+  if(isOwner) tabs.push(['compta','Comptabilité'],['profile','Profil']);
   tabsEl.innerHTML = '';
   document.body.classList.add('admin-mode');
   createSidebar(tabs);
   switchAdminTab('caisse');
 }
 function switchAdminTab(tab){
+  /* Garde-fou : la comptabilité et la gestion des gérants sont réservées au propriétaire. */
+  if((tab==='compta'||tab==='utilisateurs')&&!isOwnerRole()){
+    alert('Section réservée au propriétaire.');
+    tab='caisse';
+  }
   if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
   if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
   if(caisseOrderId && tab!=='caisse'){
@@ -1381,7 +1389,8 @@ function getPeriodRange(period){
 }
 
 async function renderAdminCompta(){
-  const isOwner=isOwnerRole();
+  if(!isOwnerRole()){ alert('Comptabilité réservée au propriétaire.'); adminActiveTab='caisse'; switchAdminTab('caisse'); return; }
+  const isOwner=true;
   if(!isOwner) comptaPoint=adminProfile.point_id;
   const pointOptions=isOwner
     ? `<option value="all" ${comptaPoint==='all'?'selected':''}>Tous les points</option>${POINTS.map(p=>`<option value="${p.id}" ${comptaPoint===p.id?'selected':''}>${p.name}</option>`).join('')}`
@@ -1558,11 +1567,11 @@ function openApproModal(request=null){
   if(request) approPoint=request.point_id;
   const pointOptions=allowedPoints.map(p=>`<option value="${p.id}" ${p.id===(request?.point_id||approPoint)?'selected':''}>${p.name}</option>`).join('');
   const requestItems=new Map((request?.approvisionnement_items||[]).map(item=>[item.product_id,Number(item.qty)]));
-  const productRows=PRODUCTS.map(p=>`<div class="shop-color-row"><label>${esc(p.name)}</label><input type="number" id="appro-${p.id}" min="0" value="${requestItems.get(p.id)||0}" style="width:80px;"></div>`).join('');
-  body.insertAdjacentHTML('beforeend', `<div class="overlay" id="approModal" onclick="if(event.target===this) closeApproModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact">
-    <h3 class="modal-title-small">${request?'Modifier l’approvisionnement':'Approvisionner un point de vente'}</h3>
+  const productRows=PRODUCTS.map(p=>`<div class="appro-row"><label>${esc(p.name)}</label><input type="number" id="appro-${p.id}" min="0" value="${requestItems.get(p.id)||0}"></div>`).join('');
+  body.insertAdjacentHTML('beforeend', `<div class="overlay" id="approModal" onclick="if(event.target===this) closeApproModal()"><div class="modal modal-appro"><div class="modal-body modal-body-compact">
+    <h3 class="appro-title">${request?'Modifier l’approvisionnement':'Approvisionner un point<br>de vente'}</h3>
     <div class="field"><label>Point de vente</label><select id="apPoint" ${request?'disabled':''}>${pointOptions}</select></div>
-    <div style="max-height:40vh;overflow-y:auto;border:1px solid rgba(110,59,30,0.12);border-radius:10px;padding:8px 12px;">${productRows}</div>
+    <div class="appro-list">${productRows}</div>
     <button class="btn-primary btn-full-width" style="margin-top:12px;" onclick="saveAppro()">${request?'Enregistrer les modifications':'Valider'}</button>
     <button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeApproModal()">Annuler</button></div></div>`);
   document.getElementById('approModal').classList.add('open');
@@ -1729,21 +1738,22 @@ function renderAdminProducts(){
   document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div><button class="btn-ghost" onclick="renderAdminCategories()">Gérer les catégories</button></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
   renderProductForm(); renderProductRows();
 }
-function renderProductForm(product){
+function renderProductForm(product, containerId='adminProductForm', returnToInventory=false){
   editingProductId = product?product.id:null; pendingPhotoData = product?product.image_url:null;
-  document.getElementById('adminProductForm').innerHTML = `<div class="admin-product-form">
-    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${pendingPhotoData}">`:'📷'}</div><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 Ajouter une photo</button></div>
-    <div class="field"><label>Nom du produit</label><input type="text" id="pfName" value="${product?product.name.replace(/"/g,'"'):''}" placeholder="Ex : Café Touba"></div>
+  productEditorReturnToInventory=returnToInventory;
+  document.getElementById(containerId).innerHTML = `<div class="admin-product-form">
+    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${esc(pendingPhotoData)}">`:'📷'}</div><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 ${pendingPhotoData?'Modifier':'Ajouter'} une photo</button></div>
+    <div class="field"><label>Nom du produit</label><input type="text" id="pfName" value="${product?esc(product.name):''}" placeholder="Ex : Café Touba"></div>
     <div class="field"><label>Catégorie</label><select id="pfCat"><option value="cafe" ${product&&product.cat==='cafe'?'selected':''}>Café</option><option value="wass" ${product&&product.cat==='wass'?'selected':''}>Wass / Boissons</option></select></div>
     <div class="field"><label>Prix (FCFA)</label><input type="number" id="pfPrice" value="${product?product.price:''}" min="0" placeholder="500"></div>
     ${!product?`<div class="field"><label>Stock initial (par point)</label><input type="number" id="pfStock" value="20" min="0"></div>`:`<div class="field"><label>Stock</label><input type="text" value="Géré dans l'onglet Stock" disabled class="stock-field-disabled"></div>`}
-    <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?(product.description||''):''}</textarea></div>
-    <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?'Enregistrer':'Ajouter le produit'}</button>${product?'<button class="btn-ghost" onclick="renderProductForm()">Annuler</button>':''}</div>
+    <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?esc(product.description||''):''}</textarea></div>
+    <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?'Enregistrer':'Ajouter le produit'}</button>${product?`<button class="btn-ghost" onclick="${returnToInventory?'cancelInventoryProductEdit()':'renderProductForm()'}">Annuler</button>`:''}</div>
   </div>`;
 }
 async function saveProductForm(){
   const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(document.getElementById('pfPrice').value,10), desc=document.getElementById('pfDesc').value.trim();
-  if(!name || isNaN(price)){ alert("Merci de renseigner le nom et le prix."); return; }
+  if(!name || !Number.isInteger(price) || price<0){ alert("Merci de renseigner un nom et un prix entier égal ou supérieur à zéro."); return; }
   if(editingProductId){
     const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
     if(error){ alert("Erreur lors de la mise à jour."); console.error(error); return; }
@@ -1753,7 +1763,31 @@ async function saveProductForm(){
     if(error){ alert("Erreur lors de la création."); console.error(error); return; }
     if(POINTS.length){ const rows=POINTS.map(pt=>({point_id:pt.id,product_id:data.id,quantity:initialStock,store_id:ACTIVE_STORE_ID})); await sb.from('stock').insert(rows); }
   }
-  await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts();
+  const returnToInventory=productEditorReturnToInventory;
+  productEditorReturnToInventory=false;
+  await loadProducts(); await loadStock(); renderMenu();
+  if(returnToInventory) renderAdminStock(); else renderAdminProducts();
+}
+function editInventoryProduct(id){
+  if(!isOwnerRole()){ alert('Seul le propriétaire peut modifier les détails des produits.'); return; }
+  const product=PRODUCTS.find(item=>item.id===id);
+  if(!product){ alert('Ce produit est introuvable.'); return; }
+  let editor=document.getElementById('inventoryProductEditor');
+  if(!editor){
+    const table=document.getElementById('adminStockRows')?.closest('table');
+    if(!table){ alert("L'éditeur de produit est indisponible."); return; }
+    table.insertAdjacentHTML('beforebegin','<div id="inventoryProductEditor"></div>');
+    editor=document.getElementById('inventoryProductEditor');
+  }
+  editor.scrollIntoView({behavior:'smooth',block:'start'});
+  renderProductForm(product,'inventoryProductEditor',true);
+}
+function cancelInventoryProductEdit(){
+  const editor=document.getElementById('inventoryProductEditor');
+  if(editor) editor.remove();
+  editingProductId=null;
+  pendingPhotoData=null;
+  productEditorReturnToInventory=false;
 }
 function renderProductRows(){
   const tbody=document.getElementById('adminProductRows');
@@ -1814,18 +1848,31 @@ function renderAdminStock(){
   if(!isOwner){ stockSelectedPoint = adminProfile.point_id || stockSelectedPoint; } else if(!stockSelectedPoint && POINTS.length){ stockSelectedPoint = POINTS[0].id; }
   const lowCount = PRODUCTS.filter(p=>stockFor(stockSelectedPoint,p.id)<=5).length;
   const pointSelectorHtml = isOwner ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===stockSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div><button class="btn-ghost" onclick="renderAdminAppro()">Approvisionnements</button></div><div class="admin-toolbar"><span id="stockSaveStatus" class="shop-note">Les modifications restent en attente jusqu'à leur enregistrement.</span><button class="btn-primary" id="saveStockBtn" onclick="savePointInventory()">Enregistrer l'inventaire</button></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th><th>Nouvelle quantité</th></tr></thead><tbody id="adminStockRows"></tbody></table>`;
+  const todayDakar = new Date(new Date().toLocaleString('en-US',{timeZone:'Africa/Dakar'}));
+  const isFirstDay = todayDakar.getDate()===1;
+  const stockNote = isOwner
+    ? 'Le stock se met à jour via les ventes (décrément) et les approvisionnements (incrément). Vous pouvez aussi valider un comptage ici.'
+    : (isFirstDay
+      ? '1er du mois : comptez physiquement chaque produit et validez ce que vous voyez. Le stock sera recalculé avec écarts.'
+      : 'Stock automatique via ventes et approvisionnements. La validation manuelle est possible uniquement le 1er du mois (ou sur inventaire demandé par le propriétaire).');
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${pointSelectorHtml}<div class="admin-stat"><b>${lowCount}</b>produit(s) en stock faible (≤5)</div><button class="btn-ghost" onclick="renderAdminAppro()">Approvisionnements</button><button class="btn-ghost" onclick="renderInventoryCampaigns()">Inventaires</button></div><div class="admin-toolbar"><span id="stockSaveStatus" class="shop-note">${stockNote}</span><button class="btn-primary" id="saveStockBtn" onclick="savePointInventory()">Valider le stock</button></div><div id="activeCampaignBanner"></div><table class="admin-table"><thead><tr><th></th><th>Produit</th><th>Stock actuel</th><th>Quantité comptée</th>${isOwner?'<th>Écart</th><th>Modifier</th>':''}</tr></thead><tbody id="adminStockRows"></tbody></table>`;
   renderStockRows();
   updateStockSaveButton();
+  renderActiveCampaignBanner();
 }
 function onStockPointChange(id){ stockSelectedPoint=id; renderAdminStock(); renderAdminPointBar(); }
 function renderStockRows(){
   const tbody=document.getElementById('adminStockRows');
   if(!tbody) return;
-  if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="4" class="admin-empty">Aucun produit.</td></tr>'; return; }
+  const isOwner=isOwnerRole();
+  const colspan=isOwner?'6':'4';
+  if(PRODUCTS.length===0){ tbody.innerHTML=`<tr><td colspan="${colspan}" class="admin-empty">Aucun produit.</td></tr>`; return; }
   tbody.innerHTML = PRODUCTS.map(p=>{ const key=`${stockSelectedPoint}:${p.id}`, qty=stockFor(stockSelectedPoint,p.id), draft=STOCK_DRAFT.has(key)?STOCK_DRAFT.get(key):qty;
     const adjustCell = `<div class="stock-adjust"><button type="button" aria-label="Diminuer ${esc(p.name)}" onclick="adjustStock('${p.id}',-1)">−</button><input type="number" min="0" step="1" class="stock-input" value="${draft}" onchange="setStock('${p.id}', this.value)"><button type="button" aria-label="Augmenter ${esc(p.name)}" onclick="adjustStock('${p.id}',1)">+</button></div>`;
-    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb" alt="">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${esc(p.name)}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td>${adjustCell}</td></tr>`; }).join('');
+    const gap = draft - qty;
+    const gapCell = isOwner ? `<td class="${gap===0?'':'stock-low'}">${gap>0?'+':''}${gap}</td>` : '';
+    const editCell = isOwner ? `<td><button type="button" class="admin-icon-btn" aria-label="Modifier ${esc(p.name)}" title="Modifier le produit" onclick="editInventoryProduct('${p.id}')">✎</button></td>` : '';
+    return `<tr><td>${p.image_url?`<img src="${p.image_url}" class="p-thumb" alt="">`:`<div class="stock-thumb-placeholder">${p.icon||'☕'}</div>`}</td><td>${esc(p.name)}</td><td class="${qty<=5?'stock-low':''}">${qty} unités</td><td>${adjustCell}</td>${gapCell}${editCell}</tr>`; }).join('');
 }
 function adjustStock(productId, delta){
   const key=`${stockSelectedPoint}:${productId}`, current=STOCK_DRAFT.has(key)?STOCK_DRAFT.get(key):stockFor(stockSelectedPoint,productId);
@@ -1849,14 +1896,18 @@ async function savePointInventory(){
   const pointId=stockSelectedPoint;
   const entries=[...STOCK_DRAFT.entries()].filter(([key])=>key.startsWith(`${pointId}:`));
   if(!pointId||entries.length===0) return;
-  const items=entries.map(([key,quantity])=>({product_id:key.slice(pointId.length+1),quantity}));
+  /* Règle métier : le gérant ne valide qu'au 1er du mois ou sur campagne du propriétaire. Le serveur tranche. */
   const button=document.getElementById('saveStockBtn');
-  if(button){button.disabled=true;button.textContent='Enregistrement...';}
-  const {error}=await sb.rpc('save_point_inventory',{p_point_id:pointId,p_items:items});
+  if(button){button.disabled=true;button.textContent='Validation...';}
+  const items=entries.map(([key,counted_quantity])=>({product_id:key.slice(pointId.length+1),counted_quantity}));
+  const payload={p_point_id:pointId,p_items:items};
+  if(typeof activeCampaignId!=='undefined'&&activeCampaignId) payload.p_campaign_id=activeCampaignId;
+  if(!confirm('Valider ce comptage ? Le stock sera recalculé avec les écarts.')){ if(button){button.disabled=false;button.textContent='Valider le stock';} return; }
+  const {error}=await sb.rpc('submit_monthly_stock_count',payload);
   if(error){
-    console.error('Enregistrement inventaire impossible :',error);
-    alert(`L'inventaire n'a pas été enregistré : ${error.message}`);
-    if(button){button.disabled=false;button.textContent="Enregistrer l'inventaire";}
+    console.error('Validation du stock impossible :',error);
+    alert(`Le stock n'a pas été validé : ${error.message}`);
+    if(button){button.disabled=false;button.textContent='Valider le stock';}
     return;
   }
   entries.forEach(([key])=>STOCK_DRAFT.delete(key));
@@ -1865,17 +1916,90 @@ async function savePointInventory(){
   renderCaisseProductGrid();
   renderMenu();
   updateStockSaveButton();
-  if(button) button.textContent="Enregistrer l'inventaire";
+  if(button) button.textContent='Valider le stock';
   const status=document.getElementById('stockSaveStatus');
-  if(status) status.textContent='Inventaire enregistré pour ce point de vente.';
+  if(status) status.textContent='Stock validé : écarts enregistrés pour comparaison.';
+  await loadInventoryHistory();
 }
 
-/* ---------- CARNET DE VENTE (manager: tous / gérant: son point) ---------- */
+/* ---------- CAMPAGNES D'INVENTAIRE (propriétaire déclenche, gérant compte) ---------- */
+let activeCampaignId=null, inventoryHistory=[];
+async function renderActiveCampaignBanner(){
+  const banner=document.getElementById('activeCampaignBanner');
+  if(!banner) return;
+  activeCampaignId=null;
+  if(!sb||!stockSelectedPoint) return;
+  const {data,error}=await sb.from('inventory_campaigns').select('*').eq('store_id',ACTIVE_STORE_ID).eq('status','demande').order('starts_at',{ascending:false}).limit(10);
+  if(error||!data) return;
+  const match=(data||[]).find(c=>!c.point_id||c.point_id===stockSelectedPoint);
+  if(!match) return;
+  activeCampaignId=match.id;
+  const start=match.starts_at?new Date(match.starts_at).toLocaleString('fr-FR'):'';
+  banner.innerHTML=`<div class="admin-stat" style="margin-bottom:12px;"><b>Inventaire demandé : ${esc(match.title||'Inventaire')}</b> ${start} · ${esc(match.recurrence||'ponctuel')} — saisissez puis « Valider le stock ».</div>`;
+}
+async function renderInventoryCampaigns(){
+  const isOwner=isOwnerRole();
+  const body=document.getElementById('adminBody');
+  body.innerHTML=`<div class="admin-toolbar"><button type="button" class="btn-ghost admin-back" onclick="renderAdminStock()">← Retour au stock</button><h3 style="color:var(--coffee-black);">Inventaires</h3>${isOwner?'<button type="button" class="btn-primary appro-open-btn" onclick="openCampaignModal()">+ Demander un inventaire</button>':''}</div>
+  <p class="shop-note" style="margin-bottom:12px;">Le gérant compte le 1er du mois, ou sur inventaire demandé par le propriétaire. Chaque validation enregistre théorique, compté et écart.</p>
+  <div class="table-scroll"><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Titre</th><th>Mode</th><th>Récurrence</th><th>Statut</th>${isOwner?'<th>Action</th>':''}</tr></thead><tbody id="campaignRows"></tbody></table></div>
+  <h4 style="margin:18px 0 10px;">Historique des comptages (écarts)</h4>
+  <div class="table-scroll"><table class="admin-table"><thead><tr><th>Date</th><th>Produit</th><th>Théorique</th><th>Compté</th><th>Écart</th></tr></thead><tbody id="inventoryHistoryRows"></tbody></table></div>`;
+  await Promise.all([loadCampaignRows(),loadInventoryHistory()]);
+}
+async function loadCampaignRows(){
+  const tbody=document.getElementById('campaignRows'); if(!tbody) return;
+  const isOwner=isOwnerRole();
+  const {data,error}=await sb.from('inventory_campaigns').select('*').eq('store_id',ACTIVE_STORE_ID).order('starts_at',{ascending:false}).limit(50);
+  if(error){ tbody.innerHTML=`<tr><td colspan="${isOwner?'7':'6'}" class="admin-empty">${esc(error.message)}</td></tr>`; return; }
+  const rows=(data||[]).filter(c=>isOwner||!c.point_id||c.point_id===adminProfile.point_id);
+  if(!rows.length){ tbody.innerHTML=`<tr><td colspan="${isOwner?'7':'6'}" class="admin-empty">Aucun inventaire demandé.</td></tr>`; return; }
+  tbody.innerHTML=rows.map(c=>{ const point=POINTS.find(p=>p.id===c.point_id)?.name||'Tous les points';
+    const action=isOwner&&c.status==='demande'?`<button class="btn-ghost" onclick="closeCampaign('${c.id}')">Clôturer</button>`:(isOwner?'—':'');
+    return `<tr><td>${c.starts_at?new Date(c.starts_at).toLocaleString('fr-FR'):'—'}</td><td>${esc(point)}</td><td>${esc(c.title||'Inventaire')}</td><td>${esc(c.mode||'')}</td><td>${esc(c.recurrence||'')}</td><td>${c.status==='demande'?'Demandé':'Clôturé'}</td>${isOwner?`<td>${action}</td>`:''}</tr>`; }).join('');
+}
+async function loadInventoryHistory(){
+  const tbody=document.getElementById('inventoryHistoryRows'); if(!tbody) return;
+  const isOwner=isOwnerRole();
+  let query=sb.from('inventory_counts').select('*, products(name)').eq('store_id',ACTIVE_STORE_ID).order('counted_at',{ascending:false}).limit(100);
+  if(!isOwner&&adminProfile.point_id) query=query.eq('point_id',adminProfile.point_id);
+  else if(isOwner&&stockSelectedPoint) query=query.eq('point_id',stockSelectedPoint);
+  const {data,error}=await query;
+  if(error){ tbody.innerHTML=`<tr><td colspan="5" class="admin-empty">${esc(error.message)}</td></tr>`; return; }
+  inventoryHistory=data||[];
+  if(!inventoryHistory.length){ tbody.innerHTML='<tr><td colspan="5" class="admin-empty">Aucun comptage enregistré.</td></tr>'; return; }
+  tbody.innerHTML=inventoryHistory.map(h=>`<tr><td>${h.counted_at?new Date(h.counted_at).toLocaleDateString('fr-FR'):'—'}</td><td>${esc(h.products?.name||'Produit')}</td><td>${h.expected_quantity}</td><td>${h.counted_quantity}</td><td class="${h.gap===0?'':'stock-low'}">${h.gap>0?'+':''}${h.gap}</td></tr>`).join('');
+}
+function openCampaignModal(){
+  if(!isOwnerRole()){ alert('Seul le propriétaire peut demander un inventaire.'); return; }
+  const pointOpts=[['', 'Tous les points'],...POINTS.filter(p=>p.active).map(p=>[p.id,p.name])].map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join('');
+  document.getElementById('adminBody').insertAdjacentHTML('beforeend', `<div class="overlay" id="campaignModal" onclick="if(event.target===this) closeCampaignModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact"><h3 class="modal-title-small">Demander un inventaire</h3><div class="field"><label>Point de vente</label><select id="campPoint">${pointOpts}</select></div><div class="field"><label>Titre</label><input id="campTitle" value="Inventaire" maxlength="80"></div><div class="field"><label>Déclenchement</label><select id="campMode"><option value="immediat">Immédiat</option><option value="planifie">Planifié</option></select></div><div class="field"><label>Récurrence</label><select id="campRecurrence"><option value="ponctuel">Ponctuel</option><option value="jour">Quotidien</option><option value="semaine">Hebdomadaire</option><option value="mois">Mensuel</option><option value="annee">Annuel</option></select></div><div class="field"><label>Date de démarrage</label><input id="campStart" type="datetime-local"></div><button class="btn-primary btn-full-width" onclick="saveCampaign()">Envoyer au gérant</button><button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeCampaignModal()">Annuler</button></div></div></div>`);
+  document.getElementById('campaignModal').classList.add('open');
+}
+function closeCampaignModal(){ const o=document.getElementById('campaignModal'); if(o) o.remove(); }
+async function saveCampaign(){
+  const point=document.getElementById('campPoint').value||null;
+  const title=document.getElementById('campTitle').value.trim()||'Inventaire';
+  const mode=document.getElementById('campMode').value;
+  const recurrence=document.getElementById('campRecurrence').value;
+  const startRaw=document.getElementById('campStart').value;
+  const {error}=await sb.rpc('create_inventory_campaign',{p_point_id:point,p_title:title,p_mode:mode,p_recurrence:recurrence,p_starts_at:startRaw?new Date(startRaw).toISOString():new Date().toISOString()});
+  if(error){ console.error(error); alert(`Inventaire non envoyé : ${error.message}`); return; }
+  closeCampaignModal(); await loadCampaignRows();
+}
+async function closeCampaign(id){
+  if(!confirm('Clôturer cet inventaire ?')) return;
+  const {error}=await sb.rpc('close_inventory_campaign',{p_campaign_id:id});
+  if(error){ console.error(error); alert(`Clôture impossible : ${error.message}`); return; }
+  await loadCampaignRows(); await renderActiveCampaignBanner();
+}
+
+/* ---------- CARNET DE VENTE (manager: tous / gérant: son point, lecture seule) ---------- */
 function renderAdminSales(){
   const isManager = isOwnerRole();
   if(!isManager){ salesSelectedPoint = adminProfile.point_id; }
   const filterHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===salesSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div class="field admin-toolbar-field"><label>Période</label><select id="salesPeriod" onchange="salesPeriod=this.value;loadAndRenderSales()"><option value="day" ${salesPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${salesPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${salesPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${salesPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${salesPeriod==='all'?'selected':''}>Tout</option></select></div><div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div><table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th></tr></thead><tbody id="adminSalesRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div class="field admin-toolbar-field"><label>Période</label><select id="salesPeriod" onchange="salesPeriod=this.value;loadAndRenderSales()"><option value="day" ${salesPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${salesPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${salesPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${salesPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${salesPeriod==='all'?'selected':''}>Tout</option></select></div><div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div>${isManager?'':'<p class="shop-note" style="margin-bottom:12px;">Ventes en lecture seule : pour toute correction après encaissement, contactez le propriétaire.</p>'}<table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th>${isManager?'<th>Actions</th>':''}</tr></thead><tbody id="adminSalesRows"></tbody></table>`;
   loadAndRenderSales();
 }
 function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
@@ -1892,14 +2016,53 @@ async function loadAndRenderSales(){
   if(statsEl){ statsEl.innerHTML = `<div class="admin-stat"><b>${SALES_CACHE.length}</b>commandes</div><div class="admin-stat"><b>${money(totalRevenue)}</b>CA net confirmé</div><div class="admin-stat"><b>${SALES_CACHE.filter(v=>v.channel==='en_ligne' && !v.fulfilled).length}</b>en attente (en ligne)</div>`; }
   renderSalesRows();
 }
+function saleStatusLabel(status){
+  return {vendu:'Vendu',rembourse:'Remboursé',annule:'Annulée'}[status]||status||'—';
+}
 function renderSalesRows(){
   const tbody=document.getElementById('adminSalesRows');
-  if(SALES_CACHE.length===0){ tbody.innerHTML='<tr><td colspan="9" class="admin-empty">Aucune vente.</td></tr>'; return; }
+  const isOwner=isOwnerRole();
+  const colspan=isOwner?'10':'9';
+  if(SALES_CACHE.length===0){ tbody.innerHTML=`<tr><td colspan="${colspan}" class="admin-empty">Aucune vente.</td></tr>`; return; }
   tbody.innerHTML = SALES_CACHE.map(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||'—';
+    const pendingOnline=v.channel==='en_ligne'&&!v.fulfilled;
+    const statusCell=pendingOnline?'<span class="status-btn active">En attente de règlement</span>':(isOwner?`<div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div>`:`<span class="status-btn active">${saleStatusLabel(v.status)}</span>`);
+    const actionCell=isOwner?`<td><div class="admin-row-actions"><button class="admin-icon-btn" aria-label="Corriger la vente" title="Corriger (stock ajusté)" onclick="editSaleById('${v.id}')">✎</button><button class="admin-icon-btn danger" aria-label="Supprimer la vente" title="Supprimer" onclick="deleteSaleById('${v.id}')">🗑</button></div></td>`:'';
     return `<tr><td>${new Date(v.created_at).toLocaleString('fr-FR')}</td><td>${esc(pointName)}</td><td>${v.channel==='caisse'?'Comptoir':'En ligne'+(v.fulfilled?'':' ⏳')}</td><td>${esc(v.client_name||'')}<br><span class="sales-phone">${esc(v.client_phone||'')}</span></td><td>${v.sale_items.map(l=>`${esc(l.product_name)} x${l.qty}`).join('<br>')}</td><td>${esc(v.delivery_mode||'')}</td><td>${esc(v.payment_method||'')}</td><td class="sales-total">${money(v.total)}</td>
-    <td>${v.channel==='en_ligne'&&!v.fulfilled?'<span class="status-btn active">En attente de règlement</span>':`<div class="status-buttons"><button class="status-btn ${v.status==='vendu'?'active vendu':''}" onclick="setSaleStatus('${v.id}','vendu')">Vendu</button><button class="status-btn ${v.status==='rembourse'?'active rembourse':''}" onclick="setSaleStatus('${v.id}','rembourse')">Remboursé</button><button class="status-btn ${v.status==='annule'?'active annule':''}" onclick="setSaleStatus('${v.id}','annule')">Annulée</button></div>`}</td></tr>`; }).join('');
+    <td>${statusCell}</td>${actionCell}</tr>`; }).join('');
 }
-async function setSaleStatus(id, status){ const {error}=await sb.from('sales').update({status}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales(); }
+async function setSaleStatus(id, status){
+  if(!isOwnerRole()){ alert("Seul le propriétaire peut modifier le statut d'une vente après encaissement. Contactez-le."); return; }
+  const {error}=await sb.from('sales').update({status}).eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){console.error(error);alert(`Le statut n'a pas été modifié : ${error.message}`);return;} const v=SALES_CACHE.find(s=>s.id===id); if(v) v.status=status; loadAndRenderSales();
+}
+let editingSaleId=null;
+async function editSaleById(id){
+  if(!isOwnerRole()){ alert("Seul le propriétaire peut corriger une vente."); return; }
+  const {data,error}=await sb.from('sales').select('*, sale_items(*)').eq('id',id).eq('store_id',ACTIVE_STORE_ID).single();
+  if(error){ console.error('Chargement vente :',error); alert(`Vente non chargée : ${error.message}`); return; }
+  editingSaleId=id;
+  const rows=(data.sale_items||[]).map(l=>`<div class="shop-color-row"><label>${esc(l.product_name||'Produit')}</label><input type="number" id="saleitem-${l.product_id}" min="0" value="${Number(l.qty)||0}" style="width:80px;"></div>`).join('');
+  const statusOpts=['vendu','rembourse','annule'].map(s=>`<option value="${s}" ${data.status===s?'selected':''}>${saleStatusLabel(s)}</option>`).join('');
+  document.getElementById('adminBody').insertAdjacentHTML('beforeend', `<div class="overlay" id="saleEditModal" onclick="if(event.target===this) closeSaleEditModal()"><div class="modal modal-small"><div class="modal-body modal-body-compact"><h3 class="modal-title-small">Corriger la vente (stock ajusté)</h3><div class="field"><label>Statut</label><select id="saleEditStatus">${statusOpts}</select></div><div style="max-height:32vh;overflow-y:auto;border:1px solid rgba(110,59,30,0.12);border-radius:10px;padding:8px 12px;">${rows}</div><p class="shop-note" style="margin-top:10px;">La correction recalcule le total et ajuste le stock (écart).</p><button class="btn-primary btn-full-width" style="margin-top:12px;" onclick="saveSaleCorrection()">Enregistrer</button><button class="btn-ghost btn-full-width" style="margin-top:8px;" onclick="closeSaleEditModal()">Annuler</button></div></div></div>`);
+  document.getElementById('saleEditModal').classList.add('open');
+}
+function closeSaleEditModal(){ const o=document.getElementById('saleEditModal'); if(o) o.remove(); editingSaleId=null; }
+async function saveSaleCorrection(){
+  const sale=SALES_CACHE.find(s=>s.id===editingSaleId);
+  const lines=(sale?.sale_items||[]).map(l=>({product_id:l.product_id,qty:Math.max(0,parseInt(document.getElementById('saleitem-'+l.product_id)?.value)||0)}));
+  const status=document.getElementById('saleEditStatus').value;
+  if(!confirm('Enregistrer ? Le stock sera ajusté.')) return;
+  const {error}=await sb.rpc('correct_sale_status',{p_sale_id:editingSaleId,p_status:status,p_items:lines});
+  if(error){ console.error(error); alert(`Correction impossible : ${error.message}`); return; }
+  closeSaleEditModal(); await loadStock(); await loadAndRenderSales(); renderMenu(); renderCaisseProductGrid();
+}
+async function deleteSaleById(id){
+  if(!isOwnerRole()){ alert("Seul le propriétaire peut supprimer une vente."); return; }
+  if(!confirm('Supprimer ? Le stock vendu sera réintégré.')) return;
+  const {error}=await sb.rpc('delete_sale_with_restock',{p_sale_id:id});
+  if(error){ console.error(error); alert(`Suppression impossible : ${error.message}`); return; }
+  await loadStock(); await loadAndRenderSales(); renderMenu(); renderCaisseProductGrid();
+}
 function exportSalesCSV(){
   let csv="Date;Point;Canal;Client;Telephone;Produits;Mode;Paiement;Total;Statut\n";
   SALES_CACHE.forEach(v=>{ const pointName=POINTS.find(p=>p.id===v.point_id)?.name||''; const items=v.sale_items.map(l=>`${l.product_name} x${l.qty}`).join(' | ');
@@ -2126,19 +2289,32 @@ async function reopenTokcosRegister(){
   await loadRegisterStatus();
 }
 
+function tokcosSlug(text){
+  return (text||'point').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'')||'point';
+}
+function gerantEmailForPoint(pointId){
+  const point=POINTS.find(p=>p.id===pointId);
+  return `gerant.${tokcosSlug(point?.name||'point')}@tokcos.sn`;
+}
+function refreshGerantEmailPreview(){
+  const sel=document.getElementById('managerInvitePoint');
+  const out=document.getElementById('gerantEmailPreview');
+  if(sel&&out) out.textContent=gerantEmailForPoint(sel.value);
+}
 /* ---------- UTILISATEURS (manager uniquement) ---------- */
 function renderAdminUsers(){
   editingManagerId=null;
   document.getElementById('adminBody').innerHTML = `${adminActiveTab==='profile'?profileNavMarkup('gerants'):''}<div class="admin-toolbar">${adminActiveTab==='profile'?'':adminBackButton()}<div class="admin-stat"><b>Gérants et points attribués</b></div></div>
     <div class="admin-product-form manager-invite-form">
-      <h4 class="full">Inviter un gérant</h4>
+      <h4 class="full">Créer un gérant (compte actif immédiat)</h4>
       <div class="field"><label>Nom ou pseudo</label><input id="managerInviteName" maxlength="80" placeholder="Nom du gérant"></div>
-      <div class="field"><label>E-mail d'invitation</label><input id="managerInviteEmail" type="email" autocomplete="email" placeholder="gerant@exemple.com"></div>
+      <div class="field"><label>Point de vente</label><select id="managerInvitePoint" onchange="refreshGerantEmailPreview()">${POINTS.filter(point=>point.active).map(point=>`<option value="${point.id}">${esc(point.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>E-mail généré automatiquement</label><input id="managerInviteEmail" type="email" readonly style="background:var(--cream);"><span class="shop-note" id="gerantEmailPreview"></span></div>
       <div class="field"><label>Téléphone</label><input id="managerInvitePhone" type="tel" placeholder="Téléphone"></div>
-      <div class="field"><label>Point de vente</label><select id="managerInvitePoint">${POINTS.filter(point=>point.active).map(point=>`<option value="${point.id}">${esc(point.name)}</option>`).join('')}</select></div>
-      <div class="full admin-form-actions"><button class="btn-primary" type="button" onclick="inviteManager()">Envoyer l'invitation</button><span class="shop-note">Le gérant recevra un e-mail pour activer son compte et définir son mot de passe.</span></div>
-    </div><div id="managerEditor"></div>
+      <div class="full admin-form-actions"><button class="btn-primary" type="button" onclick="inviteManager()">Créer le compte gérant</button><span class="shop-note">Un seul gérant par point. E-mail auto : gerant.(point)@tokcos.sn — compte actif aussitôt, sans e-mail. Transmettez l’e-mail et le mot de passe affiché au gérant.</span></div>
+    </div><div id="managerEditor"></div><div id="gerantCredentials"></div>
     <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>`;
+  refreshGerantEmailPreview();
   renderUsersTable();
 }
 async function renderUsersTable(){
@@ -2152,18 +2328,23 @@ async function renderUsersTable(){
 }
 async function inviteManager(){
   const displayName=document.getElementById('managerInviteName').value.trim();
-  const email=document.getElementById('managerInviteEmail').value.trim();
   const phone=document.getElementById('managerInvitePhone').value.trim();
   const pointId=document.getElementById('managerInvitePoint').value;
-  if(!displayName||!email||!pointId){alert('Renseignez le nom, l’e-mail et le point de vente.');return;}
+  if(!displayName||!pointId){alert('Renseignez le nom et le point de vente.');return;}
+  const email=gerantEmailForPoint(pointId);
+  const {data:existing}=await sb.from('profiles').select('id').eq('organization_id',adminProfile.organization_id).eq('point_id',pointId).neq('role','manager').neq('role','owner').limit(1);
+  if(existing&&existing.length){ alert('Ce point de vente a déjà un gérant (un seul gérant par point).'); return; }
   const {data:{session}}=await sb.auth.getSession();
-  if(!session){alert('Votre session a expiré. Reconnectez-vous avant d’inviter un gérant.');return;}
+  if(!session){alert('Votre session a expiré. Reconnectez-vous avant de créer un gérant.');return;}
   const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'invite',display_name:displayName,email,phone,point_id:pointId},headers:{Authorization:`Bearer ${session.access_token}`}});
-  if(error){console.error('Invitation du gérant impossible :',error);alert(`L'invitation n'a pas été envoyée : ${error.message}`);return;}
-  alert(data?.message||'Invitation envoyée.');
+  if(error){console.error('Création du gérant impossible :',error);alert(`Le compte n'a pas été créé : ${error.message}`);return;}
+  const box=document.getElementById('gerantCredentials');
+  if(box) box.innerHTML=`<div class="admin-stat" style="margin:12px 0;"><b>Compte actif : ${esc(data?.email||email)}</b>Mot de passe : <b>${esc(data?.initial_password||'—')}</b> — transmettez ces identifiants au gérant (6 caractères).</div>`;
+  alert(data?.message||'Compte gérant créé et actif.');
   document.getElementById('managerInviteName').value='';
   document.getElementById('managerInviteEmail').value='';
   document.getElementById('managerInvitePhone').value='';
+  refreshGerantEmailPreview();
   await renderUsersTable();
 }
 function editManagedManager(userId){
@@ -2173,17 +2354,22 @@ function editManagedManager(userId){
     editingManagerId=data.id;
     editor.innerHTML=`<div class="admin-product-form manager-edit-form"><h4 class="full">Modifier le gérant</h4>
       <div class="field"><label>Nom ou pseudo</label><input id="managedName" maxlength="80" value="${esc(data.display_name||'')}"></div>
+      <div class="field"><label>E-mail (auto, lié au point)</label><input value="${esc(data.email||gerantEmailForPoint(data.point_id))}" readonly style="background:var(--cream);"></div>
       <div class="field"><label>Téléphone</label><input id="managedPhone" type="tel" value="${esc(data.phone||'')}"></div>
       <div class="field"><label>Point de vente</label><select id="managedPoint">${POINTS.filter(point=>point.active||point.id===data.point_id).map(point=>`<option value="${point.id}" ${point.id===data.point_id?'selected':''}>${esc(point.name)}</option>`).join('')}</select></div>
-      <div class="full admin-form-actions"><button class="btn-primary" onclick="saveManagedManager()">Enregistrer</button><button class="btn-ghost" onclick="cancelManagedManagerEdit()">Annuler</button></div></div>`;
+      <div class="full admin-form-actions"><button class="btn-primary" onclick="saveManagedManager()">Enregistrer</button><button class="btn-ghost" onclick="cancelManagedManagerEdit()">Annuler</button></div><p class="shop-note full">Un seul gérant par point : changer de point régénère gerant.(point)@tokcos.sn.</p></div>`;
     editor.scrollIntoView({behavior:'smooth',block:'nearest'});
   });
 }
 async function saveManagedManager(){
   const displayName=document.getElementById('managedName').value.trim(),phone=document.getElementById('managedPhone').value.trim(),pointId=document.getElementById('managedPoint').value;
   if(!displayName||!pointId){alert('Renseignez le nom et le point de vente.');return;}
-  const {error}=await sb.from('profiles').update({display_name:displayName,phone,point_id:pointId}).eq('id',editingManagerId).eq('organization_id',adminProfile.organization_id);
-  if(error){console.error('Modification du gérant impossible :',error);alert(`Le gérant n'a pas été modifié : ${error.message}`);return;}
+  /* Changement de point = nouvel email auto gerant.(point)@tokcos.sn via la fonction serveur (unicité contrôlée). */
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){alert('Votre session a expiré. Reconnectez-vous.');return;}
+  const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'move',user_id:editingManagerId,new_point_id:pointId,display_name:displayName,phone},headers:{Authorization:`Bearer ${session.access_token}`}});
+  if(error){console.error('Déplacement du gérant impossible :',error);alert(`Le gérant n'a pas été modifié : ${error.message}`);return;}
+  alert(data?.message||'Gérant mis à jour.');
   editingManagerId=null;document.getElementById('managerEditor').innerHTML='';await renderUsersTable();
 }
 function cancelManagedManagerEdit(){editingManagerId=null;document.getElementById('managerEditor').innerHTML='';}

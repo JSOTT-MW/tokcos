@@ -1,5 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+declare const Deno: {
+  env: { get(name: string): string | undefined };
+  serve(handler: (request: Request) => Response | Promise<Response>): unknown;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
@@ -53,17 +58,33 @@ Deno.serve(async (request: Request) => {
   const phone = typeof body.phone === "string" ? body.phone.trim() : "";
   const pointId = typeof body.point_id === "string" ? body.point_id : "";
   const userId = typeof body.user_id === "string" ? body.user_id : "";
+  const managedPointId = typeof (body as { new_point_id?: unknown }).new_point_id === "string"
+    ? (body as { new_point_id: string }).new_point_id
+    : "";
+  const slugify = (value: string) =>
+    value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/(^-+|-+$)/g, "") || "point";
+  const gerantEmailForSlug = (slug: string) => `gerant.${slug}@tokcos.sn`;
+  /* Mot de passe auto : 6 caractères max, sans ambiguïté (pas de 0/O/1/l). */
+  const randomGerantPassword = () => {
+    const alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+    const bytes = new Uint8Array(6);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+  };
   const isUuid = (value: string) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-  if (action !== "invite" && action !== "remove") {
+  if (action !== "invite" && action !== "remove" && action !== "move") {
     return respond({ error: "Action non prise en charge." }, 400);
   }
   if (action === "invite" && (
     !displayName || displayName.length > 80 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
     phone.length > 40 || !isUuid(pointId)
   )) {
-    return respond({ error: "Vérifiez le nom, l’e-mail, le téléphone et le point de vente." }, 400);
+    return respond({ error: "Vérifiez le nom, le téléphone et le point de vente." }, 400);
+  }
+  if (action === "move" && (!isUuid(userId) || !isUuid(managedPointId))) {
+    return respond({ error: "Gérant ou point de destination invalide." }, 400);
   }
   if (action === "remove" && !isUuid(userId)) {
     return respond({ error: "Identifiant de gérant invalide." }, 400);
@@ -105,13 +126,68 @@ Deno.serve(async (request: Request) => {
     .from("stores")
     .select("id")
     .eq("organization_id", owner.organization_id)
-    .in("id", memberships.map((membership) => membership.store_id));
+    .in("id", memberships.map((membership: { store_id: string }) => membership.store_id));
   if (storesError) {
     console.error("Impossible de vérifier la boutique du propriétaire.", storesError);
     return respond({ error: "Impossible de vérifier la boutique du propriétaire." }, 500);
   }
   const storeId = ownedStores?.[0]?.id;
   if (!storeId) return respond({ error: "Aucune boutique autorisée pour ce compte." }, 403);
+
+  if (action === "move") {
+    const { data: target, error: targetError } = await adminClient
+      .from("profiles")
+      .select("id, role, point_id, organization_id")
+      .eq("id", userId)
+      .eq("organization_id", owner.organization_id)
+      .single();
+    if (targetError || !target || ["manager", "owner"].includes(target.role)) {
+      return respond({ error: "Ce compte gérant est introuvable." }, 404);
+    }
+    const { data: dest, error: destError } = await adminClient
+      .from("points_de_vente")
+      .select("id, store_id, active, name, slug")
+      .eq("id", managedPointId)
+      .eq("store_id", storeId)
+      .single();
+    if (destError || !dest || !dest.active) {
+      return respond({ error: "Le point de destination est introuvable ou inactif." }, 400);
+    }
+    if (target.point_id !== dest.id) {
+      const { data: taken } = await adminClient
+        .from("profiles")
+        .select("id")
+        .eq("organization_id", owner.organization_id)
+        .eq("point_id", dest.id)
+        .neq("id", target.id)
+        .neq("role", "manager")
+        .neq("role", "owner")
+        .limit(1);
+      if (taken && taken.length) {
+        return respond({ error: "Le point de destination a déjà un gérant." }, 409);
+      }
+    }
+    const destSlug = dest.slug || slugify(dest.name || "point");
+    const destEmail = gerantEmailForSlug(destSlug);
+    const updates: Record<string, unknown> = { point_id: dest.id, email: destEmail };
+    if (displayName) updates.display_name = displayName.slice(0, 80);
+    if (phone !== undefined) updates.phone = phone || null;
+    const { error: moveError } = await adminClient
+      .from("profiles")
+      .update(updates)
+      .eq("id", target.id)
+      .eq("organization_id", owner.organization_id);
+    if (moveError) {
+      console.error("Déplacement du gérant échoué.", moveError);
+      return respond({ error: "Le gérant n’a pas pu être déplacé." }, 500);
+    }
+    const { error: authMailError } = await adminClient.auth.admin.updateUserById(target.id, { email: destEmail });
+    if (authMailError) {
+      console.error("Mise à jour de l’e-mail Auth échouée.", authMailError);
+      return respond({ message: `Gérant déplacé, mais l’e-mail Auth doit être resynchronisé vers ${destEmail}.` });
+    }
+    return respond({ message: `Gérant déplacé vers ${destEmail}.` });
+  }
 
   if (action === "remove") {
     const { data: target, error: targetError } = await adminClient
@@ -145,31 +221,45 @@ Deno.serve(async (request: Request) => {
 
   const { data: point, error: pointError } = await adminClient
     .from("points_de_vente")
-    .select("id, store_id, active")
+    .select("id, store_id, active, name, slug")
     .eq("id", pointId)
     .eq("store_id", storeId)
     .single();
   if (pointError || !point || !point.active) {
     return respond({ error: "Le point de vente sélectionné est introuvable ou inactif." }, 400);
   }
-
-  const appUrl = Deno.env.get("APP_URL");
-  const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(
-    email,
-    {
-      data: { display_name: displayName },
-      ...(appUrl ? { redirectTo: appUrl } : {}),
-    },
-  );
-  if (inviteError || !inviteData.user) {
-    console.error("Invitation Supabase Auth échouée.", inviteError);
-    return respond({ error: inviteError?.message || "L’invitation n’a pas pu être envoyée." }, 400);
+  const pointSlug = point.slug || slugify(point.name || "point");
+  const autoEmail = gerantEmailForSlug(pointSlug);
+  const { data: taken } = await adminClient
+    .from("profiles")
+    .select("id")
+    .eq("organization_id", owner.organization_id)
+    .eq("point_id", point.id)
+    .neq("role", "manager")
+    .neq("role", "owner")
+    .limit(1);
+  if (taken && taken.length) {
+    return respond({ error: "Ce point de vente a déjà un gérant (un seul gérant par point)." }, 409);
   }
 
-  const invitedUser = inviteData.user;
+  /* Compte actif immédiatement : aucune confirmation par e-mail.
+     createUser (et non inviteUserByEmail) + email_confirm:true. */
+  const initialPassword = randomGerantPassword();
+  const { data: createdData, error: createError } = await adminClient.auth.admin.createUser({
+    email: autoEmail,
+    password: initialPassword,
+    email_confirm: true,
+    user_metadata: { display_name: displayName },
+  });
+  if (createError || !createdData.user) {
+    console.error("Création du compte gérant échouée.", createError);
+    return respond({ error: createError?.message || "Le compte gérant n’a pas pu être créé." }, 400);
+  }
+
+  const invitedUser = createdData.user;
   const { error: profileError } = await adminClient.from("profiles").insert({
     id: invitedUser.id,
-    email,
+    email: autoEmail,
     display_name: displayName,
     phone: phone || null,
     role: "gerant",
@@ -179,7 +269,7 @@ Deno.serve(async (request: Request) => {
   if (profileError) {
     console.error("Création du profil gérant échouée.", profileError);
     await adminClient.auth.admin.deleteUser(invitedUser.id);
-    return respond({ error: "Le compte a été invité, mais son profil n’a pas pu être créé." }, 500);
+    return respond({ error: "Le compte a été créé, mais son profil n’a pas pu être enregistré." }, 500);
   }
 
   const { error: storeMemberError } = await adminClient.from("store_members").upsert(
@@ -190,8 +280,12 @@ Deno.serve(async (request: Request) => {
     console.error("Ajout du gérant à la boutique échoué.", storeMemberError);
     await adminClient.from("profiles").delete().eq("id", invitedUser.id);
     await adminClient.auth.admin.deleteUser(invitedUser.id);
-    return respond({ error: "Le compte a été invité, mais son accès au point n’a pas pu être créé." }, 500);
+    return respond({ error: "Le compte a été créé, mais son accès au point n’a pas pu être enregistré." }, 500);
   }
 
-  return respond({ message: `Invitation envoyée à ${email}.` }, 201);
+  return respond({
+    message: `Compte gérant actif : ${autoEmail}.`,
+    email: autoEmail,
+    initial_password: initialPassword,
+  }, 201);
 });
