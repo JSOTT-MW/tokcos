@@ -354,10 +354,10 @@ begin
   loop
     select name, price into v_product_name, v_price
       from public.products
-     where id = (v_item->>'product_id')::uuid and store_id = p_store_id and active = true;
-    v_line_total := v_price * (v_item->>'qty')::integer;
+     where id = (v_item.value->>'product_id')::uuid and store_id = p_store_id and active = true;
+    v_line_total := v_price * (v_item.value->>'qty')::integer;
     insert into public.sale_items (sale_id, product_id, product_name, qty, price, subtotal)
-    values (v_sale_id, (v_item->>'product_id')::uuid, v_product_name, (v_item->>'qty')::integer, v_price, v_line_total);
+    values (v_sale_id, (v_item.value->>'product_id')::uuid, v_product_name, (v_item.value->>'qty')::integer, v_price, v_line_total);
   end loop;
   return v_sale_id;
 end;

@@ -87,21 +87,24 @@
   .menu-col{background:var(--white);border-radius:20px;padding:28px;border:1px solid rgba(110,59,30,0.12);box-shadow:0 2px 8px rgba(30,15,7,0.06);}
   .menu-col-title{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid rgba(110,59,30,0.1);}
   .menu-col-title .dot{width:10px;height:10px;border-radius:50%;}
-  .dot-gold{background:var(--gold);} .dot-rust{background:var(--rust);}
+  .dot-gold{background:var(--gold);} .dot-rust{background:var(--rust);} .dot-green{background:#2E7D32;}
   .menu-col-title h3{font-size:19px;color:var(--coffee-black);}
-  .card-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:14px;}
+  .card-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;}
+  @media(max-width:900px){ .card-grid{grid-template-columns:repeat(2, 1fr);} }
   @media(max-width:600px){ .card-grid{grid-template-columns:1fr;} }
   .menu-card{background:var(--white);border-radius:16px;padding:18px;border:1px solid rgba(110,59,30,0.12);box-shadow:0 2px 8px rgba(30,15,7,0.06);transition:transform .25s ease, box-shadow .25s ease;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;}
   .menu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, var(--gold-light), var(--gold));}
   .menu-card.cafe::before{background:linear-gradient(90deg, var(--coffee-tan), var(--gold));}
   .menu-card.wass::before{background:linear-gradient(90deg, var(--blush), var(--rust));}
+  .menu-card.bouteille::before{background:linear-gradient(90deg,#57A862,#2E7D32);}
   .menu-card:hover{transform:translateY(-6px);box-shadow:0 12px 24px rgba(30,15,7,0.15);}
   .menu-card .card-icon{font-size:34px;margin-bottom:8px;}
-  .menu-card .card-photo{width:100%;height:80px;border-radius:10px;object-fit:cover;margin-bottom:8px;}
+  .menu-card .card-photo{width:100%;aspect-ratio:1/1;height:auto;border-radius:10px;object-fit:cover;margin-bottom:8px;}
   .menu-card .card-name{font-size:13.5px;font-weight:700;color:var(--coffee-black);margin-bottom:5px;line-height:1.3;}
   .menu-card .card-price{font-size:12.5px;font-weight:700;color:var(--rust);margin-bottom:9px;}
   .menu-card .card-add{font-size:11px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg, var(--coffee-brown), var(--coffee-black));color:var(--white);font-weight:700;}
   .menu-card.wass .card-add{background:linear-gradient(135deg, var(--rust), #6E2418);}
+  .menu-card.bouteille .card-add{background:linear-gradient(135deg,#2E7D32,#1B5E20);}
   .menu-card .card-add:hover{transform:scale(1.05);filter:brightness(1.15);}
   .menu-card.out-of-stock{opacity:0.55;cursor:not-allowed;}
   .menu-card .stock-flag{position:absolute;top:8px;right:8px;background:var(--rust);color:var(--white);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;}
@@ -169,6 +172,7 @@
   .modal-visual img{width:100%;height:100%;object-fit:cover;}
   .modal-visual.cafe{background:linear-gradient(155deg,var(--coffee-brown),var(--coffee-black));}
   .modal-visual.wass{background:linear-gradient(155deg,var(--rust),#6E2418);}
+  .modal-visual.bouteille{background:linear-gradient(155deg,#2E7D32,#1B5E20);}
   .modal-body{padding:26px 26px 28px;}
   .modal-body.modal-body-compact{padding:22px;}
   .modal-body h3{font-size:21px;color:var(--coffee-black);margin-bottom:8px;}
@@ -180,6 +184,16 @@
   .qty-stepper button{width:28px;height:28px;border-radius:50%;background:var(--cream);font-size:16px;font-weight:700;color:var(--coffee-black);}
   .qty-stepper button:hover{background:var(--gold-light);}
   .qty-stepper span{min-width:20px;text-align:center;font-weight:700;}
+  .format-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .format-label{font-size:13px;font-weight:600;}
+  .format-options{display:flex;gap:8px;flex-wrap:wrap;}
+  .format-option{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:12px;border:1px solid rgba(110,59,30,0.25);background:var(--white);font-weight:600;transition:all .2s ease;}
+  .format-option .format-name{font-size:12.5px;color:var(--coffee-black);}
+  .format-option .format-price{font-size:11px;color:var(--rust);}
+  .format-option.active{border-color:var(--rust);background:linear-gradient(135deg,var(--rust),#6E2418);}
+  .format-option.active .format-name{color:var(--white);}
+  .format-option.active .format-price{color:var(--gold-light);}
+  .format-option:disabled{opacity:0.45;cursor:not-allowed;}
   .modal-actions{display:flex;gap:10px;}
   .modal-buttons-vertical{display:flex;flex-direction:column;gap:10px;}
   .btn-primary{flex:1;background:var(--rust);color:var(--white);padding:13px;border-radius:999px;font-weight:700;font-size:14px;text-align:center;}
@@ -256,8 +270,9 @@
   .admin-product-form .full{grid-column:1/-1;}
   .admin-form-actions{display:flex;gap:10px;}
   .admin-photo-zone{display:flex;align-items:center;gap:14px;}
-  .admin-photo-preview{width:64px;height:64px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
+  .admin-photo-preview{width:84px;height:84px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
   .admin-photo-preview img{width:100%;height:100%;object-fit:cover;}
+  .admin-photo-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
   .admin-photo-btn{font-size:12px;font-weight:700;color:var(--rust);border:1px solid var(--rust);padding:9px 16px;border-radius:999px;}
   .stock-field-disabled{color:#8A7660;}
 
@@ -475,10 +490,7 @@
       <h2>Vente de café tous genres</h2>
       <p>Cliquez sur une carte pour voir la description, puis ajoutez-la au panier.</p>
     </div>
-    <div class="menu-cols">
-      <div class="menu-col"><div class="menu-col-title"><span class="dot dot-gold"></span><h3>Café & Douceurs Chaudes</h3></div><div class="card-grid" id="grid-cafe"></div></div>
-      <div class="menu-col"><div class="menu-col-title"><span class="dot dot-rust"></span><h3>Wass, Jus & Saveurs Locales</h3></div><div class="card-grid" id="grid-wass"></div></div>
-    </div>
+    <div class="menu-cols" id="menuCols"></div>
   </div>
 </section>
 
@@ -525,6 +537,7 @@
     <div class="modal-relative"><div class="modal-visual" id="modalVisual"></div><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
       <h3 id="modalName"></h3><p id="modalDesc"></p><div class="modal-price" id="modalPrice"></div>
+      <div class="format-row" id="modalFormatRow" style="display:none;"><span class="format-label">Format</span><div class="format-options" id="modalFormatOptions"></div></div>
       <div class="qty-row"><span class="qty-label">Quantité</span><div class="qty-stepper"><button onclick="changeModalQty(-1)">−</button><span id="modalQty">1</span><button onclick="changeModalQty(1)">+</button></div></div>
       <div class="modal-actions"><button class="btn-ghost" onclick="closeModal()">Annuler</button><button class="btn-primary" id="modalAddBtn" onclick="addModalToCart()">Ajouter au panier</button></div>
     </div>
@@ -575,7 +588,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.error('Supabase indisponible :', e); sb = null; }
 
-let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1;
+let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1, modalFormats = [];
 let profileSection = 'profil', pendingAvatarFile = null, editingManagerId = null;
 let STOREFRONT_MODE = 'ecommerce';
 let cart = loadCart();
@@ -596,11 +609,29 @@ const DEFAULT_PRODUCTS = [
   {id:'default-cafe-3', cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
   {id:'default-cafe-4', cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
   {id:'default-cafe-5', cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
-  {id:'default-wass-1', cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
-  {id:'default-wass-2', cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
-  {id:'default-wass-3', cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
-  {id:'default-wass-4', cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
-  {id:'default-wass-5', cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
+  {id:'default-wass-1-mini', cat:'wass', format_group:'Soft Wass', format:'Gobelet (mini)', format_order:1, name:'Soft Wass — Gobelet (mini)', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
+  {id:'default-wass-1-grand', cat:'wass', format_group:'Soft Wass', format:'Gobelet (grand)', format_order:2, name:'Soft Wass — Gobelet (grand)', price:800, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
+  {id:'default-wass-2-mini', cat:'wass', format_group:'Wonder Wass', format:'Gobelet (mini)', format_order:1, name:'Wonder Wass — Gobelet (mini)', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
+  {id:'default-wass-2-grand', cat:'wass', format_group:'Wonder Wass', format:'Gobelet (grand)', format_order:2, name:'Wonder Wass — Gobelet (grand)', price:900, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
+  {id:'default-wass-3-mini', cat:'wass', format_group:'Tarkinda', format:'Gobelet (mini)', format_order:1, name:'Tarkinda — Gobelet (mini)', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
+  {id:'default-wass-3-grand', cat:'wass', format_group:'Tarkinda', format:'Gobelet (grand)', format_order:2, name:'Tarkinda — Gobelet (grand)', price:800, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
+  {id:'default-wass-4-mini', cat:'wass', format_group:'Bisap (Bissap)', format:'Gobelet (mini)', format_order:1, name:'Bisap (Bissap) — Gobelet (mini)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+  {id:'default-wass-4-grand', cat:'wass', format_group:'Bisap (Bissap)', format:'Gobelet (grand)', format_order:2, name:'Bisap (Bissap) — Gobelet (grand)', price:800, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+  {id:'default-wass-5-mini', cat:'wass', format_group:'Jus locaux & Smoothies', format:'Gobelet (mini)', format_order:1, name:'Jus locaux, Smoothie — Gobelet (mini)', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
+  {id:'default-wass-5-grand', cat:'wass', format_group:'Jus locaux & Smoothies', format:'Gobelet (grand)', format_order:2, name:'Jus locaux, Smoothie — Gobelet (grand)', price:1200, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
+  /* Section « Bouteilles — Jus & Wass » : 6 marques × 2 formats (1L puis 1,5L). */
+  {id:'default-bt-wonder-1l', cat:'bouteille', format_group:'Wonder Wass', format:'Bouteille 1L', format_order:3, name:'Wonder Wass — Bouteille 1L', price:1500, description:"Wonder Wass (bouye) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-wonder-15l', cat:'bouteille', format_group:'Wonder Wass', format:'Bouteille 1,5L', format_order:4, name:'Wonder Wass — Bouteille 1,5L', price:2000, description:"Wonder Wass (bouye) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-soft-1l', cat:'bouteille', format_group:'Soft Wass', format:'Bouteille 1L', format_order:3, name:'Soft Wass — Bouteille 1L', price:1500, description:"Soft Wass (thé jasmin) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-soft-15l', cat:'bouteille', format_group:'Soft Wass', format:'Bouteille 1,5L', format_order:4, name:'Soft Wass — Bouteille 1,5L', price:2000, description:"Soft Wass (thé jasmin) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-daxar-1l', cat:'bouteille', format_group:"Dax'ar", format:'Bouteille 1L', format_order:3, name:"Dax'ar — Bouteille 1L", price:1500, description:"Dax'ar en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-daxar-15l', cat:'bouteille', format_group:"Dax'ar", format:'Bouteille 1,5L', format_order:4, name:"Dax'ar — Bouteille 1,5L", price:2000, description:"Dax'ar en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-bissapparal-1l', cat:'bouteille', format_group:"Bissap'Paral", format:'Bouteille 1L', format_order:3, name:"Bissap'Paral — Bouteille 1L", price:1500, description:"Bissap'Paral en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-bissapparal-15l', cat:'bouteille', format_group:"Bissap'Paral", format:'Bouteille 1,5L', format_order:4, name:"Bissap'Paral — Bouteille 1,5L", price:2000, description:"Bissap'Paral en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-tarkinda-1l', cat:'bouteille', format_group:'Tarkinda', format:'Bouteille 1L', format_order:3, name:'Tarkinda — Bouteille 1L', price:1500, description:"Tarkinda (gingembre) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-tarkinda-15l', cat:'bouteille', format_group:'Tarkinda', format:'Bouteille 1,5L', format_order:4, name:'Tarkinda — Bouteille 1,5L', price:2000, description:"Tarkinda (gingembre) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-anaconda-1l', cat:'bouteille', format_group:'Anaconda', format:'Bouteille 1L', format_order:3, name:'Anaconda — Bouteille 1L', price:1500, description:"Anaconda en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-anaconda-15l', cat:'bouteille', format_group:'Anaconda', format:'Bouteille 1,5L', format_order:4, name:'Anaconda — Bouteille 1,5L', price:2000, description:"Anaconda en bouteille 1,5 litre.", icon:'🍾', active:true}
 ];
 const DEFAULT_POINTS = [
   {id:'default-point-1', name:'QG Ouakam', address:'Cité Avion, Ouakam — Dakar', phone1:'77 707 72 70', phone2:'76 634 56 39', map_query:'Ouakam Dakar Senegal', active:true},
@@ -608,6 +639,19 @@ const DEFAULT_POINTS = [
   {id:'default-point-3', name:'Almadies', address:'Route des Almadies, près de la Corniche — Dakar', phone1:'77 707 72 70', phone2:'', map_query:'Almadies Dakar Senegal', active:true},
   {id:'default-point-4', name:'Sacré-Cœur', address:'Sacré-Cœur 3, Dakar', phone1:'77 707 72 70', phone2:'', map_query:'Sacre Coeur Dakar Senegal', active:true}
 ];
+
+/* Sections du menu par défaut (utilisées hors-ligne et comme valeurs de repli).
+   Chaque "key" correspond au champ `cat` des produits de cette section. */
+const DEFAULT_SECTIONS = [
+  {key:'cafe', label:'Café & Douceurs Chaudes', icon:'☕', accent:'#B9814A', accent2:'#DDA53F', ord:1, active:true},
+  {key:'wass', label:'Wass, Jus & Saveurs Locales', icon:'🍵', accent:'#A6402A', accent2:'#D98A73', ord:2, active:true},
+  {key:'bouteille', label:'Bouteilles — Jus & Wass', icon:'🍾', accent:'#2E7D32', accent2:'#57A862', ord:3, active:true}
+];
+let MENU_SECTIONS = DEFAULT_SECTIONS.map(s=>({...s}));
+function getMenuSections(){
+  const list = (MENU_SECTIONS && MENU_SECTIONS.length) ? MENU_SECTIONS : DEFAULT_SECTIONS;
+  return list.filter(s=>s.active!==false).slice().sort((a,b)=>(a.ord||0)-(b.ord||0));
+}
 
 function money(n){ return (n||0).toLocaleString('fr-FR') + ' FCFA'; }
 function toggleMobileMenu(){ document.getElementById('mobileMenu').classList.add('open'); }
@@ -674,6 +718,11 @@ const PRESET_THEMES = [
 function applyStoreBranding(store){
   STOREFRONT_MODE = 'ecommerce';
   document.body.classList.add('ecommerce-mode');
+  if(Array.isArray(store.menu_sections) && store.menu_sections.length){
+    MENU_SECTIONS = store.menu_sections.map(s=>({...s}));
+  } else {
+    MENU_SECTIONS = DEFAULT_SECTIONS.map(s=>({...s}));
+  }
   if(store.name){ document.title=store.name; document.querySelectorAll('.brand-name').forEach(el=>el.textContent=store.name); }
   const logoUrl=store.logo_url||'logo.png';
   document.querySelectorAll('.brand-logo,.admin-brand-logo').forEach(image=>{image.src=logoUrl;image.alt=`Logo ${store.name||"TOK'COS"}`;});
@@ -708,18 +757,7 @@ async function loadProducts(){
 /* Insère le menu par défaut si la table produits est vide */
 async function seedDefaultProducts(){
   if(!sb || OFFLINE) return;
-  const defaults = [
-    {cat:'cafe', name:'Café Touba Wakan Khakhan', price:500, description:"Café Touba signature, à la saveur intense et épicée.", icon:'☕', active:true},
-    {cat:'cafe', name:'Café en poudre', price:500, description:"Café moulu en poudre, prêt à l'infusion.", icon:'☕', active:true},
-    {cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
-    {cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
-    {cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
-    {cat:'wass', name:'Soft Wass', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🥤', active:true},
-    {cat:'wass', name:'Wonder Wass', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🥤', active:true},
-    {cat:'wass', name:'Tarkinda', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🥤', active:true},
-    {cat:'wass', name:'Bisap (Bissap)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
-    {cat:'wass', name:'Jus locaux, Smoothie, Jus de fruits', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true}
-  ];
+  const defaults = DEFAULT_PRODUCTS.map(({id, ...rest})=>rest);
   const {data, error} = await sb.from('products').insert(defaults.map(product=>({...product,store_id:ACTIVE_STORE_ID}))).select();
   if(error){ console.error('Erreur seed produits:', error); return; }
   PRODUCTS = data;
@@ -755,16 +793,45 @@ function stockFor(pointId, productId){
 
 /* ---------- STOREFRONT ---------- */
 function renderMenu(){
-  const gridCafe = document.getElementById('grid-cafe'), gridWass = document.getElementById('grid-wass');
-  gridCafe.innerHTML=''; gridWass.innerHTML='';
-  PRODUCTS.filter(p=>p.active).forEach(p=>{
-    const stock = totalStock(p.id), outOfStock = stock<=0;
+  const container = document.getElementById('menuCols');
+  if(!container) return;
+  container.innerHTML = '';
+  const active = PRODUCTS.filter(p=>p.active);
+  const sections = getMenuSections();
+
+  const buildCard = (group, section)=>{
+    const rep = group[0];
+    const stock = group.reduce((s,gp)=>s+totalStock(gp.id),0);
+    const outOfStock = stock<=0;
     const el = document.createElement('div');
-    el.className = 'menu-card ' + p.cat + (outOfStock?' out-of-stock':'');
-    const visual = p.image_url ? `<img src="${p.image_url}" class="card-photo" alt="${p.name}">` : `<span class="card-icon">${p.icon||'☕'}</span>`;
-    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`:''}`;
-    el.onclick = ()=>{ if(!outOfStock) openModal(p.id); };
-    (p.cat==='cafe'?gridCafe:gridWass).appendChild(el);
+    el.className = 'menu-card ' + rep.cat + (outOfStock?' out-of-stock':'');
+    const visual = rep.image_url ? `<img src="${rep.image_url}" class="card-photo" alt="${rep.name}">` : `<span class="card-icon">${rep.icon||'☕'}</span>`;
+    const title = rep.format_group || rep.name;
+    const minPrice = Math.min(...group.map(gp=>Number(gp.price)||0));
+    const priceLabel = group.length>1 ? `À partir de ${money(minPrice)}` : money(rep.price);
+    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${title}</div><div class="card-price">${priceLabel}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`:''}`;
+    el.onclick = ()=>{ if(!outOfStock) openModal(rep.id); };
+    return el;
+  };
+
+  sections.forEach(section=>{
+    const col = document.createElement('div');
+    col.className = 'menu-col';
+    const dotColor = section.accent2 || section.accent || '#DDA53F';
+    col.innerHTML = `<div class="menu-col-title"><span class="dot" style="background:${dotColor};"></span><h3>${section.icon?section.icon+' ':''}${section.label||section.key}</h3></div><div class="card-grid"></div>`;
+    const grid = col.querySelector('.card-grid');
+    const seen = new Set();
+    active.filter(p=>p.cat===section.key).forEach(p=>{
+      // Regroupe les formats d'une même boisson au sein d'une même section
+      const group = p.format_group
+        ? active.filter(gp=>gp.cat===section.key && gp.format_group===p.format_group).sort((a,b)=>(a.format_order||0)-(b.format_order||0))
+        : [p];
+      const key = p.format_group || p.id;
+      if(seen.has(key)) return;
+      seen.add(key);
+      grid.appendChild(buildCard(group, section));
+    });
+    container.appendChild(col);
   });
 }
 function renderPointCards(){
@@ -784,19 +851,49 @@ function renderPointCards(){
 function flipCard(id){ document.getElementById(id).classList.toggle('flipped'); }
 
 function openModal(id){
-  modalProduct = PRODUCTS.find(p=>p.id===id); modalQty = 1;
+  modalProduct = PRODUCTS.find(p=>p.id===id);
+  if(!modalProduct) return;
+  modalQty = 1;
+  // Tous les formats d'une même boisson (mini / grand / bouteille), triés
+  modalFormats = modalProduct.format_group
+    ? PRODUCTS.filter(p=>p.active && p.format_group===modalProduct.format_group).sort((a,b)=>(a.format_order||0)-(b.format_order||0))
+    : [modalProduct];
   const v = document.getElementById('modalVisual');
   v.className = 'modal-visual ' + modalProduct.cat;
   v.innerHTML = modalProduct.image_url ? `<img src="${modalProduct.image_url}" alt="${modalProduct.name}">` : (modalProduct.icon||'☕');
-  document.getElementById('modalName').textContent = modalProduct.name;
+  document.getElementById('modalName').textContent = modalProduct.format_group || modalProduct.name;
   document.getElementById('modalDesc').textContent = modalProduct.description || '';
-  document.getElementById('modalPrice').textContent = money(modalProduct.price);
+  renderModalFormats();
   document.getElementById('modalQty').textContent = modalQty;
   document.getElementById('modalAddBtn').disabled = totalStock(modalProduct.id)<=0;
   document.querySelector('.qty-row').classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce');
   document.getElementById('modalAddBtn').classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce');
   document.getElementById('productOverlay').classList.add('open');
 }
+function renderModalFormats(){
+  const row = document.getElementById('modalFormatRow'), box = document.getElementById('modalFormatOptions');
+  if(!row || !box) return;
+  if(modalFormats.length<=1){ row.style.display='none'; box.innerHTML=''; updateModalPrice(); return; }
+  row.style.display='flex';
+  box.innerHTML = modalFormats.map(f=>{
+    const stock = totalStock(f.id), active = f.id===modalProduct.id;
+    return `<button type="button" class="format-option${active?' active':''}" ${stock<=0?'disabled':''} onclick="selectModalFormat('${f.id}')"><span class="format-name">${f.format||f.name}</span><span class="format-price">${money(f.price)}</span></button>`;
+  }).join('');
+  updateModalPrice();
+}
+function selectModalFormat(id){
+  const f = modalFormats.find(x=>x.id===id);
+  if(!f || totalStock(f.id)<=0) return;
+  modalProduct = f; modalQty = 1;
+  const v = document.getElementById('modalVisual');
+  v.className = 'modal-visual ' + f.cat;
+  v.innerHTML = f.image_url ? `<img src="${f.image_url}" alt="${f.name}">` : (f.icon||'☕');
+  document.getElementById('modalDesc').textContent = f.description || '';
+  document.getElementById('modalQty').textContent = modalQty;
+  renderModalFormats();
+  document.getElementById('modalAddBtn').disabled = totalStock(f.id)<=0;
+}
+function updateModalPrice(){ document.getElementById('modalPrice').textContent = money(modalProduct.price); }
 function closeModal(){ document.getElementById('productOverlay').classList.remove('open'); }
 function changeModalQty(d){ const max=Math.max(1,totalStock(modalProduct.id)); modalQty=Math.max(1,Math.min(max,modalQty+d)); document.getElementById('modalQty').textContent=modalQty; }
 function addModalToCart(){ const e=cart.find(c=>c.id===modalProduct.id); if(e){e.qty+=modalQty;}else{cart.push({id:modalProduct.id,qty:modalQty});} saveCart(); closeModal(); renderCartBadge(); openDrawer(); }
@@ -823,19 +920,19 @@ function renderDrawer(){
     if(cart.length!==before){ saveCart(); renderCartBadge(); }
   }
   const body=document.getElementById('drawerBody'), foot=document.getElementById('drawerFoot');
-  document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Demande d\'approvisionnement';
+  document.getElementById('drawerTitle').textContent = checkoutStep==='cart'?'Votre panier':'Finaliser la commande';
   if(checkoutStep==='cart'){
-    if(cart.length===0){ body.innerHTML='<div class="empty-cart">Votre panier est vide.<br>Ajoutez les produits dont le point de vente a besoin.</div>'; foot.innerHTML=''; return; }
+    if(cart.length===0){ body.innerHTML='<div class="empty-cart">Votre panier est vide.<br>Ajoutez des produits.</div>'; foot.innerHTML=''; return; }
     body.innerHTML = cart.map(c=>{ const p=PRODUCTS.find(pp=>pp.id===c.id); const thumb=p.image_url?`<img src="${p.image_url}" alt="${p.name}">`:(p.icon||'☕');
       return `<div class="cart-item"><div class="ci-icon">${thumb}</div><div class="ci-info"><h4>${p.name}</h4><div class="ci-price">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div><div class="ci-qty"><button onclick="cartQty('${c.id}',-1)">−</button><span>${c.qty}</span><button onclick="cartQty('${c.id}',1)">+</button></div><div class="ci-remove" onclick="cartRemove('${c.id}')">Retirer</div></div></div>`; }).join('');
-    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Envoyer la demande d'approvisionnement</button>`;
+    foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Commander</button>`;
   } else {
     body.innerHTML = `<div class="field"><label>Point de vente demandeur</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
-      <div class="field"><label>Nom du responsable</label><input type="text" id="ckName" placeholder="Ex : Aïssatou Diop"></div>
+      <div class="field"><label>Nom du responsable</label><input type="text" id="ckName" placeholder="Ex : Aïssatou DIOP"></div>
       <div class="field"><label>Numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
-      <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Livraison boutique" class="active">Livraison boutique</button><button type="button" data-val="Retrait au point">Retrait au point</button></div></div>
+      <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Livraison boutique" class="active">Livraison</button><button type="button" data-val="Retrait au point">Retrait en boutique</button></div></div>
       <div class="checkout-note">Votre commande sera préparée au point choisi. Le paiement se fera sur place.</div>`;
-    foot.innerHTML = `<div class="drawer-total"><span>Total estimé</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Envoyer la demande</button></div>`;
+    foot.innerHTML = `<div class="drawer-total"><span>Total estimé</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Valider</button></div>`;
     setupSegButtons();
   }
 }
@@ -921,12 +1018,44 @@ async function sendWhatsAppApprov(name, phone, pointName, lines, total, delivery
   window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
 }
 
-/* ---------- PHOTO ---------- */
+/* ---------- PHOTO (recadrée en carré 1:1 puis enregistrée en JPEG léger) ---------- */
 function openPhotoChoice(){ const overlay=document.getElementById('photoChoiceOverlay'); if(overlay) overlay.classList.add('open'); }
 function closePhotoChoice(){ document.getElementById('photoChoiceOverlay').classList.remove('open'); }
 function triggerCamera(){ const input=document.getElementById('cameraInput'); closePhotoChoice(); if(input){ input.value=''; input.click(); } }
 function triggerGallery(){ const input=document.getElementById('galleryInput'); closePhotoChoice(); if(input){ input.value=''; input.click(); } }
-function handlePhotoUpload(e){ const f=e.target.files?.[0]; if(!f || !f.type.startsWith('image/')){ if(f) alert('Veuillez sélectionner une image.'); return; } const r=new FileReader(); r.onload=ev=>{ pendingPhotoData=ev.target.result; const pv=document.getElementById('photoPreview'); if(pv) pv.innerHTML=`<img src="${pendingPhotoData}" alt="Aperçu de la photo">`; }; r.readAsDataURL(f); }
+function handlePhotoUpload(e){
+  const f=e.target.files?.[0];
+  if(!f){ return; }
+  if(!['image/jpeg','image/png','image/webp'].includes(f.type)){ alert('Choisissez une image JPG, PNG ou WebP.'); e.target.value=''; return; }
+  if(f.size>5*1024*1024){ alert('Image trop lourde : 5 Mo maximum.'); e.target.value=''; return; }
+  const r=new FileReader();
+  r.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      /* Coupure centrée au format carré puis redimensionnement 800×800 :
+         photo présentable partout et assez légère pour être enregistrée en base. */
+      const SIZE=800;
+      const side=Math.min(img.width,img.height);
+      const sx=(img.width-side)/2, sy=(img.height-side)/2;
+      const canvas=document.createElement('canvas');
+      canvas.width=SIZE; canvas.height=SIZE;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,sx,sy,side,side,0,0,SIZE,SIZE);
+      pendingPhotoData=canvas.toDataURL('image/jpeg',0.85);
+      const pv=document.getElementById('photoPreview');
+      if(pv) pv.innerHTML=`<img src="${pendingPhotoData}" alt="Aperçu de la photo">`;
+    };
+    img.onerror=()=>alert('Impossible de lire cette image.');
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+}
+function removeProductPhoto(){
+  pendingPhotoData=null;
+  const pv=document.getElementById('photoPreview');
+  if(pv) pv.innerHTML='📷';
+}
 
 /* =======================================================
    ADMIN — auth + rôles
@@ -948,9 +1077,6 @@ function closeAdmin(){
 function renderAdminLogin(){
   document.getElementById('adminTitle').textContent = "Espace de gestion TOK'COS";
   document.getElementById('adminTabs').classList.add('admin-tabs-hidden');
-  const pointBar=document.getElementById('adminPointBar');
-  pointBar.innerHTML='';
-  pointBar.style.display='none';
   document.getElementById('adminLogoutBtn').classList.add('admin-logout-btn-hidden');
   document.body.classList.remove('admin-mode');
   removeSidebar();
@@ -1021,15 +1147,16 @@ function renderAdminShell(){
   tabsEl.classList.remove('admin-tabs-hidden');
   const tabs = [['caisse','Caisse'],['ventes','Ventes'],['stock','Inventaire']];
   /* La comptabilité reste réservée au propriétaire : aucun onglet pour le gérant. */
-  if(isOwner) tabs.push(['compta','Comptabilité'],['profile','Profil']);
+  if(isOwner) tabs.push(['produits','Produits'],['sections','Sections'],['points','Points de vente'],['utilisateurs','Gérants'],['compta','Comptabilité'],['profile','Profil']);
   tabsEl.innerHTML = '';
   document.body.classList.add('admin-mode');
   createSidebar(tabs);
   switchAdminTab('caisse');
 }
 function switchAdminTab(tab){
-  /* Garde-fou : la comptabilité et la gestion des gérants sont réservées au propriétaire. */
-  if((tab==='compta'||tab==='utilisateurs')&&!isOwnerRole()){
+  /* Garde-fou : la comptabilité, la gestion des gérants, des produits, des sections
+     et des points de vente sont réservées au propriétaire. */
+  if((tab==='compta'||tab==='utilisateurs'||tab==='produits'||tab==='sections'||tab==='points')&&!isOwnerRole()){
     alert('Section réservée au propriétaire.');
     tab='caisse';
   }
@@ -1051,6 +1178,7 @@ function switchAdminTab(tab){
   if(tab==='clients') renderAdminCustomers();
   if(tab==='rapports') renderAdminReports();
   if(tab==='produits') renderAdminProducts();
+  if(tab==='sections') renderAdminSections();
   if(tab==='points') renderAdminPoints();
   if(tab==='stock') renderAdminStock();
   if(tab==='ventes') renderAdminSales();
@@ -1066,15 +1194,13 @@ function adminBackButton(){
 }
 
 function profileNavMarkup(active){
-  const sections=[['profil','Mon profil'],['boutique','Boutique'],['points','Points de vente'],['gerants','Gérants']];
+  const sections=[['profil','Mon profil'],['boutique','Boutique']];
   return `<nav class="profile-nav" aria-label="Sections du profil">${sections.map(([key,label])=>`<button type="button" class="${active===key?'active':''}" onclick="switchProfileSection('${key}')">${label}</button>`).join('')}</nav>`;
 }
 function switchProfileSection(section){
   profileSection=section;
   if(section==='profil') renderAdminProfile();
   if(section==='boutique') renderAdminBoutique();
-  if(section==='points') renderAdminPoints();
-  if(section==='gerants') renderAdminUsers();
   if(window.matchMedia('(max-width: 760px)').matches) closeSidebar();
 }
 function renderAdminProfile(){
@@ -1732,35 +1858,120 @@ async function loadAdminReports(){
 function exportReportCSV(){ const csv=['Date;Point;Canal;Total;Statut',...REPORT_ROWS.map(s=>`${new Date(s.created_at).toLocaleString('fr-FR')};${POINTS.find(p=>p.id===s.point_id)?.name||''};${s.channel};${s.total};${s.status}`)].join('\n'); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rapport-tokcos.csv';a.click(); }
 function exportReportPDF(){ if(!window.jspdf){alert('Le module PDF est indisponible.');return;} const {jsPDF}=window.jspdf,doc=new jsPDF(); doc.text('Rapport TOKCOS',14,18); REPORT_ROWS.forEach((s,index)=>doc.text(`${new Date(s.created_at).toLocaleDateString('fr-FR')} - ${money(s.total)} - ${s.status}`,14,28+index*7)); doc.save('rapport-tokcos.pdf'); }
 
+/* ---------- SECTIONS DU MENU (propriétaire) ---------- */
+function sectionsDraft(){ return (MENU_SECTIONS && MENU_SECTIONS.length ? MENU_SECTIONS : DEFAULT_SECTIONS).map(s=>({...s})); }
+function renderAdminSections(){
+  const body=document.getElementById('adminBody');
+  const sections=sectionsDraft().sort((a,b)=>(a.ord||0)-(b.ord||0));
+  body.innerHTML=`<div class="admin-toolbar"><div class="admin-stat"><b>${sections.length}</b>sections au menu</div><button class="btn-primary" onclick="addSectionRow()">+ Ajouter une section</button></div>
+    <p class="shop-note" style="margin-bottom:12px;">Chaque section regroupe les produits ayant la même « clé » (catégorie). Glissez l'ordre avec les flèches, choisissez une couleur d'accent, et enregistrez. Les clés déjà utilisées par des produits ne peuvent pas être supprimées.</p>
+    <div id="sectionsEditor"></div>
+    <div class="admin-form-actions" style="margin-top:16px;display:flex;gap:10px;"><button class="btn-primary" onclick="saveMenuSections()">Enregistrer les sections</button><button class="btn-ghost" onclick="resetMenuSections()">Réinitialiser</button></div>`;
+  renderSectionsEditor(sections);
+  window.__sectionsDraft=sections;
+}
+function renderSectionsEditor(sections){
+  const usedKeys=new Set(PRODUCTS.map(p=>p.cat));
+  const body=document.getElementById('sectionsEditor');
+  body.innerHTML=sections.map((s,i)=>{
+    const used=usedKeys.has(s.key);
+    return `<div class="admin-product-form section-row" data-index="${i}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="field" style="flex:2;min-width:180px;"><label>Titre de la section</label><input type="text" value="${esc(s.label||'')}" oninput="updateSectionField(${i},'label',this.value)" placeholder="Ex : Pâtisseries"></div>
+      <div class="field" style="flex:1;min-width:130px;"><label>Clé (catégorie)</label><input type="text" value="${esc(s.key||'')}" oninput="updateSectionField(${i},'key',this.value)" placeholder="ex : patisserie" ${used?'title="Utilisée par des produits"':''}></div>
+      <div class="field" style="width:90px;"><label>Icône</label><input type="text" value="${esc(s.icon||'')}" oninput="updateSectionField(${i},'icon',this.value)" placeholder="🍰" maxlength="4"></div>
+      <div class="field" style="width:110px;"><label>Couleur 1</label><input type="color" value="${esc(s.accent||'#DDA53F')}" oninput="updateSectionField(${i},'accent',this.value)"></div>
+      <div class="field" style="width:110px;"><label>Couleur 2</label><input type="color" value="${esc(s.accent2||'#F2D189')}" oninput="updateSectionField(${i},'accent2',this.value)"></div>
+      <div class="field" style="width:80px;"><label>Ordre</label><input type="number" value="${s.ord||0}" min="0" oninput="updateSectionField(${i},'ord',parseInt(this.value,10)||0)"></div>
+      <div class="field" style="width:110px;"><label>Visible</label><select onchange="updateSectionField(${i},'active',this.value==='true')"><option value="true" ${s.active!==false?'selected':''}>Oui</option><option value="false" ${s.active===false?'selected':''}>Non</option></select></div>
+      <div style="display:flex;gap:6px;padding-bottom:4px;">
+        <button type="button" class="admin-icon-btn" title="Monter" onclick="moveSection(${i},-1)">↑</button>
+        <button type="button" class="admin-icon-btn" title="Descendre" onclick="moveSection(${i},1)">↓</button>
+        <button type="button" class="admin-icon-btn danger" title="Supprimer" ${used?'disabled title="Impossible : utilisée par des produits"':`onclick="deleteSectionRow(${i})"`}>🗑</button>
+      </div>
+    </div>`;
+  }).join('') || '<p class="admin-empty">Aucune section. Ajoutez-en une.</p>';
+}
+function updateSectionField(i,field,value){ if(window.__sectionsDraft&&window.__sectionsDraft[i]) window.__sectionsDraft[i][field]=value; }
+function moveSection(i,dir){ const d=window.__sectionsDraft; const j=i+dir; if(j<0||j>=d.length) return; [d[i],d[j]]=[d[j],d[i]]; renderSectionsEditor(d); }
+function addSectionRow(){ const d=window.__sectionsDraft||sectionsDraft(); d.push({key:'nouveau-'+(d.length+1),label:'Nouvelle section',icon:'⭐',accent:'#DDA53F',accent2:'#F2D189',ord:(Math.max(0,...d.map(s=>s.ord||0))+1),active:true}); window.__sectionsDraft=d; renderSectionsEditor(d); }
+function deleteSectionRow(i){ const d=window.__sectionsDraft; if(!d) return; const used=new Set(PRODUCTS.map(p=>p.cat)); if(used.has(d[i].key)){ alert('Cette section est utilisée par des produits. Réaffectez-les d\'abord.'); return; } d.splice(i,1); renderSectionsEditor(d); }
+function resetMenuSections(){ if(!confirm('Réinitialiser aux sections par défaut (Café, Wass, Bouteilles) ?')) return; window.__sectionsDraft=DEFAULT_SECTIONS.map(s=>({...s})); renderSectionsEditor(window.__sectionsDraft); }
+async function saveMenuSections(){
+  const draft=(window.__sectionsDraft||sectionsDraft()).map((s,i)=>({key:(s.key||'').trim()||('section-'+(i+1)),label:(s.label||'').trim()||'Section',icon:(s.icon||'').trim(),accent:s.accent||'#DDA53F',accent2:s.accent2||'#F2D189',ord:Number(s.ord)||i+1,active:s.active!==false}));
+  // Validation : clés uniques et non vides
+  const keys=draft.map(s=>s.key); if(new Set(keys).size!==keys.length){ alert('Deux sections ne peuvent pas avoir la même clé.'); return; }
+  // Garde-fou : ne pas renommer la clé d'une section déjà utilisée par des produits
+  // (sinon ces produits ne seraient plus rattachés à aucune section visible).
+  const originalByLabel={}; (MENU_SECTIONS||[]).forEach(s=>{ originalByLabel[s.label]=s.key; });
+  const usedKeys=new Set(PRODUCTS.map(p=>p.cat));
+  for(const s of draft){
+    const prevKey=originalByLabel[s.label];
+    if(prevKey && prevKey!==s.key && usedKeys.has(prevKey)){
+      alert(`Impossible de renommer la clé de « ${s.label} » : ${PRODUCTS.filter(p=>p.cat===prevKey).length} produit(s) l'utilisent. Modifiez plutôt la section de ces produits.`);
+      return;
+    }
+  }
+  if(!sb || OFFLINE){ alert('La connexion est nécessaire pour enregistrer les sections.'); return; }
+  const {error}=await sb.from('stores').update({menu_sections:draft}).eq('id',ACTIVE_STORE_ID);
+  if(error){ alert(`Enregistrement impossible : ${error.message}`); console.error(error); return; }
+  MENU_SECTIONS=draft; ACTIVE_STORE={...(ACTIVE_STORE||{}),menu_sections:draft};
+  renderMenu(); renderAdminSections();
+  alert('Sections enregistrées.');
+}
+
 /* ---------- PRODUITS (manager) ---------- */
+/* Formats proposés dans le menu déroulant du formulaire produit. */
+const PRODUCT_FORMATS=['Gobelet (mini)','Gobelet (grand)','Bouteille 1L','Bouteille 1,5L'];
+function formatOptions(product){
+  const current=product?(product.format||''):'';
+  const list=PRODUCT_FORMATS.slice();
+  if(current && !list.includes(current)) list.unshift(current);
+  return `<option value="">Aucun format</option>${list.map(f=>`<option value="${esc(f)}" ${current===f?'selected':''}>${esc(f)}</option>`).join('')}`;
+}
 function renderAdminProducts(){
   editingProductId=null; pendingPhotoData=null;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${adminBackButton()}<div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div><button class="btn-ghost" onclick="renderAdminCategories()">Gérer les catégories</button></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div><button class="btn-ghost" onclick="renderAdminSections()">Gérer les sections</button></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Section</th><th>Prix</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
   renderProductForm(); renderProductRows();
 }
 function renderProductForm(product, containerId='adminProductForm', returnToInventory=false){
   editingProductId = product?product.id:null; pendingPhotoData = product?product.image_url:null;
   productEditorReturnToInventory=returnToInventory;
   document.getElementById(containerId).innerHTML = `<div class="admin-product-form">
-    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${esc(pendingPhotoData)}">`:'📷'}</div><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 ${pendingPhotoData?'Modifier':'Ajouter'} une photo</button></div>
+    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${pendingPhotoData}">`:'📷'}</div><div class="admin-photo-actions"><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 ${pendingPhotoData?'Changer la photo':'Ajouter une photo'}</button><button type="button" class="admin-photo-btn" onclick="removeProductPhoto()">🗑 Retirer</button><span class="shop-note">Format carré 1:1 — recadrage et redimensionnement automatiques (800×800, JPG, 5 Mo max).</span></div></div>
     <div class="field"><label>Nom du produit</label><input type="text" id="pfName" value="${product?esc(product.name):''}" placeholder="Ex : Café Touba"></div>
-    <div class="field"><label>Catégorie</label><select id="pfCat"><option value="cafe" ${product&&product.cat==='cafe'?'selected':''}>Café</option><option value="wass" ${product&&product.cat==='wass'?'selected':''}>Wass / Boissons</option></select></div>
+    <div class="field"><label>Section / Catégorie</label><select id="pfCat">${getMenuSections().map(s=>`<option value="${esc(s.key)}" ${product&&product.cat===s.key?'selected':''}>${s.icon?s.icon+' ':''}${esc(s.label||s.key)}</option>`).join('')}${product&&!getMenuSections().some(s=>s.key===product.cat)?`<option value="${esc(product.cat)}" selected>${esc(product.cat)}</option>`:''}</select></div>
     <div class="field"><label>Prix (FCFA)</label><input type="number" id="pfPrice" value="${product?product.price:''}" min="0" placeholder="500"></div>
+    <div class="field"><label>Disponible à la vente</label><select id="pfActive"><option value="true" ${(!product||product.active!==false)?'selected':''}>Oui (visible au menu)</option><option value="false" ${product&&product.active===false?'selected':''}>Non (masqué)</option></select></div>
+    <div class="field"><label>Format <span style="font-weight:400;color:#8A7660;">(optionnel)</span></label><select id="pfFormat">${formatOptions(product)}</select></div>
     ${!product?`<div class="field"><label>Stock initial (par point)</label><input type="number" id="pfStock" value="20" min="0"></div>`:`<div class="field"><label>Stock</label><input type="text" value="Géré dans l'onglet Stock" disabled class="stock-field-disabled"></div>`}
-    <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?esc(product.description||''):''}</textarea></div>
+    <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?(product.description||''):''}</textarea></div>
     <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?'Enregistrer':'Ajouter le produit'}</button>${product?`<button class="btn-ghost" onclick="${returnToInventory?'cancelInventoryProductEdit()':'renderProductForm()'}">Annuler</button>`:''}</div>
   </div>`;
 }
 async function saveProductForm(){
-  const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(document.getElementById('pfPrice').value,10), desc=document.getElementById('pfDesc').value.trim();
+  const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(String(document.getElementById('pfPrice').value).replace(/[^0-9]/g,''),10), desc=document.getElementById('pfDesc').value.trim();
+  const format=(document.getElementById('pfFormat')?.value||'').trim();
+  const activeEl=document.getElementById('pfActive');
+  const active=activeEl?activeEl.value==='true':true;
+  /* Groupe et ordre dérivés automatiquement (plus de champs manuels) :
+     le groupe reprend le nom de la boisson (tout avant « — », sinon le nom complet),
+     l'ordre suit le format choisi (mini → 1, grand → 2, bouteille 1L → 3, bouteille 1,5L → 4). */
+  const FORMAT_ORDER={'Gobelet (mini)':1,'Gobelet (grand)':2,'Bouteille 1L':3,'Bouteille 1,5L':4};
+  const baseName=name.split(/[–—]/)[0].trim()||name;
+  const existing=editingProductId?PRODUCTS.find(p=>p.id===editingProductId):null;
+  const formatGroup=format?baseName:null;
+  const formatOrder=format?(FORMAT_ORDER[format]||((existing&&existing.format===format)?(existing.format_order||0):0)):0;
+  const formatFields={format_group:formatGroup, format:format||null, format_order:formatOrder, active};
+  const section=getMenuSections().find(s=>s.key===cat);
+  const icon=(section&&section.icon)||(cat==='bouteille'?'🍾':(cat==='cafe'?'☕':'🥤'));
   if(!name || !Number.isInteger(price) || price<0){ alert("Merci de renseigner un nom et un prix entier égal ou supérieur à zéro."); return; }
   if(editingProductId){
-    const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
-    if(error){ alert("Erreur lors de la mise à jour."); console.error(error); return; }
+    const {error} = await sb.from('products').update({name,cat,price,description:desc,image_url:pendingPhotoData||null,...formatFields}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
+    if(error){ alert(`Erreur lors de la mise à jour : ${error.message||'inconnue'}`); console.error(error); return; }
   } else {
     const initialStock = parseInt(document.getElementById('pfStock').value,10)||0;
-    const {data, error} = await sb.from('products').insert({cat,name,price,description:desc,icon:cat==='cafe'?'☕':'🥤',image_url:pendingPhotoData,store_id:ACTIVE_STORE_ID}).select().single();
-    if(error){ alert("Erreur lors de la création."); console.error(error); return; }
+    const {data, error} = await sb.from('products').insert({cat,name,price,description:desc,icon,image_url:pendingPhotoData||null,store_id:ACTIVE_STORE_ID,...formatFields}).select().single();
+    if(error){ alert(`Erreur lors de la création : ${error.message||'inconnue'}`); console.error(error); return; }
     if(POINTS.length){ const rows=POINTS.map(pt=>({point_id:pt.id,product_id:data.id,quantity:initialStock,store_id:ACTIVE_STORE_ID})); await sb.from('stock').insert(rows); }
   }
   const returnToInventory=productEditorReturnToInventory;
@@ -1792,12 +2003,17 @@ function cancelInventoryProductEdit(){
 function renderProductRows(){
   const tbody=document.getElementById('adminProductRows');
   if(PRODUCTS.length===0){ tbody.innerHTML='<tr><td colspan="6" class="admin-empty">Aucun produit.</td></tr>'; return; }
-  tbody.innerHTML = PRODUCTS.map(p=>`<tr>
+  tbody.innerHTML = PRODUCTS.map(p=>{
+    const section=getMenuSections().find(s=>s.key===p.cat);
+    const catLabel=section?(section.label||section.key):p.cat;
+    const inactive=p.active===false?' style="opacity:.5;"':'';
+    return `<tr${inactive}>
     <td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="product-thumb-placeholder">${p.icon||'☕'}</div>`}</td>
-    <td>${p.name}</td><td>${p.cat==='cafe'?'Café':'Wass'}</td><td>${money(p.price)}</td>
+    <td>${esc(p.name)}${p.active===false?' <span class="stock-low" style="font-size:11px;">(masqué)</span>':''}${p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:''}</td>
+    <td>${esc(catLabel)}</td><td>${money(p.price)}</td>
     <td class="${totalStock(p.id)<=5?'stock-low':''}">${totalStock(p.id)}</td>
     <td><div class="admin-row-actions"><button class="admin-icon-btn" onclick='editProductById("${p.id}")'>✎</button><button class="admin-icon-btn danger" onclick="deleteProduct('${p.id}')">🗑</button></div></td>
-  </tr>`).join('');
+  </tr>`;}).join('');
 }
 function editProductById(id){ renderProductForm(PRODUCTS.find(p=>p.id===id)); document.getElementById('adminProductForm').scrollIntoView({behavior:'smooth'}); }
 async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts(); }
@@ -1805,7 +2021,7 @@ async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock 
 /* ---------- POINTS DE VENTE (manager) ---------- */
 function renderAdminPoints(){
   editingPointId=null;
-  document.getElementById('adminBody').innerHTML = `${adminActiveTab==='profile'?profileNavMarkup('points'):''}<div class="admin-toolbar">${adminActiveTab==='profile'?'':adminBackButton()}<div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${POINTS.length}</b>points de vente</div></div><div id="adminPointForm"></div><table class="admin-table"><thead><tr><th>Nom</th><th>Adresse</th><th>Téléphones</th><th>Actif</th><th></th></tr></thead><tbody id="adminPointRows"></tbody></table>`;
   renderPointForm(); renderPointRows();
 }
 function renderPointForm(point){
@@ -2304,7 +2520,7 @@ function refreshGerantEmailPreview(){
 /* ---------- UTILISATEURS (manager uniquement) ---------- */
 function renderAdminUsers(){
   editingManagerId=null;
-  document.getElementById('adminBody').innerHTML = `${adminActiveTab==='profile'?profileNavMarkup('gerants'):''}<div class="admin-toolbar">${adminActiveTab==='profile'?'':adminBackButton()}<div class="admin-stat"><b>Gérants et points attribués</b></div></div>
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>Gérants et points attribués</b></div></div>
     <div class="admin-product-form manager-invite-form">
       <h4 class="full">Créer un gérant (compte actif immédiat)</h4>
       <div class="field"><label>Nom ou pseudo</label><input id="managerInviteName" maxlength="80" placeholder="Nom du gérant"></div>
@@ -2326,6 +2542,44 @@ async function renderUsersTable(){
   tbody.innerHTML = managers.map(user=>{ const pointName=POINTS.find(point=>point.id===user.point_id)?.name||'—';
     return `<tr><td><strong>${esc(user.display_name||'—')}</strong></td><td>${esc(user.email||'—')}</td><td>${esc(user.phone||'—')}</td><td>${esc(pointName)}</td><td><div class="admin-row-actions"><button class="admin-icon-btn" aria-label="Modifier ${esc(user.display_name||'le gérant')}" onclick="editManagedManager('${user.id}')">✎</button><button class="admin-icon-btn danger" aria-label="Retirer ${esc(user.display_name||'le gérant')}" onclick="deleteUserProfile('${user.id}')">🗑</button></div></td></tr>`; }).join('');
 }
+/* Extrait le message d'erreur le plus précis renvoyé par une Edge Function :
+   - `data` contient le corps JSON ({error, code, message}) lors d'un statut non-2xx ;
+   - à défaut, `error.context` (la Response brute conservée par functions-js) est
+     relue pour trouver la cause réelle, ex. 404 NOT_FOUND = fonction non déployée. */
+async function edgeManagerError(error, data){
+  const pick=(body)=>{
+    if(!body||typeof body!=='object') return null;
+    if(body.error) return String(body.error);
+    if(body.code==='NOT_FOUND') return 'la fonction Edge « manage-managers » n\'est pas déployée sur Supabase (404). Déployez-la avec « supabase functions deploy manage-managers » dans le dossier du projet, puis réessayez.';
+    if(body.message) return String(body.message);
+    if(body.msg) return String(body.msg);
+    return null;
+  };
+  const fromData=pick(data);
+  if(fromData) return fromData;
+  if(error){
+    const ctx=error.context;
+    if(ctx&&typeof ctx==='object'){
+      if(typeof ctx.clone==='function'){
+        try{
+          const text=await ctx.clone().text();
+          if(text){
+            let body=null; try{ body=JSON.parse(text); }catch{}
+            const msg=pick(body);
+            if(msg) return msg;
+            return `réponse HTTP ${ctx.status||'?'} : ${text.slice(0,180)}`;
+          }
+        }catch{}
+      }else{
+        const msg=pick(ctx);
+        if(msg) return msg;
+      }
+      if(ctx.status===404) return 'la fonction Edge « manage-managers » n\'est pas déployée sur Supabase (404). Exécutez « supabase functions deploy manage-managers ».';
+    }
+    return error.message||'erreur inconnue';
+  }
+  return 'erreur inconnue';
+}
 async function inviteManager(){
   const displayName=document.getElementById('managerInviteName').value.trim();
   const phone=document.getElementById('managerInvitePhone').value.trim();
@@ -2337,7 +2591,7 @@ async function inviteManager(){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){alert('Votre session a expiré. Reconnectez-vous avant de créer un gérant.');return;}
   const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'invite',display_name:displayName,email,phone,point_id:pointId},headers:{Authorization:`Bearer ${session.access_token}`}});
-  if(error){console.error('Création du gérant impossible :',error);alert(`Le compte n'a pas été créé : ${error.message}`);return;}
+  if(error){console.error('Création du gérant impossible :',error,data);alert(`Le compte n'a pas été créé : ${await edgeManagerError(error,data)}`);return;}
   const box=document.getElementById('gerantCredentials');
   if(box) box.innerHTML=`<div class="admin-stat" style="margin:12px 0;"><b>Compte actif : ${esc(data?.email||email)}</b>Mot de passe : <b>${esc(data?.initial_password||'—')}</b> — transmettez ces identifiants au gérant (6 caractères).</div>`;
   alert(data?.message||'Compte gérant créé et actif.');
@@ -2368,7 +2622,7 @@ async function saveManagedManager(){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){alert('Votre session a expiré. Reconnectez-vous.');return;}
   const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'move',user_id:editingManagerId,new_point_id:pointId,display_name:displayName,phone},headers:{Authorization:`Bearer ${session.access_token}`}});
-  if(error){console.error('Déplacement du gérant impossible :',error);alert(`Le gérant n'a pas été modifié : ${error.message}`);return;}
+  if(error){console.error('Déplacement du gérant impossible :',error,data);alert(`Le gérant n'a pas été modifié : ${await edgeManagerError(error,data)}`);return;}
   alert(data?.message||'Gérant mis à jour.');
   editingManagerId=null;document.getElementById('managerEditor').innerHTML='';await renderUsersTable();
 }
@@ -2378,7 +2632,7 @@ async function deleteUserProfile(userId){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){alert('Votre session a expiré. Reconnectez-vous avant de retirer un gérant.');return;}
   const {data,error}=await sb.functions.invoke('manage-managers',{body:{action:'remove',user_id:userId},headers:{Authorization:`Bearer ${session.access_token}`}});
-  if(error){console.error('Suppression du compte gérant impossible :',error);alert(`Le gérant n'a pas été supprimé : ${error.message}`);return;}
+  if(error){console.error('Suppression du compte gérant impossible :',error,data);alert(`Le gérant n'a pas été supprimé : ${await edgeManagerError(error,data)}`);return;}
   alert(data?.message||'Compte gérant supprimé.');
   await renderUsersTable();
 }
