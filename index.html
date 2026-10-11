@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20260111b">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -384,14 +384,41 @@
   .admin-sidebar-overlay.open{display:block;opacity:1;}
 
   /* ---------- CAISSE (POS) ---------- */
-  .caisse-layout{display:flex;flex-direction:column;height:auto;min-height:0;gap:16px;position:relative;}
+  .caisse-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 700px;
+  gap: 16px;
+  position: relative;
+}
   .caisse-left{flex:1;overflow:visible;padding-right:0;min-height:0;display:flex;flex-direction:column;}
   .caisse-product-grid{flex:initial;min-height:0;overflow:visible;align-content:start;grid-template-columns:repeat(3,minmax(0,1fr));}
-  .caisse-right{width:100%;flex-shrink:0;position:static;height:auto;min-height:250px;max-height:none;overflow:visible;background:var(--cream);border:2px solid rgba(110,59,30,0.15);padding:16px;box-shadow:0 -4px 12px rgba(0,0,0,0.08);display:flex;flex-direction:column;border-radius:14px;}
+  .caisse-right {
+  width: 100%;
+  flex: 1; /* Permet de s'adapter et d'occuper l'espace disponible */
+  position: static;
+  height: 100%; /* Force le conteneur à respecter la hauteur disponible */
+  min-height: 450px;
+  max-height: 100%; 
+  overflow: hidden; /* Empêche le panneau de s'étirer et force l'enfant à gérer le scroll */
+  background: var(--cream);
+  border: 2px solid rgba(110,59,30,0.15);
+  padding: 16px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+}
   .caisse-cart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid rgba(110,59,30,0.15);}
   .caisse-cart-header h4{font-size:16px;color:var(--coffee-black);}
   .caisse-cart-header .cart-badge{background:var(--rust);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
-  .caisse-cart-body{flex:1;min-height:0;overflow-y:auto;margin-bottom:10px;}
+  .caisse-cart-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* Le scroll vertical s'activera ici dès que la liste dépasse */
+  margin-bottom: 10px;
+}
   .caisse-cart-footer{border-top:1px solid rgba(110,59,30,0.15);padding-top:12px;flex-shrink:0;}
   .caisse-cart-icon-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--cream);border:1px solid rgba(110,59,30,0.2);font-size:20px;}
   .caisse-cart-icon-btn .cart-badge{position:absolute;top:-4px;right:-4px;background:var(--rust);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;}
@@ -440,6 +467,54 @@
     .admin-toolbar{flex-direction:column;align-items:stretch;}
     .chat-wrap{height:50vh;}
   }
+
+/* =======================================================
+   CAISSE MOBILE — règles FINALES (doublon anti-cache Safari/iOS).
+   Reprennent les règles de styles.css (bloc "MOBILE CAISSE") avec une
+   spécificité maximale + !important, pour neutraliser d'éventuels
+   restes de l'ancien styles.css conservé en cache sur mobile.
+   - Produits : grille VERTICALE (2 colonnes), scroll interne si longue.
+   - Caisse (panier) : entièrement visible dans le flux de la page.
+   ======================================================= */
+@media (max-width: 768px) {
+  html body.admin-mode .admin-caisse-body{ height:auto !important; padding:16px 14px 24px !important; overflow-y:auto !important; overflow-x:hidden !important; }
+  html body.admin-mode .caisse-layout{ display:grid !important; grid-template-columns:minmax(0,1fr) !important; }
+  html body.admin-mode .caisse-left{ display:flex !important; flex-direction:column !important; overflow:visible !important; height:auto !important; flex:initial !important; padding-right:0 !important; }
+  html body.admin-mode .caisse-left .card-grid,
+  html body.admin-mode .caisse-product-grid{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    grid-auto-rows:auto !important;
+    max-height:min(46dvh,400px) !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    align-content:start !important;
+    touch-action:pan-y;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  html body.admin-mode .caisse-product-grid .menu-card{ height:auto !important; min-width:0 !important; max-width:none !important; }
+  html body.admin-mode .caisse-product-grid .menu-card .card-photo{ height:60px !important; }
+  html body.admin-mode .caisse-right{
+    position:static !important;
+    top:auto !important; bottom:auto !important; left:auto !important; right:auto !important;
+    width:100% !important; height:auto !important; min-height:0 !important; max-height:none !important;
+    overflow:visible !important; z-index:auto !important;
+    border-left:none !important;
+    border-top:1px solid rgba(110,59,30,0.15) !important;
+    box-shadow:none !important;
+    border-radius:12px !important;
+    padding:12px !important;
+  }
+  html body.admin-mode .caisse-right .caisse-cart-body{
+    max-height:min(32dvh,300px) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    margin-bottom:6px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -557,7 +632,6 @@
       <h3 id="adminTitle">Espace de gestion TOK'COS</h3>
       <div class="admin-header-actions">
         <button class="admin-logout-btn admin-logout-btn-hidden" id="adminLogoutBtn" onclick="adminLogout()">Déconnexion</button>
-        <button class="admin-close" onclick="closeAdmin()">✕</button>
       </div>
     </div>
     <div class="admin-tabs admin-tabs-hidden" id="adminTabs"></div>
@@ -601,6 +675,14 @@ let STOCK_DRAFT = new Map();
 let salesSelectedPoint = 'all', salesPeriod = 'day', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
 let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null;
 let caisseOrderId = null, pendingOrdersTimer = null, registerStatusTimer = null, registerStatus = null;
+/* Commandes en attente déjà connues : permet de détecter l'arrivée d'UNE nouvelle commande (son). */
+let knownPendingOrderIds = null;
+/* Ids déjà annoncés par un son (évite le doublon Realtime + polling). */
+const sonnedOrderIds = new Set();
+/* Canal Supabase Realtime sur la table sales : réception instantanée des commandes. */
+let salesChannel = null;
+/* AudioContext des sons de commande (créé à la volée, aucun fichier son requis). */
+let orderChimeCtx = null;
 
 /* ---------- DONNÉES PAR DÉFAUT (menu & points affichés SANS connexion, même si Supabase est indisponible) ---------- */
 const DEFAULT_PRODUCTS = [
@@ -1069,6 +1151,7 @@ async function openAdmin(){
 function closeAdmin(){
   if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
   if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
+  unsubscribePendingOrders();
   document.getElementById('adminOverlay').classList.remove('open');
   document.body.classList.remove('admin-mode');
   removeSidebar();
@@ -1162,6 +1245,7 @@ function switchAdminTab(tab){
   }
   if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
   if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
+  unsubscribePendingOrders();
   if(caisseOrderId && tab!=='caisse'){
     alert('Terminez ou annulez la commande importée avant de quitter la caisse.');
     tab='caisse';
@@ -1361,6 +1445,7 @@ function collectShopTab(){
     SHOP_COLORS.forEach(([k])=>shopDraft.theme[k]=shopVal('th-'+k,shopDraft.theme[k]));
     shopDraft.theme.fontDisplay=shopVal('thDisplayFont',shopDraft.theme.fontDisplay);
     shopDraft.theme.fontBody=shopVal('thBodyFont',shopDraft.theme.fontBody);
+    shopDraft.theme.orderSound=shopVal('thOrderSound',shopDraft.theme.orderSound||'kora');
   } else if(shopTab==='horaires'){
     const hours={};
     let invalidDay='';
@@ -1423,6 +1508,8 @@ function shopAppearancePanel(panel){
   const colorRows=SHOP_COLORS.map(([k,label])=>`<div class="shop-color-row"><label>${label}</label><input type="color" id="th-${k}" value="${esc(t[k]||DEFAULT_THEME[k]||'#000000')}" oninput="liveTheme()"><span class="hex-name">${esc(t[k]||DEFAULT_THEME[k]||'')}</span></div>`).join('');
   const displayOpts=SHOP_DISPLAY_FONTS.map(([v,l])=>`<option value="${v}" ${t.fontDisplay===v?'selected':''}>${l}</option>`).join('');
   const bodyOpts=SHOP_BODY_FONTS.map(([v,l])=>`<option value="${v}" ${t.fontBody===v?'selected':''}>${l}</option>`).join('');
+  const soundCurrent=ORDER_SOUNDS.some(s=>s[0]===t.orderSound)?t.orderSound:'kora';
+  const soundOpts=ORDER_SOUNDS.map(([v,l])=>`<option value="${v}" ${soundCurrent===v?'selected':''}>${l}</option>`).join('');
   panel.innerHTML=`<div class="admin-stat" style="margin-bottom:12px;"><b>Thèmes rapides</b></div>
     <div class="theme-swatches">${swatches}</div>
     <p class="shop-note">Cliquez sur un thème pour l'appliquer instantanément en aperçu, puis affinez les couleurs ci-dessous.</p>
@@ -1432,6 +1519,16 @@ function shopAppearancePanel(panel){
       <div class="field"><label>Police des titres</label><select id="thDisplayFont" onchange="liveTheme()">${displayOpts}</select></div>
       <div class="field"><label>Police du texte</label><select id="thBodyFont" onchange="liveTheme()">${bodyOpts}</select></div>
     </div>
+    <div class="admin-stat" style="margin:16px 0 8px;"><b>Notification de commande</b></div>
+    <div class="shop-grid">
+      <div class="field full"><label for="thOrderSound">Son des commandes en ligne</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select id="thOrderSound" style="flex:1;">${soundOpts}</select>
+          <button type="button" class="btn-ghost" onclick="previewOrderSound()">▶ Écouter</button>
+        </div>
+      </div>
+    </div>
+    <p class="shop-note">Joué à la caisse dès la réception d'une commande en ligne (instantané). Le choix s'applique à toute la boutique : cliquez sur « Enregistrer ».</p>
     <p class="shop-note">Les couleurs et polices s'appliquent en direct sur votre boutique (aperçu). Cliquez sur « Enregistrer » pour les conserver.</p>`;
 }
 function liveTheme(){ collectShopTab(); applyStoreTheme(shopDraft.theme); }
@@ -1915,7 +2012,7 @@ async function saveMenuSections(){
   const {error}=await sb.from('stores').update({menu_sections:draft}).eq('id',ACTIVE_STORE_ID);
   if(error){ alert(`Enregistrement impossible : ${error.message}`); console.error(error); return; }
   MENU_SECTIONS=draft; ACTIVE_STORE={...(ACTIVE_STORE||{}),menu_sections:draft};
-  renderMenu(); renderAdminSections();
+  renderMenu(); renderCaisseProductGrid(); renderAdminSections(); /* les nouvelles sections/produits s'affichent partout */
   alert('Sections enregistrées.');
 }
 
@@ -1976,7 +2073,7 @@ async function saveProductForm(){
   }
   const returnToInventory=productEditorReturnToInventory;
   productEditorReturnToInventory=false;
-  await loadProducts(); await loadStock(); renderMenu();
+  await loadProducts(); await loadStock(); renderMenu(); renderCaisseProductGrid(); /* met à jour boutique ET caisse */
   if(returnToInventory) renderAdminStock(); else renderAdminProducts();
 }
 function editInventoryProduct(id){
@@ -2016,7 +2113,7 @@ function renderProductRows(){
   </tr>`;}).join('');
 }
 function editProductById(id){ renderProductForm(PRODUCTS.find(p=>p.id===id)); document.getElementById('adminProductForm').scrollIntoView({behavior:'smooth'}); }
-async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderAdminProducts(); }
+async function deleteProduct(id){ if(!confirm("Supprimer ce produit ? Son stock sera aussi supprimé.")) return; const {error}=await sb.from('products').delete().eq('id',id).eq('store_id',ACTIVE_STORE_ID); if(error){alert("Erreur.");return;} await loadProducts(); await loadStock(); renderMenu(); renderCaisseProductGrid(); renderAdminProducts(); }
 
 /* ---------- POINTS DE VENTE (manager) ---------- */
 function renderAdminPoints(){
@@ -2288,11 +2385,16 @@ function exportSalesCSV(){
 }
 
 /* ---------- CAISSE (propriétaire: choisit un point / gérant: son point) ---------- */
-function renderAdminCaisse(){
+async function renderAdminCaisse(){
   if(pendingOrdersTimer){clearInterval(pendingOrdersTimer);pendingOrdersTimer=null;}
   if(registerStatusTimer){clearInterval(registerStatusTimer);registerStatusTimer=null;}
   const isOwner = isOwnerRole();
   if(!isOwner){ caisseSelectedPoint = adminProfile.point_id; } else if(!caisseSelectedPoint && POINTS.length){ caisseSelectedPoint = POINTS[0].id; }
+  /* La caisse doit afficher TOUS les produits : on s'assure que produits + stocks sont chargés avant le rendu. */
+  if(!PRODUCTS.length || !STOCK.length){
+    await Promise.all([loadProducts(), loadStock()]);
+    if(adminActiveTab!=='caisse') return; /* on a quitté la caisse pendant le chargement */
+  }
   const adminBody=document.getElementById('adminBody');
   adminBody.classList.add('admin-caisse-body');
   adminBody.innerHTML = `
@@ -2315,8 +2417,12 @@ function renderAdminCaisse(){
     <div class="caisse-footer-actions" id="registerActions"></div>`;
   renderAdminPointBar();
   renderCaisseProductGrid(); renderCaisseCart(); setupCaissePaymentButtons();
+  observeCaisseGridVisibility(); /* ré-affiche les produits quand la section devient visible (mobile) */
+  knownPendingOrderIds = null; sonnedOrderIds.clear(); /* la détection du son repart de zéro */
   loadPendingOrders();
-  pendingOrdersTimer=setInterval(loadPendingOrders,30000);
+  subscribePendingOrders(); /* réception instantanée des commandes (Supabase Realtime) */
+  /* Filet de sécurité : actualisation automatique du badge et de la liste toutes les 5 s. */
+  pendingOrdersTimer=setInterval(loadPendingOrders,5000);
   loadRegisterStatus();
   registerStatusTimer=setInterval(loadRegisterStatus,30000);
 }
@@ -2336,13 +2442,142 @@ function togglePendingOrders(){
   button.setAttribute('aria-expanded',String(!panel.hidden));
   if(!panel.hidden) loadPendingOrders();
 }
+/* =======================================================
+   SONS DE NOTIFICATION DE COMMANDE
+   6 sonorités synthétisées via Web Audio (aucun fichier son).
+   Choix enregistré dans stores.theme.orderSound (Boutique > Apparence).
+   ======================================================= */
+const ORDER_SOUNDS=[
+  ['kora','Kora — arpège élégant'],
+  ['sabar','Sabar — rythme sénégalais'],
+  ['mbalax','Mbalax — ting-ting moderne'],
+  ['baobab','Baobab — mallet chaleureux'],
+  ['dakar','Dakar — accord moderne'],
+  ['classique','Classique — ding-dong']
+];
+function selectedOrderSoundId(){
+  const id=ACTIVE_STORE&&ACTIVE_STORE.theme?ACTIVE_STORE.theme.orderSound:null;
+  return ORDER_SOUNDS.some(s=>s[0]===id)?id:'kora';
+}
+function orderAudioCtx(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return null;
+    if(!orderChimeCtx) orderChimeCtx=new AC();
+    if(orderChimeCtx.state==='suspended') orderChimeCtx.resume();
+    return orderChimeCtx;
+  }catch(err){ console.warn('AudioContext indisponible :',err); return null; }
+}
+function orderNote(ctx,freq,delay,opts){
+  const o=opts||{};
+  const type=o.type||'sine', dur=o.dur||0.8, vol=o.vol||0.25, attack=o.attack||0.012;
+  const osc=ctx.createOscillator(), gain=ctx.createGain(), t=ctx.currentTime+delay;
+  osc.type=type; osc.frequency.setValueAtTime(freq,t);
+  gain.gain.setValueAtTime(0.0001,t);
+  gain.gain.exponentialRampToValueAtTime(vol,t+attack);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t); osc.stop(t+dur+0.05);
+}
+function orderDrum(ctx,delay,opts){
+  const o=opts||{};
+  const dur=o.dur||0.18, vol=o.vol||0.3, start=o.startFreq||180, end=o.endFreq||55;
+  const t=ctx.currentTime+delay;
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.type='sine';
+  osc.frequency.setValueAtTime(start,t);
+  osc.frequency.exponentialRampToValueAtTime(end,t+dur);
+  gain.gain.setValueAtTime(0.0001,t);
+  gain.gain.exponentialRampToValueAtTime(vol,t+0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t); osc.stop(t+dur+0.05);
+}
+function orderTing(ctx,delay,opts){
+  const o=opts||{};
+  const freq=o.freq||2400, dur=o.dur||0.08, vol=o.vol||0.15;
+  const t=ctx.currentTime+delay;
+  const osc=ctx.createOscillator(), gain=ctx.createGain(), bp=ctx.createBiquadFilter();
+  osc.type='square'; osc.frequency.value=freq;
+  bp.type='bandpass'; bp.frequency.value=freq; bp.Q.value=6;
+  gain.gain.setValueAtTime(0.0001,t);
+  gain.gain.exponentialRampToValueAtTime(vol,t+0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  osc.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
+  osc.start(t); osc.stop(t+dur+0.05);
+}
+function playOrderSound(id){
+  id=id||selectedOrderSoundId();
+  const ctx=orderAudioCtx(); if(!ctx) return;
+  if(id==='sabar'){
+    /* Trois coups : boum … da … boum */
+    orderDrum(ctx,0,{dur:0.22,vol:0.34,startFreq:190,endFreq:55});
+    orderTing(ctx,0.14,{freq:1500,dur:0.1,vol:0.12});
+    orderDrum(ctx,0.26,{dur:0.26,vol:0.38,startFreq:220,endFreq:50});
+  }else if(id==='mbalax'){
+    /* Ting-ting mbalax sur une pulsation grave */
+    orderDrum(ctx,0,{dur:0.14,vol:0.3,startFreq:170,endFreq:60});
+    orderTing(ctx,0,{freq:2400,dur:0.07,vol:0.15});
+    orderTing(ctx,0.12,{freq:2900,dur:0.07,vol:0.15});
+    orderTing(ctx,0.24,{freq:2400,dur:0.07,vol:0.15});
+    orderDrum(ctx,0.3,{dur:0.18,vol:0.32,startFreq:200,endFreq:55});
+    orderTing(ctx,0.42,{freq:2900,dur:0.07,vol:0.15});
+  }else if(id==='baobab'){
+    /* Mallet doux : La4 puis Mi5 (harmonique à l'octave) */
+    orderNote(ctx,440,0,{type:'sine',dur:0.9,vol:0.26});
+    orderNote(ctx,880,0,{type:'sine',dur:0.5,vol:0.06});
+    orderNote(ctx,659.25,0.15,{type:'sine',dur:1,vol:0.26});
+    orderNote(ctx,1318.51,0.15,{type:'sine',dur:0.5,vol:0.05});
+  }else if(id==='dakar'){
+    /* Accord moderne (Do majeur) + note aiguë */
+    [523.25,659.25,783.99].forEach((f,i)=>orderNote(ctx,f,i*0.03,{type:'sawtooth',dur:1.1,vol:0.07,attack:0.05}));
+    orderNote(ctx,1046.66,0.12,{type:'triangle',dur:0.9,vol:0.2});
+  }else if(id==='classique'){
+    /* Ding-dong */
+    orderNote(ctx,1046.66,0,{type:'sine',dur:0.7,vol:0.3});
+    orderNote(ctx,1568,0.18,{type:'sine',dur:0.9,vol:0.3});
+  }else{
+    /* Kora (défaut) : arpège pentatonique élégant */
+    [659.25,739.99,987.77,1174.66].forEach((f,i)=>orderNote(ctx,f,i*0.09,{type:'triangle',dur:1,vol:0.22}));
+  }
+}
+function previewOrderSound(){
+  const sel=document.getElementById('thOrderSound');
+  playOrderSound(sel&&sel.value?sel.value:null);
+}
 async function loadPendingOrders(){
   if(!caisseSelectedPoint) return;
   const {data, error} = await sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).eq('point_id', caisseSelectedPoint).eq('channel','en_ligne').eq('fulfilled', false).eq('status','vendu').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
   CACHED_PENDING_ORDERS = data || [];
+  const ids=CACHED_PENDING_ORDERS.map(o=>o.id);
+  if(knownPendingOrderIds===null){
+    /* 1er chargement : on mémorise l'existant sans sonner. */
+    ids.forEach(id=>sonnedOrderIds.add(id));
+    knownPendingOrderIds=new Set(ids);
+  }else{
+    /* Nouvelle commande non encore annoncée => son (sans doublon si Realtime l'a déjà joué). */
+    ids.forEach(id=>{ if(!knownPendingOrderIds.has(id)&&!sonnedOrderIds.has(id)){ sonnedOrderIds.add(id); playOrderSound(); } });
+    knownPendingOrderIds=new Set(ids);
+  }
   renderPendingOrders();
   renderCaisseProductGrid();
+}
+/* Réception instantanée : canal Realtime sur la table sales (le polling 5 s reste en filet de sécurité). */
+function unsubscribePendingOrders(){ if(sb&&salesChannel){ sb.removeChannel(salesChannel); salesChannel=null; } }
+function subscribePendingOrders(){
+  unsubscribePendingOrders();
+  if(!sb||!caisseSelectedPoint) return;
+  salesChannel=sb.channel('sales-caisse-'+caisseSelectedPoint);
+  salesChannel.on('postgres_changes',{event:'INSERT',schema:'public',table:'sales',filter:`point_id=eq.${caisseSelectedPoint}`},payload=>{
+    const s=payload.new||{};
+    if(ACTIVE_STORE_ID&&s.store_id&&s.store_id!==ACTIVE_STORE_ID) return;
+    if(s.channel!=='en_ligne'||s.status!=='vendu'||s.fulfilled) return;
+    if(!sonnedOrderIds.has(s.id)){ sonnedOrderIds.add(s.id); playOrderSound(); }
+    loadPendingOrders(); /* actualisation immédiate du badge et de la liste */
+  }).subscribe((status)=>{
+    if(status==='CHANNEL_ERROR') console.warn("Realtime commandes indisponible : le polling 5 s assure l'actualisation.");
+  });
 }
 function renderPendingOrders(){
   const container=document.getElementById('pendingOrdersList'); const badge=document.getElementById('pendingCount');
@@ -2391,6 +2626,19 @@ function renderCaisseProductGrid(){
     return `<div class="menu-card ${p.cat}" onclick="addToCaisse('${p.id}')">${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add">Ajouter</button></div>`; }).join('');
   if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit en stock sur ce point.</div>';
 }
+/* La caisse doit récupérer tous les produits : recharge si la liste est vide,
+   puis (re)dessine la grille une fois la section visible à l'écran. */
+let caisseGridObserver=null;
+function observeCaisseGridVisibility(){
+  const grid=document.getElementById('caisseProductGrid'); if(!grid) return;
+  if(!PRODUCTS.length){ loadProducts().then(()=>{ if(document.getElementById('caisseProductGrid')) renderCaisseProductGrid(); }); }
+  if(!('IntersectionObserver' in window)) return;
+  if(caisseGridObserver) caisseGridObserver.disconnect();
+  caisseGridObserver=new IntersectionObserver(entries=>{
+    if(entries.some(e=>e.isIntersecting)){ renderCaisseProductGrid(); caisseGridObserver.disconnect(); caisseGridObserver=null; }
+  },{threshold:0.05});
+  caisseGridObserver.observe(grid);
+}
 function availableStockFor(productId){
   const reserved=CACHED_PENDING_ORDERS.reduce((sum,order)=>sum+(order.sale_items||[]).filter(item=>item.product_id===productId).reduce((itemSum,item)=>itemSum+Number(item.qty||0),0),0);
   return Math.max(0,stockFor(caisseSelectedPoint,productId)-reserved);
@@ -2400,6 +2648,8 @@ function addToCaisse(productId){
   const existing=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId);
   if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
   renderCaisseCart(); renderCaisseProductGrid();
+  /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout. */
+  if(window.matchMedia('(max-width: 768px)').matches){ document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 function removeFromCaisse(productId){ if(caisseOrderId)return; caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
 function changeCaisseQty(productId, delta){ if(caisseOrderId)return; const it=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId); it.qty=Math.max(1,Math.min(max,it.qty+delta)); renderCaisseCart(); renderCaisseProductGrid(); }

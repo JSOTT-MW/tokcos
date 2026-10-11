@@ -618,6 +618,8 @@ body.admin-mode .admin-body.caisse-active {
   color: #fff;
   font-size: 11px;
   font-weight: 700;
+  /* Cohérent avec le compteur du panier dans le header : police élégante, gras. */
+  font-family: var(--font-display);
   padding: 3px 10px;
   border-radius: 999px;
 }
@@ -747,119 +749,7 @@ body.admin-mode .admin-body.caisse-active {
   border-radius: 14px;
 }
 
-/* =======================================================
-   MOBILE : produits en ligne, caisse en bas fixe
-   ======================================================= */
-@media (max-width: 768px) {
-  body.admin-mode .admin-body.caisse-active {
-    padding-right: 0;
-    padding-bottom: 50vh;
-  }
-
-  .caisse-layout {
-    flex-direction: column;
-  }
-
-  .caisse-left {
-    padding-right: 0;
-    overflow-y: visible;
-  }
-
-  /* Produits en ligne (scroll horizontal) */
-  .caisse-left .card-grid {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    gap: 10px !important;
-    padding-bottom: 8px !important;
-    touch-action: pan-x;
-  }
-
-  .caisse-left .card-grid .menu-card {
-    min-width: 150px;
-    max-width: 180px;
-    flex-shrink: 0;
-  }
-
-  .caisse-left .card-grid .menu-card .card-photo {
-    height: 60px;
-  }
-
-  .caisse-left .card-grid .menu-card .card-name {
-    font-size: 12px;
-  }
-
-  .caisse-left .card-grid .menu-card .card-price {
-    font-size: 11px;
-  }
-
-  .caisse-left .card-grid .menu-card .card-add {
-    font-size: 10px;
-    padding: 4px 10px;
-  }
-
-  /* Panier fixe en bas - OPTIMISE MOBILE */
-  .caisse-right {
-    position: fixed !important;
-    bottom: 0 !important;
-    top: auto !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: 38vh !important;
-    border-left: none !important;
-    border-top: 1px solid rgba(110,59,30,0.15) !important;
-    z-index: 210 !important;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.08) !important;
-    border-radius: 10px 10px 0 0 !important;
-    padding: 6px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .caisse-right .caisse-cart-body {
-    max-height: 8vh !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    margin-bottom: 6px !important;
-  }
-
-  .caisse-cart-header {
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-  }
-
-  .caisse-cart-header h4 {
-    font-size: 14px;
-  }
-
-  .caisse-cart-footer {
-    padding-top: 8px;
-  }
-
-  /* Commandes en attente sur mobile */
-  .pending-order-card {
-    padding: 10px 12px;
-  }
-
-  .pending-order-card .order-info .order-client {
-    font-size: 13px;
-  }
-
-  .pending-order-card .order-info .order-detail {
-    font-size: 11px;
-  }
-
-  .pending-order-card .order-total {
-    font-size: 12px;
-  }
-
-  .pending-order-card .import-btn {
-    font-size: 10px;
-    padding: 4px 10px;
-  }
-}
+/* Règles mobile de la caisse : voir le bloc "MOBILE CAISSE" en fin de fichier. */
 
 /* Back-office : navigation persistante, structure type application SaaS */
 body.admin-mode {
@@ -1402,8 +1292,13 @@ body.admin-mode .caisse-orders-toggle {
 
 body.admin-mode .caisse-orders-toggle .cart-badge {
   position: absolute;
-  top: -7px;
+  /* Compteur en bas du panier plutôt qu'en haut. */
+  bottom: -7px;
   right: -7px;
+  /* Chiffre du panier : police élégante et gras (Fraunces, celle des titres/valeurs). */
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 body.admin-mode .pending-orders-banner[hidden] {
@@ -1599,27 +1494,30 @@ body.admin-mode .register-summary strong {
 }
 
 @media (max-width: 768px) {
+  /* Caisse mobile : entièrement visible dans le flux (cf. bloc MOBILE CAISSE en fin de fichier) */
   body.admin-mode .caisse-right {
-    position: sticky !important;
+    position: static !important;
     top: auto !important;
-    bottom: 0 !important;
+    bottom: auto !important;
     left: auto !important;
     right: auto !important;
-    width: auto !important;
+    width: 100% !important;
     height: auto !important;
-    max-height: 58dvh !important;
+    max-height: none !important;
     min-height: 0 !important;
-    z-index: 10 !important;
-    overflow: auto !important;
-    border-left: 2px solid rgba(110, 59, 30, 0.15) !important;
-    border-top: 2px solid rgba(110, 59, 30, 0.15) !important;
-    border-radius: 14px !important;
+    z-index: auto !important;
+    overflow: visible !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(110, 59, 30, 0.15) !important;
+    border-radius: 10px !important;
     padding: 12px !important;
   }
 
   body.admin-mode .caisse-right .caisse-cart-body {
-    max-height: 22dvh !important;
+    max-height: min(30dvh, 280px) !important;
     overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -1635,10 +1533,14 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
   padding: 0;
   overflow: visible;
   background: var(--cream);
+  /* Supprime la ligne du header admin (border-bottom hérité de body.admin-mode .admin-head)
+     qui se peint au-dessus de la barre et coupait le bouton panier / le select. */
+  border-bottom: 0;
 }
 
 body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
-  top: 26px;
+  /* Même axe vertical que la barre Point de vente : centre exact de la barre de 64px. */
+  top: 32px;
   left: 50%;
   width: 48px;
   height: 48px;
@@ -1653,7 +1555,8 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-brand-logo {
 
 body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
   position: absolute;
-  top: 26px;
+  /* Aligné sur la même ligne que le logo, le select et le panier. */
+  top: 32px;
   right: 24px;
   z-index: 23;
   justify-content: flex-end;
@@ -1682,10 +1585,15 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row {
 body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .admin-toolbar-field {
   flex: 0 0 280px;
   align-self: center;
+  /* Le label est sorti du flux pour que le select seul soit centré sur la ligne. */
+  position: relative;
 }
 
 body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field label {
-  margin-bottom: 2px;
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 2px);
+  margin: 0;
   font-size: 11px;
 }
 
@@ -1806,6 +1714,12 @@ body.admin-mode .caisse-footer-actions {
     min-height: 42px;
   }
 
+  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field label {
+    /* Sur mobile, la barre n'est plus superposée : le label reprend sa place dans le flux. */
+    position: static;
+    margin-bottom: 2px;
+  }
+
   body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
     position: relative;
     top: auto;
@@ -1815,7 +1729,7 @@ body.admin-mode .caisse-footer-actions {
 
   body.admin-mode .admin-caisse-body {
     height: auto;
-    padding: 16px 14px 10dvh;
+    padding: 16px 14px 24px;
     overflow: auto;
   }
 
@@ -1824,3 +1738,190 @@ body.admin-mode .caisse-footer-actions {
     max-height: min(42dvh, 360px);
   }
 }
+
+/* ===== CAISSE v3 : plein écran 2 colonnes + liste panier haute avec scroll ===== */
+/* REMPLACE tout le bloc "CAISSE v2" ajouté à la fin de styles.css (de "/* ===== CAISSE : mise en page plein écran" jusqu'à la fin du fichier). */
+
+/* --- Bureau / tablette large (> 900px) --- */
+@media (min-width:901px){
+  html body.admin-mode .admin-body.admin-caisse-body{
+    display:flex;
+    flex-direction:column;
+    max-height:none;                /* annule calc(100vh - 120px) : pleine hauteur */
+    overflow:hidden !important;
+    padding-bottom:12px;
+  }
+  html body.admin-mode .admin-caisse-body .caisse-layout{
+    flex:1 1 0;                     /* caisse-layout = toute la hauteur libre */
+    min-height:0;
+    height:auto;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 380px;
+    grid-template-rows:minmax(0,1fr);   /* la rangée ne dépasse jamais l'écran */
+    align-items:stretch;
+    gap:20px;
+  }
+  html body.admin-mode .admin-caisse-body .caisse-left{
+    min-width:0;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+  html body.admin-mode .admin-caisse-body .caisse-right{
+    position:static;
+    width:auto;
+    height:auto;                    /* étiré sur toute la hauteur par la grille */
+    min-height:0;
+    max-height:none;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  html body.admin-mode .admin-caisse-body .caisse-right .caisse-cart-body{
+    flex:1 1 0;                     /* la liste prend tout l'espace libre */
+    min-height:0;
+    max-height:none;
+    overflow-y:auto;                /* scroll vertical de la commande */
+    overscroll-behavior:contain;
+    padding-right:6px;
+    margin-bottom:8px;
+  }
+  html body.admin-mode .admin-caisse-body .caisse-footer-actions{
+    flex:0 0 auto;
+    margin-top:10px;
+  }
+}
+
+/* --- Mobile / petite tablette (≤ 900px) --- */
+
+/* =======================================================
+   MOBILE : produits en grille verticale (scroll interne),
+   caisse entièrement visible dans le flux de la page
+   ======================================================= */
+@media (max-width: 768px) {
+  /* La caisse n'est plus fixée en bas : plus besoin de grand padding réservé. */
+  body.admin-mode .admin-body.caisse-active {
+    padding-right: 0;
+    padding-bottom: 24px;
+  }
+ 
+  .caisse-layout {
+    flex-direction: column;
+  }
+ 
+  .caisse-left {
+    padding-right: 0;
+    overflow-y: visible;
+  }
+ 
+  /* Produits : grille verticale (2 colonnes) — scroll vertical interne si la liste est longue */
+  .caisse-left .card-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    gap: 10px !important;
+    padding-bottom: 8px !important;
+    align-content: start;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+ 
+  .caisse-left .card-grid .menu-card {
+    min-width: 0;
+    max-width: none;
+  }
+ 
+  .caisse-left .card-grid .menu-card .card-photo {
+    height: 60px;
+  }
+ 
+  .caisse-left .card-grid .menu-card .card-name {
+    font-size: 12px;
+  }
+ 
+  .caisse-left .card-grid .menu-card .card-price {
+    font-size: 11px;
+  }
+ 
+  .caisse-left .card-grid .menu-card .card-add {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+ 
+  /* Caisse : entièrement visible dans le flux (plus de panneau fixe rogné en bas) */
+  .caisse-right {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(110,59,30,0.15) !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    overflow: visible !important;
+  }
+ 
+  .caisse-right .caisse-cart-body {
+    max-height: min(30dvh, 280px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 6px !important;
+  }
+ 
+  .caisse-cart-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+ 
+  .caisse-cart-header h4 {
+    font-size: 14px;
+  }
+ 
+  .caisse-cart-footer {
+    padding-top: 8px;
+  }
+ 
+  /* Commandes en attente sur mobile */
+  .pending-order-card {
+    padding: 10px 12px;
+  }
+ 
+  .pending-order-card .order-info .order-client {
+    font-size: 13px;
+  }
+ 
+  .pending-order-card .order-info .order-detail {
+    font-size: 11px;
+  }
+ 
+  .pending-order-card .order-total {
+    font-size: 12px;
+  }
+ 
+  .pending-order-card .import-btn {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+}
+
+/* --- Lignes du panier : nom complet visible, boutons +/- jamais écrasés --- */
+html body.admin-mode .caisse-cart-body > div > div:first-child{ min-width:0; overflow-wrap:anywhere; }
+html body.admin-mode .caisse-cart-body > div > div:last-child{ flex-shrink:0; }
+
+/* --- Pied de caisse compact pour libérer de la hauteur --- */
+html body.admin-mode .caisse-cart-footer > div[style]{ margin:6px 0 !important; }
+html body.admin-mode .caisse-cart-footer .field{ margin-bottom:8px; }
+html body.admin-mode .caisse-cart-footer .field input{ padding:8px 12px; }
+html body.admin-mode .caisse-cart-footer .seg{ flex-wrap:nowrap; gap:6px; }
+html body.admin-mode .caisse-cart-footer .seg button{ min-width:0; padding:8px 4px; font-size:11px; }
