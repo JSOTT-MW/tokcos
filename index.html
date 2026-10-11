@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260111c">
+<link rel="stylesheet" href="styles.css?v=20260111d">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -476,12 +476,14 @@
    ======================================================= */
 @media (max-width: 768px) {
   html body.admin-mode .admin-caisse-body{ height:auto !important; padding:16px 14px 24px !important; overflow-y:auto !important; overflow-x:hidden !important; }
-  html body.admin-mode .caisse-layout{ display:flex !important; flex-direction:column !important; }
-  html body.admin-mode .caisse-left{ display:flex !important; flex-direction:column !important; overflow:visible !important; height:auto !important; padding-right:0 !important; }
+  html body.admin-mode .caisse-layout{ display:flex !important; flex-direction:column !important; height:auto !important; min-height:0 !important; }
+  html body.admin-mode .caisse-left{ display:flex !important; flex-direction:column !important; overflow:visible !important; height:auto !important; flex:0 0 auto !important; padding-right:0 !important; }
   /* Produits : une seule ligne, défilement horizontal (gauche ↔ droite) */
   html body.admin-mode .caisse-left .card-grid,
   html body.admin-mode .caisse-product-grid{
     display:flex !important;
+    flex:0 0 auto !important;
+    height:auto !important;
     flex-wrap:nowrap !important;
     overflow-x:auto !important;
     overflow-y:hidden !important;
@@ -2626,9 +2628,11 @@ async function cancelImportedOrder(){
 
 function renderCaisseProductGrid(){
   const grid=document.getElementById('caisseProductGrid'); if(!grid) return;
-  grid.innerHTML = PRODUCTS.filter(p=>p.active && availableStockFor(p.id)>0).map(p=>{ const qty=availableStockFor(p.id);
-    return `<div class="menu-card ${p.cat}" onclick="addToCaisse('${p.id}')">${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add">Ajouter</button></div>`; }).join('');
-  if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit en stock sur ce point.</div>';
+  /* Tous les produits actifs (toutes sections confondues) sont affichés ;
+     ceux sans stock sur ce point sont marqués « Rupture » et non ajoutables. */
+  grid.innerHTML = PRODUCTS.filter(p=>p.active).map(p=>{ const qty=availableStockFor(p.id); const rupture=qty<=0;
+    return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div><div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`; }).join('');
+  if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit actif au catalogue.</div>';
 }
 /* La caisse doit récupérer tous les produits : recharge si la liste est vide,
    puis (re)dessine la grille une fois la section visible à l'écran. */
@@ -2650,6 +2654,7 @@ function availableStockFor(productId){
 function addToCaisse(productId){
   if(caisseOrderId){alert('Une commande client est importée. Terminez-la avant d’ajouter une autre vente.');return;}
   const existing=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId);
+  if(max<=0){ alert('Ce produit est en rupture de stock sur ce point.'); return; }
   if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
   renderCaisseCart(); renderCaisseProductGrid();
   /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout. */

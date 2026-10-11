@@ -1807,17 +1807,23 @@ body.admin-mode .caisse-footer-actions {
  
   .caisse-layout {
     flex-direction: column;
+    height: auto;
+    min-height: 0;
   }
  
   .caisse-left {
     padding-right: 0;
     overflow-y: visible;
+    height: auto;
+    flex: 0 0 auto;
   }
  
   /* Produits : une seule ligne, défilement horizontal (gauche ↔ droite) */
   body.admin-mode .caisse-left .card-grid,
   body.admin-mode .caisse-product-grid {
     display: flex !important;
+    flex: 0 0 auto;
+    height: auto;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
