@@ -123,7 +123,7 @@
   .contact-info h5{font-size:14px;color:var(--gold-light);margin-bottom:8px;font-weight:600;}
   .contact-info p{font-size:12.5px;color:rgba(255,255,255,0.85);margin-bottom:5px;line-height:1.4;}
   .contact-info .phone{color:var(--gold-light);font-weight:700;font-size:12.5px;margin-bottom:4px;}
-  .map-btn{display:inline-flex;align-items:center;gap:7px;background:var(--gold);color:var(--coffee-black);padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:700;margin-top:10px;}
+  .map-btn{display:inline-flex;align-items:center;gap:7px;background:var(--gold);color:#ffffff;padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:700;margin-top:10px;}
   .map-btn:hover{background:var(--gold-light);}
   .map-btn svg{width:15px;height:15px;}
   .close-btn{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:rgba(221,165,63,0.2);color:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid rgba(221,165,63,0.4);z-index:10;}
@@ -897,7 +897,7 @@ function renderMenu(){
     const title = rep.format_group || rep.name;
     const minPrice = Math.min(...group.map(gp=>Number(gp.price)||0));
     const priceLabel = group.length>1 ? `À partir de ${money(minPrice)}` : money(rep.price);
-    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${title}</div><div class="card-price">${priceLabel}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Voir + ajouter'}</button>`:''}`;
+    el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${title}</div><div class="card-price">${priceLabel}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Ajouter'}</button>`:''}`;
     el.onclick = ()=>{ if(!outOfStock) openModal(rep.id); };
     return el;
   };
@@ -932,7 +932,7 @@ function renderPointCards(){
           ${p.phone1?`<p class="phone">📞 ${p.phone1}</p>`:''}${p.phone2?`<p class="phone">📞 ${p.phone2}</p>`:''}
           <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.map_query||p.address)}" target="_blank" rel="noopener" class="map-btn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            Voir sur Maps</a>
+            Kay nuy dem !!!</a>
         </div></div>
     </div></div>`).join('');
 }
@@ -1015,9 +1015,9 @@ function renderDrawer(){
       return `<div class="cart-item"><div class="ci-icon">${thumb}</div><div class="ci-info"><h4>${p.name}</h4><div class="ci-price">${money(p.price)} × ${c.qty} = ${money(p.price*c.qty)}</div><div class="ci-qty"><button onclick="cartQty('${c.id}',-1)">−</button><span>${c.qty}</span><button onclick="cartQty('${c.id}',1)">+</button></div><div class="ci-remove" onclick="cartRemove('${c.id}')">Retirer</div></div></div>`; }).join('');
     foot.innerHTML = `<div class="drawer-total"><span>Total</span><span>${money(cartTotal())}</span></div><button class="btn-primary btn-full-width" onclick="goCheckout()">Commander</button>`;
   } else {
-    body.innerHTML = `<div class="field"><label>Point de vente demandeur</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
-      <div class="field"><label>Nom du responsable</label><input type="text" id="ckName" placeholder="Ex : Aïssatou DIOP"></div>
-      <div class="field"><label>Numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
+    body.innerHTML = `<div class="field"><label>Choisir un point de vente</label><select id="ckPoint">${POINTS.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Votre nom</label><input type="text" id="ckName" placeholder="Ex : Aïssatou DIOP"></div>
+      <div class="field"><label>votre numéro de téléphone</label><input type="tel" id="ckPhone" placeholder="77 000 00 00"></div>
       <div class="field"><label>Mode de réception</label><div class="seg" id="segDelivery"><button type="button" data-val="Livraison boutique" class="active">Livraison</button><button type="button" data-val="Retrait au point">Retrait en boutique</button></div></div>
       <div class="checkout-note">Votre commande sera préparée au point choisi. Le paiement se fera sur place.</div>`;
     foot.innerHTML = `<div class="drawer-total"><span>Total estimé</span><span>${money(cartTotal())}</span></div><div class="checkout-actions"><button class="btn-ghost" onclick="backToCart()">Retour</button><button class="btn-primary" id="submitOrderBtn" onclick="submitOrder()">Valider</button></div>`;
