@@ -278,6 +278,17 @@
   .admin-product-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--cream);border-radius:14px;padding:20px;margin-bottom:22px;}
   @media(max-width:640px){ .admin-product-form{grid-template-columns:1fr;} }
   .admin-product-form .full{grid-column:1/-1;}
+  /* Sélecteur de formats : menu déroulant à cases à cocher (formulaire produit, mode création). */
+  .pf-formats-wrap{position:relative;}
+  .pf-formats-toggle{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(110,59,30,0.25);border-radius:10px;background:var(--white);font-size:13px;font-weight:700;color:var(--coffee-black);cursor:pointer;}
+  .pf-formats-toggle:hover{border-color:var(--rust);}
+  .pf-formats-toggle .pf-count{font-size:11px;font-weight:700;color:var(--white);background:var(--rust);border-radius:999px;padding:2px 8px;}
+  .pf-formats-toggle .pf-count[hidden]{display:none;}
+  .pf-formats-panel{position:absolute;left:0;top:calc(100% + 6px);z-index:40;min-width:250px;max-height:260px;overflow-y:auto;background:var(--white);border:1px solid rgba(110,59,30,0.18);border-radius:12px;padding:8px;box-shadow:0 12px 28px rgba(60,30,10,0.15);}
+  .pf-formats-panel[hidden]{display:none;}
+  .pf-format-check{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;}
+  .pf-format-check:hover{background:var(--cream);}
+  .pf-format-check input{width:16px;height:16px;accent-color:var(--rust);flex-shrink:0;}
   .admin-form-actions{display:flex;gap:10px;}
   .admin-photo-zone{display:flex;align-items:center;gap:14px;}
   .admin-photo-preview{width:84px;height:84px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
@@ -2088,12 +2099,38 @@ function onPfFormatToggle(){
   if(!box||!wrap) return;
   const basePrice=document.getElementById('pfPrice')?.value||'';
   const checked=[...box.querySelectorAll('input[name="pfFormat"]:checked')].map(i=>i.value);
+  updatePfFormatsCount(checked);
   if(checked.length<=1){ wrap.innerHTML=''; return; }
   wrap.innerHTML=`<div class="pf-format-prices-title">Prix par format</div>`+checked.map(f=>{
     const prev=wrap.querySelector(`input[data-fmt="${CSS.escape(f)}"]`)?.value;
     return `<div class="field"><label>${esc(f)}</label><input type="number" min="0" data-fmt="${esc(f)}" value="${prev!=null?esc(prev):esc(basePrice)}" placeholder="500"></div>`;
   }).join('');
 }
+/* Menu déroulant « Formats de vente » : ouverture/fermeture du panneau à cases à cocher
+   et compteurs sur le bouton. Le panneau se referme au clic en dehors. */
+function togglePfFormats(){
+  const panel=document.getElementById('pfFormats'), toggle=document.getElementById('pfFormatsToggle');
+  if(!panel) return;
+  panel.hidden=!panel.hidden;
+  if(toggle) toggle.setAttribute('aria-expanded',String(!panel.hidden));
+}
+function closePfFormatsPanel(){
+  const panel=document.getElementById('pfFormats'), toggle=document.getElementById('pfFormatsToggle');
+  if(!panel||panel.hidden) return;
+  panel.hidden=true;
+  if(toggle) toggle.setAttribute('aria-expanded','false');
+}
+function updatePfFormatsCount(checked){
+  const badge=document.getElementById('pfFormatsCount');
+  if(!badge) return;
+  if(!checked||!checked.length){ badge.hidden=true; badge.textContent=''; return; }
+  badge.hidden=false;
+  badge.textContent=checked.length===1?'1 format':`${checked.length} formats`;
+}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('pfFormatsDd');
+  if(dd && !dd.contains(e.target)) closePfFormatsPanel();
+});
 function selectedPfFormats(){
   const box=document.getElementById('pfFormats');
   if(!box) return null; /* mode édition : pas de sélection multiple */
@@ -2129,9 +2166,12 @@ function renderProductForm(product, containerId='adminProductForm', returnToInve
     <div class="field full"><label>Format(s) de vente <span style="font-weight:400;color:#8A7660;">(un produit peut être vendu sous plusieurs formats — chacun a son propre prix et son propre stock)</span></label>
       ${product
         ? `<select id="pfFormat">${formatOptions(product)}</select><span class="shop-note" style="font-size:11px;">Vous modifiez un article (un format). Pour ajouter un autre format à la même boisson, créez un nouveau produit avec le même nom et un format différent, ou dupliquez cet article.</span>`
-        : `<div class="pf-formats" id="pfFormats">${PRODUCT_FORMATS.map(f=>`<label class="pf-format-check"><input type="checkbox" name="pfFormat" value="${esc(f)}" onchange="onPfFormatToggle()"><span>${esc(f)}</span></label>`).join('')}</div>
+        : `<div class="pf-formats-wrap" id="pfFormatsDd">
+             <button type="button" class="pf-formats-toggle" id="pfFormatsToggle" aria-haspopup="true" aria-expanded="false" onclick="togglePfFormats()">Formats de vente ▾ <span class="pf-count" id="pfFormatsCount" hidden></span></button>
+             <div class="pf-formats-panel" id="pfFormats" role="group" aria-label="Formats de vente" hidden>${PRODUCT_FORMATS.map(f=>`<label class="pf-format-check"><input type="checkbox" name="pfFormat" value="${esc(f)}" onchange="onPfFormatToggle()"><span>${esc(f)}</span></label>`).join('')}</div>
+           </div>
            <div id="pfFormatPrices"></div>
-           <span class="shop-note" style="font-size:11px;">Cochez un ou plusieurs formats. Si plusieurs sont cochés, un article distinct (stock et prix propres) est créé pour chacun, regroupés dans la même carte du menu et de la caisse. Laissez tout décoché pour un article sans format.</span>`}
+           <span class="shop-note" style="font-size:11px;">Ouvrez le menu « Formats de vente » et cochez un ou plusieurs formats. Si plusieurs sont cochés, un article distinct (stock et prix propres) est créé pour chacun, regroupés dans la même carte du menu et de la caisse. Laissez tout décoché pour un article sans format.</span>`}
     </div>
     ${!product?`<div class="field"><label>Stock initial (par point)</label><input type="number" id="pfStock" value="20" min="0"></div>`:`<div class="field"><label>Stock</label><input type="text" value="Géré dans l'onglet Stock" disabled class="stock-field-disabled"></div>`}
     <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?(product.description||''):''}</textarea></div>
