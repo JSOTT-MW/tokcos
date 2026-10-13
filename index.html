@@ -289,6 +289,20 @@
   .pf-format-check{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;}
   .pf-format-check:hover{background:var(--cream);}
   .pf-format-check input{width:16px;height:16px;accent-color:var(--rust);flex-shrink:0;}
+  /* Caisse : menu déroulant « Formats ▾ » — popover ancré sous la carte produit
+     (hors carte, celle-ci ayant une hauteur fixe et overflow:hidden). */
+  .caisse-formats-pop{position:fixed;z-index:110;background:var(--white);border:1px solid rgba(110,59,30,0.18);border-radius:12px;padding:8px;box-shadow:0 14px 30px rgba(60,30,10,0.2);max-height:270px;overflow-y:auto;}
+  .caisse-formats-pop[hidden]{display:none;}
+  .caisse-pop-title{font-size:12px;font-weight:800;color:var(--coffee-black);padding:2px 6px 7px;border-bottom:1px dashed rgba(110,59,30,0.2);margin-bottom:6px;text-align:left;}
+  .caisse-pop-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:12px;cursor:pointer;}
+  .caisse-pop-row:hover{background:var(--cream);}
+  .caisse-pop-row input{width:15px;height:15px;accent-color:var(--rust);flex-shrink:0;}
+  .caisse-pop-row .caisse-pop-label{flex:1;font-weight:700;color:var(--coffee-black);text-align:left;line-height:1.2;}
+  .caisse-pop-row .caisse-pop-price{font-weight:700;color:var(--rust);white-space:nowrap;}
+  .caisse-pop-row .caisse-pop-stock{font-size:10px;color:#8A7660;white-space:nowrap;min-width:54px;text-align:right;}
+  .caisse-pop-row.soldout{opacity:.55;cursor:not-allowed;}
+  .caisse-format-count{display:inline-block;min-width:16px;padding:0 5px;margin-left:3px;border-radius:999px;background:var(--white);color:var(--coffee-brown);font-size:10px;font-weight:800;line-height:16px;}
+  .caisse-lowstock{display:inline-block;background:#FBE7C6;color:#8A5A00;font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;margin-left:5px;}
   .admin-form-actions{display:flex;gap:10px;}
   .admin-photo-zone{display:flex;align-items:center;gap:14px;}
   .admin-photo-preview{width:84px;height:84px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
@@ -703,6 +717,8 @@ let STOCK_DRAFT = new Map();
 let salesSelectedPoint = 'all', salesPeriod = 'day', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
 let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null;
 let caisseOrderId = null, pendingOrdersTimer = null, registerStatusTimer = null, registerStatus = null;
+/* Clé du groupe « Formats ▾ » actuellement ouvert dans la caisse (popover). */
+let caisseFormatsPopupKey = null;
 /* Commandes en attente déjà connues : permet de détecter l'arrivée d'UNE nouvelle commande (son). */
 let knownPendingOrderIds = null;
 /* Ids déjà annoncés par un son (évite le doublon Realtime + polling). */
@@ -2811,17 +2827,106 @@ async function cancelImportedOrder(){
   renderAdminCaisse();
 }
 
+/* Clé de regroupement : les formats d'une même boisson (même section + format_group)
+   partagent une seule carte ; un produit sans format reste seul. */
+function caisseGroupKey(p){ return p.format_group ? (p.cat+'|'+p.format_group) : ('#'+p.id); }
+/* Clé encodée pour attributs HTML / onclick inline (aucune apostrophe ni guillemet). */
+function cfAttrKey(key){ return encodeURIComponent(key).replace(/'/g,'%27'); }
+/* Ligne « Stock : X » : ambre + badge « Stock faible » sous 10, rouge à 0. */
+function caisseStockLine(qty){
+  if(qty<=0) return `<div style="font-size:11px;color:var(--rust);font-weight:700;">Stock : 0</div>`;
+  if(qty<10) return `<div style="font-size:11px;color:#B7791F;font-weight:700;">Stock : ${qty}<span class="caisse-lowstock">Stock faible</span></div>`;
+  return `<div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div>`;
+}
 function renderCaisseProductGrid(){
-  const grid=document.getElementById('caisseProductGrid'); if(!grid) return;
+  const grid=document.getElementById('caisseProductGrid');
+  if(!grid){ closeCaisseFormatsPopup(); return; }
   /* Tous les produits actifs (toutes sections confondues) sont affichés ;
      ceux sans stock sur ce point sont marqués « Rupture » et non ajoutables.
-     Le stock est synchronisé à l'inventaire du point sélectionné (availableStockFor).
-     Le format (mini tasse / grande tasse / bouteille...) est rappelé sous le nom. */
-  grid.innerHTML = PRODUCTS.filter(p=>p.active).map(p=>{ const qty=availableStockFor(p.id); const rupture=qty<=0;
-    const formatTag=p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:'';
-    return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${p.image_url}" class="card-photo" alt="${p.name}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${p.name}</div>${formatTag}<div class="card-price">${money(p.price)}</div><div style="font-size:11px;color:#8A7660;">Stock : ${qty}</div><button class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`; }).join('');
+     Les formats d'une même boisson (format_group au sein d'une même section)
+     sont regroupés en UNE seule carte intitulée par le groupe : le bouton
+     « Formats ▾ » ouvre une liste à cases à cocher (cocher = au panier) où
+     chaque format garde son propre prix et son propre stock.
+     Le stock vient de l'inventaire du point (availableStockFor), avec alerte
+     « Stock faible » (ambre) dès que la quantité passe sous 10. */
+  const active=PRODUCTS.filter(p=>p.active);
+  const groups=[], byKey=new Map();
+  active.forEach(p=>{
+    const key=caisseGroupKey(p);
+    if(byKey.has(key)){ byKey.get(key).push(p); return; }
+    const g=[p]; byKey.set(key,g); groups.push(g);
+  });
+  const inCart=id=>caisseCart.some(c=>c.id===id);
+  grid.innerHTML = groups.map(g=>{
+    /* --- Produit unique (sans format, ou seul format actif) : carte classique. --- */
+    if(g.length===1){
+      const p=g[0], qty=availableStockFor(p.id), rupture=qty<=0;
+      const formatTag=p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:'';
+      return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${esc(p.image_url)}" class="card-photo" alt="${esc(p.name)}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${esc(p.name)}</div>${formatTag}<div class="card-price">${money(p.price)}</div>${caisseStockLine(qty)}<button type="button" class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`;
+    }
+    /* --- Plusieurs formats : une seule carte + menu déroulant « Formats ▾ ». --- */
+    const rep=g.find(x=>x.image_url)||g[0];
+    const enc=cfAttrKey(caisseGroupKey(g[0]));
+    const totalQty=g.reduce((s,p)=>s+availableStockFor(p.id),0);
+    const rupture=totalQty<=0;
+    const minPrice=Math.min(...g.map(p=>Number(p.price)||0));
+    const count=g.filter(p=>inCart(p.id)).length;
+    return `<div class="menu-card ${g[0].cat}${rupture?' out-of-stock':''}" data-caisse-formats="${enc}" onclick="toggleCaisseFormatsPopup('${enc}')">${rupture?'<span class="stock-flag">Rupture</span>':''}${rep.image_url?`<img src="${esc(rep.image_url)}" class="card-photo" alt="${esc(rep.name)}">`:`<span class="card-icon">${rep.icon||'☕'}</span>`}<div class="card-name">${esc(g[0].format_group||g[0].name)}</div><div class="card-price">À partir de ${money(minPrice)}</div>${caisseStockLine(totalQty)}<button type="button" class="card-add">Formats ▾${count?` <span class="caisse-format-count">${count}</span>`:''}</button></div>`;
+  }).join('');
   if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit actif au catalogue.</div>';
+  if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); /* le menu suit les re-rendus de la grille */
 }
+/* ---------- Menu déroulant « Formats ▾ » de la caisse (popover hors carte,
+   pour ne pas être rogné par les cartes à hauteur fixe / overflow:hidden) ---------- */
+function toggleCaisseFormatsPopup(encKey){
+  const key=decodeURIComponent(encKey);
+  if(caisseFormatsPopupKey===key){ closeCaisseFormatsPopup(); return; }
+  caisseFormatsPopupKey=key;
+  renderCaisseFormatsPopup();
+}
+function closeCaisseFormatsPopup(){
+  caisseFormatsPopupKey=null;
+  const el=document.getElementById('caisseFormatsPopup');
+  if(el){ el.hidden=true; el.innerHTML=''; }
+}
+function renderCaisseFormatsPopup(){
+  let el=document.getElementById('caisseFormatsPopup');
+  if(!el){ el=document.createElement('div'); el.id='caisseFormatsPopup'; el.className='caisse-formats-pop'; el.hidden=true; document.body.appendChild(el); }
+  if(!caisseFormatsPopupKey){ el.hidden=true; el.innerHTML=''; return; }
+  const g=PRODUCTS.filter(p=>p.active&&caisseGroupKey(p)===caisseFormatsPopupKey)
+                  .sort((a,b)=>(a.format_order||0)-(b.format_order||0));
+  const anchor=document.querySelector(`[data-caisse-formats="${cfAttrKey(caisseFormatsPopupKey)}"]`);
+  if(!g.length||!anchor){ closeCaisseFormatsPopup(); return; }
+  el.innerHTML=`<div class="caisse-pop-title">${esc(g[0].format_group||g[0].name)}</div>`+g.map(p=>{
+    const q=availableStockFor(p.id), soldOut=q<=0, checked=caisseCart.some(c=>c.id===p.id);
+    /* Rupturé = non cochable (décocher reste possible pour sortir du panier) ;
+       commande importée = panneau en lecture seule. */
+    const lock=caisseOrderId||(soldOut&&!checked);
+    return `<label class="caisse-pop-row${soldOut?' soldout':''}"><input type="checkbox" data-pid="${p.id}" ${checked?'checked':''} ${lock?'disabled':''} onchange="onCaisseFormatCheck(this.dataset.pid,this.checked)"><span class="caisse-pop-label">${esc(p.format||p.name)}</span><span class="caisse-pop-price">${money(p.price)}</span><span class="caisse-pop-stock">${soldOut?'Rupture':'Stock : '+q}</span></label>`;
+  }).join('');
+  el.hidden=false;
+  /* Ancrage sous la carte, retourné au-dessus si l'espace manque en bas. */
+  const r=anchor.getBoundingClientRect(), w=Math.min(270,window.innerWidth-16);
+  el.style.width=w+'px';
+  let top=r.bottom+6;
+  if(top+el.offsetHeight>window.innerHeight-8) top=Math.max(8,r.top-6-el.offsetHeight);
+  el.style.top=top+'px';
+  el.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
+}
+/* Case à cocher d'un format : cocher ajoute au panier, décocher retire (le menu reste ouvert). */
+function onCaisseFormatCheck(productId,checked){
+  if(checked) addToCaisse(productId,false); else removeFromCaisse(productId);
+  renderCaisseProductGrid(); /* resynchronise cartes, badge et cases à cocher */
+}
+document.addEventListener('click',e=>{
+  if(!caisseFormatsPopupKey) return;
+  const pop=document.getElementById('caisseFormatsPopup');
+  if(pop&&pop.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest('[data-caisse-formats]')) return; /* géré par le toggle */
+  closeCaisseFormatsPopup();
+});
+window.addEventListener('scroll',()=>{ if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); },true);
+window.addEventListener('resize',()=>{ if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); });
 /* La caisse doit récupérer tous les produits : recharge si la liste est vide,
    puis (re)dessine la grille une fois la section visible à l'écran. */
 let caisseGridObserver=null;
@@ -2839,14 +2944,15 @@ function availableStockFor(productId){
   const reserved=CACHED_PENDING_ORDERS.reduce((sum,order)=>sum+(order.sale_items||[]).filter(item=>item.product_id===productId).reduce((itemSum,item)=>itemSum+Number(item.qty||0),0),0);
   return Math.max(0,stockFor(caisseSelectedPoint,productId)-reserved);
 }
-function addToCaisse(productId){
+function addToCaisse(productId, scrollToCart=true){
   if(caisseOrderId){alert('Une commande client est importée. Terminez-la avant d’ajouter une autre vente.');return;}
   const existing=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId);
   if(max<=0){ alert('Ce produit est en rupture de stock sur ce point.'); return; }
   if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
   renderCaisseCart(); renderCaisseProductGrid();
-  /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout. */
-  if(window.matchMedia('(max-width: 768px)').matches){ document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout.
+     (scrollToCart=false : ajout depuis le menu « Formats ▾ », on reste sur le panneau.) */
+  if(scrollToCart && window.matchMedia('(max-width: 768px)').matches){ document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 function removeFromCaisse(productId){ if(caisseOrderId)return; caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
 function changeCaisseQty(productId, delta){ if(caisseOrderId)return; const it=caisseCart.find(c=>c.id===productId); const max=availableStockFor(productId); it.qty=Math.max(1,Math.min(max,it.qty+delta)); renderCaisseCart(); renderCaisseProductGrid(); }
