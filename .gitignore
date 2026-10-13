@@ -2,3 +2,5 @@
 .supabase-cli/
 # Fichier généré pour vérifier la syntaxe JS de index.html
 __check.js
+# Scripts temporaires de débogage (syntaxe / inspection)
+__*.js
