@@ -303,6 +303,11 @@
   .caisse-pop-row.soldout{opacity:.55;cursor:not-allowed;}
   .caisse-format-count{display:inline-block;min-width:16px;padding:0 5px;margin-left:3px;border-radius:999px;background:var(--white);color:var(--coffee-brown);font-size:10px;font-weight:800;line-height:16px;}
   .caisse-lowstock{display:inline-block;background:#FBE7C6;color:#8A5A00;font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;margin-left:5px;}
+  /* En-tête « Produits disponibles » + bouton « ⟳ Actualiser » (recharge nom,
+     prix, image/icône et stock depuis la base). */
+  .caisse-products-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .caisse-products-head h4{margin-bottom:0;}
+  .caisse-refresh-btn{font-size:12px;font-weight:700;padding:6px 14px;white-space:nowrap;}
   .admin-form-actions{display:flex;gap:10px;}
   .admin-photo-zone{display:flex;align-items:center;gap:14px;}
   .admin-photo-preview{width:84px;height:84px;border-radius:10px;background:var(--coffee-brown);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:22px;overflow:hidden;flex-shrink:0;}
@@ -932,7 +937,7 @@ function renderMenu(){
     const el = document.createElement('div');
     el.className = 'menu-card ' + rep.cat + (outOfStock?' out-of-stock':'');
     const visual = rep.image_url ? `<img src="${rep.image_url}" class="card-photo" alt="${rep.name}">` : `<span class="card-icon">${rep.icon||'☕'}</span>`;
-    const title = rep.format_group || rep.name;
+    const title = group.length>1 ? caisseGroupTitle(group) : productLabel(rep);
     const minPrice = Math.min(...group.map(gp=>Number(gp.price)||0));
     const priceLabel = group.length>1 ? `À partir de ${money(minPrice)}` : money(rep.price);
     el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${title}</div><div class="card-price">${priceLabel}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Ajouter'}</button>`:''}`;
@@ -987,7 +992,7 @@ function openModal(id){
   const v = document.getElementById('modalVisual');
   v.className = 'modal-visual ' + modalProduct.cat;
   v.innerHTML = modalProduct.image_url ? `<img src="${modalProduct.image_url}" alt="${modalProduct.name}">` : (modalProduct.icon||'☕');
-  document.getElementById('modalName').textContent = modalProduct.format_group || modalProduct.name;
+  document.getElementById('modalName').textContent = modalFormats.length>1 ? caisseGroupTitle(modalFormats) : productLabel(modalProduct);
   document.getElementById('modalDesc').textContent = modalProduct.description || '';
   renderModalFormats();
   document.getElementById('modalQty').textContent = modalQty;
@@ -1716,7 +1721,9 @@ async function loadCompta(){
   if(!isOwnerRole()) comptaPoint=adminProfile.point_id;
   const range=getPeriodRange(comptaPeriod);
   let transactionsQuery=sb.from('transactions').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
-  let salesQuery=sb.from('sales').select('total').eq('store_id',ACTIVE_STORE_ID).eq('status','vendu').eq('fulfilled',true);
+  /* Le journal retrace TOUTES les ventes : on charge les lignes complètes
+     (détail des articles compris) et non plus seulement les totaux. */
+  let salesQuery=sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(range){
     transactionsQuery=transactionsQuery.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
     salesQuery=salesQuery.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
@@ -1726,7 +1733,7 @@ async function loadCompta(){
     salesQuery=salesQuery.eq('point_id',comptaPoint);
   }
   const [transactionsResult,salesResult]=await Promise.all([transactionsQuery,salesQuery]);
-  const {data=[],error}=transactionsResult, {data:cashSales=[],error:salesError}=salesResult;
+  const {data=[],error}=transactionsResult, {data:allSales=[],error:salesError}=salesResult;
   const sumEl=document.getElementById('comptaSummary'), rowsEl=document.getElementById('comptaRows');
   if(error||salesError){
     const message=error?.message||salesError.message;
@@ -1734,19 +1741,47 @@ async function loadCompta(){
     if(sumEl) sumEl.innerHTML=`<p class="admin-empty">Impossible de charger toute la comptabilité : ${esc(message)}</p>`;
     return;
   }
+  /* Ligne de vente du journal : articles vendus + client, badge selon le statut. */
+  const saleRowHtml=(s)=>{
+    const point=POINTS.find(p=>p.id===s.point_id)?.name||'—';
+    const pendingOnline=s.channel==='en_ligne'&&!s.fulfilled;
+    const items=(s.sale_items||[]).map(l=>`${esc(l.product_name||'Article')} x${Number(l.qty||0)}`).join('<br>')||'Vente';
+    const label=`${items}${s.client_name?`<br><span class="sales-phone">${esc(s.client_name)}</span>`:''}`;
+    const total=Number(s.total||0);
+    let badge,amount;
+    if(pendingOnline){ badge='<span class="status-btn" style="font-size:10px;">En attente ⏳</span>'; amount=`<span style="color:#8A7660;">${money(total)}</span>`; }
+    else if(s.status==='rembourse'){ badge='<span class="status-btn active rembourse" style="font-size:10px;">Remboursée</span>'; amount=`<span style="color:var(--rust);">− ${money(total)}</span>`; }
+    else if(s.status==='annule'){ badge='<span class="status-btn active annule" style="font-size:10px;">Annulée</span>'; amount=`<span style="color:#8A7660;text-decoration:line-through;">${money(total)}</span>`; }
+    else { badge='<span class="status-btn active vendu" style="font-size:10px;">vente</span>'; amount=`<b style="color:#2E7D46;">${money(total)}</b>`; }
+    return `<tr><td>${new Date(s.created_at).toLocaleString('fr-FR')}</td><td>${esc(point)}</td><td>${badge}</td><td>${label}</td><td style="font-weight:700;">${amount}</td><td></td></tr>`;
+  };
+  const transactionRowHtml=(t)=>{
+    const point=POINTS.find(p=>p.id===t.point_id)?.name||'—';
+    const sign=(t.type==='depense'||t.type==='achat'||t.type==='sortie')?'− ':'';
+    const badge=t.type==='encaissement'||t.type==='apport'?'active vendu':'active annule';
+    return `<tr>
+      <td>${new Date(t.created_at).toLocaleString('fr-FR')}</td>
+      <td>${esc(point)}</td>
+      <td><span class="status-btn ${badge}" style="font-size:10px;">${t.type}</span></td>
+      <td>${t.category?`<b>${esc(t.category)}</b><br>`:''}${esc(t.label||'')}</td>
+      <td style="font-weight:700;">${sign}${money(t.amount)}</td>
+      <td><div class="admin-row-actions"><button type="button" class="admin-icon-btn" aria-label="Modifier cette ligne" title="Modifier" onclick="editTransaction('${t.id}')">✎</button><button type="button" class="admin-icon-btn danger" aria-label="Supprimer cette ligne" title="Supprimer" onclick="deleteTransaction('${t.id}')">🗑</button></div></td>
+    </tr>`;
+  };
   if(rowsEl){
-    rowsEl.innerHTML=data.length?data.map(t=>{ const point=POINTS.find(p=>p.id===t.point_id)?.name||'—';
-      const sign=(t.type==='depense'||t.type==='achat'||t.type==='sortie')?'− ':'';
-      const badge=t.type==='encaissement'||t.type==='apport'?'active vendu':'active annule';
-      return `<tr>
-        <td>${new Date(t.created_at).toLocaleString('fr-FR')}</td>
-        <td>${esc(point)}</td>
-        <td><span class="status-btn ${badge}" style="font-size:10px;">${t.type}</span></td>
-        <td>${t.category?`<b>${esc(t.category)}</b><br>`:''}${esc(t.label||'')}</td>
-        <td style="font-weight:700;">${sign}${money(t.amount)}</td>
-        <td><div class="admin-row-actions"><button type="button" class="admin-icon-btn" aria-label="Modifier cette ligne" title="Modifier" onclick="editTransaction('${t.id}')">✎</button><button type="button" class="admin-icon-btn danger" aria-label="Supprimer cette ligne" title="Supprimer" onclick="deleteTransaction('${t.id}')">🗑</button></div></td>
-      </tr>`; }).join('') : '<tr><td colspan="6" class="admin-empty">Aucune ligne sur cette période.</td></tr>';
+    if(!data.length&&!allSales.length){
+      rowsEl.innerHTML='<tr><td colspan="6" class="admin-empty">Aucune ligne sur cette période.</td></tr>';
+    } else {
+      /* Journal chronologique : ventes et lignes comptables mélangées, du plus récent au plus ancien. */
+      const journal=[
+        ...allSales.map(s=>({at:s.created_at,html:saleRowHtml(s)})),
+        ...data.map(t=>({at:t.created_at,html:transactionRowHtml(t)}))
+      ].sort((a,b)=>new Date(b.at)-new Date(a.at));
+      rowsEl.innerHTML=journal.map(row=>row.html).join('');
+    }
   }
+  /* Total « ventes en caisse » : mêmes critères qu'avant (vendu ET réglé). */
+  const cashSales=allSales.filter(s=>s.status==='vendu'&&s.fulfilled);
   const encaisse=data.filter(t=>t.type==='encaissement'||t.type==='apport').reduce((s,t)=>s+Number(t.amount||0),0);
   const sorties=data.filter(t=>t.type==='depense'||t.type==='achat'||t.type==='sortie').reduce((s,t)=>s+Number(t.amount||0),0);
   const ventesCaisse=cashSales.reduce((sum,sale)=>sum+Number(sale.total||0),0);
@@ -2607,7 +2642,10 @@ async function renderAdminCaisse(){
   adminBody.innerHTML = `
     <div class="caisse-layout">
       <div class="caisse-left">
-        <h4 style="margin-bottom:12px;">Produits disponibles</h4>
+        <div class="caisse-products-head">
+          <h4>Produits disponibles</h4>
+          <button type="button" class="btn-ghost caisse-refresh-btn" id="caisseRefreshBtn" onclick="refreshCaisseProducts(this)" title="Mettre à jour la liste des produits disponibles (nom, prix, image/icône, stock)">⟳ Actualiser</button>
+        </div>
         <div class="card-grid caisse-product-grid" id="caisseProductGrid"></div>
       </div>
       <div class="caisse-right">
@@ -2632,6 +2670,19 @@ async function renderAdminCaisse(){
   pendingOrdersTimer=setInterval(loadPendingOrders,5000);
   loadRegisterStatus();
   registerStatusTimer=setInterval(loadRegisterStatus,30000);
+}
+/* Bouton « ⟳ Actualiser » de la caisse : recharge produits ET stocks depuis la
+   base (nom, prix, image/icône, stock) puis redessine grille, panier et menu. */
+async function refreshCaisseProducts(btn){
+  const button=btn||document.getElementById('caisseRefreshBtn');
+  if(button){ button.disabled=true; button.textContent='Actualisation…'; }
+  try{
+    await Promise.all([loadProducts(),loadStock()]);
+    renderCaisseProductGrid(); renderCaisseCart(); renderMenu();
+  }catch(e){ console.error('Actualisation des produits impossible :',e); alert("La liste des produits n'a pas pu être actualisée."); }
+  finally{
+    if(button){ button.disabled=false; button.textContent='⟳ Actualiser'; }
+  }
 }
 function onCaissePointChange(id){
   if(caisseOrderId){ alert('Terminez la commande importée avant de changer de point de vente.'); document.getElementById('caissePointSelect').value=caisseSelectedPoint; return; }
@@ -2832,6 +2883,31 @@ async function cancelImportedOrder(){
 function caisseGroupKey(p){ return p.format_group ? (p.cat+'|'+p.format_group) : ('#'+p.id); }
 /* Clé encodée pour attributs HTML / onclick inline (aucune apostrophe ni guillemet). */
 function cfAttrKey(key){ return encodeURIComponent(key).replace(/'/g,'%27'); }
+/* Un libellé de format (« Gobelet (grand) », « Bouteille 1L »…) ne doit JAMAIS
+   servir de nom de produit tant qu'un vrai nom existe : les données historiques
+   contiennent des articles dont le nom est resté le format seul. */
+function isFormatLabel(txt){ return !!txt && PRODUCT_FORMATS.includes(txt); }
+/* Nom affiché d'un article : le nom du produit, sinon le nom du groupe de
+   format ; jamais un simple libellé de format. */
+function productLabel(p){
+  if(p&&p.name&&!isFormatLabel(p.name)) return p.name;
+  if(p&&p.format_group&&!isFormatLabel(p.format_group)) return p.format_group;
+  return (p&&(p.name||p.format_group||p.format))||'Produit';
+}
+/* Titre d'une carte regroupant plusieurs formats : le nom du groupe (la
+   boisson), sinon le nom du premier article dépouillé de son suffixe « — format ». */
+function caisseGroupTitle(g){
+  const first=g&&g[0]; if(!first) return 'Produit';
+  if(first.format_group&&!isFormatLabel(first.format_group)) return first.format_group;
+  for(const p of g){
+    const n=String((p&&p.name)||'').trim(); if(!n) continue;
+    const f=String((p&&p.format)||'');
+    let base=n;
+    if(f&&n.toLowerCase().endsWith(f.toLowerCase())) base=n.slice(0,n.length-f.length).replace(/\s*[—–-]\s*$/,'').trim();
+    if(base&&!isFormatLabel(base)) return base;
+  }
+  return productLabel(first);
+}
 /* Ligne « Stock : X » : ambre + badge « Stock faible » sous 10, rouge à 0. */
 function caisseStockLine(qty){
   if(qty<=0) return `<div style="font-size:11px;color:var(--rust);font-weight:700;">Stock : 0</div>`;
@@ -2862,7 +2938,7 @@ function renderCaisseProductGrid(){
     if(g.length===1){
       const p=g[0], qty=availableStockFor(p.id), rupture=qty<=0;
       const formatTag=p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:'';
-      return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${esc(p.image_url)}" class="card-photo" alt="${esc(p.name)}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${esc(p.name)}</div>${formatTag}<div class="card-price">${money(p.price)}</div>${caisseStockLine(qty)}<button type="button" class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`;
+      return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${esc(p.image_url)}" class="card-photo" alt="${esc(p.name)}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${esc(productLabel(p))}</div>${formatTag}<div class="card-price">${money(p.price)}</div>${caisseStockLine(qty)}<button type="button" class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`;
     }
     /* --- Plusieurs formats : une seule carte + menu déroulant « Formats ▾ ». --- */
     const rep=g.find(x=>x.image_url)||g[0];
@@ -2871,7 +2947,7 @@ function renderCaisseProductGrid(){
     const rupture=totalQty<=0;
     const minPrice=Math.min(...g.map(p=>Number(p.price)||0));
     const count=g.filter(p=>inCart(p.id)).length;
-    return `<div class="menu-card ${g[0].cat}${rupture?' out-of-stock':''}" data-caisse-formats="${enc}" onclick="toggleCaisseFormatsPopup('${enc}')">${rupture?'<span class="stock-flag">Rupture</span>':''}${rep.image_url?`<img src="${esc(rep.image_url)}" class="card-photo" alt="${esc(rep.name)}">`:`<span class="card-icon">${rep.icon||'☕'}</span>`}<div class="card-name">${esc(g[0].format_group||g[0].name)}</div><div class="card-price">À partir de ${money(minPrice)}</div>${caisseStockLine(totalQty)}<button type="button" class="card-add">Formats ▾${count?` <span class="caisse-format-count">${count}</span>`:''}</button></div>`;
+    return `<div class="menu-card ${g[0].cat}${rupture?' out-of-stock':''}" data-caisse-formats="${enc}" onclick="toggleCaisseFormatsPopup('${enc}')">${rupture?'<span class="stock-flag">Rupture</span>':''}${rep.image_url?`<img src="${esc(rep.image_url)}" class="card-photo" alt="${esc(rep.name)}">`:`<span class="card-icon">${rep.icon||'☕'}</span>`}<div class="card-name">${esc(caisseGroupTitle(g))}</div><div class="card-price">À partir de ${money(minPrice)}</div>${caisseStockLine(totalQty)}<button type="button" class="card-add">Formats ▾${count?` <span class="caisse-format-count">${count}</span>`:''}</button></div>`;
   }).join('');
   if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit actif au catalogue.</div>';
   if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); /* le menu suit les re-rendus de la grille */
@@ -2897,7 +2973,7 @@ function renderCaisseFormatsPopup(){
                   .sort((a,b)=>(a.format_order||0)-(b.format_order||0));
   const anchor=document.querySelector(`[data-caisse-formats="${cfAttrKey(caisseFormatsPopupKey)}"]`);
   if(!g.length||!anchor){ closeCaisseFormatsPopup(); return; }
-  el.innerHTML=`<div class="caisse-pop-title">${esc(g[0].format_group||g[0].name)}</div>`+g.map(p=>{
+  el.innerHTML=`<div class="caisse-pop-title">${esc(caisseGroupTitle(g))}</div>`+g.map(p=>{
     const q=availableStockFor(p.id), soldOut=q<=0, checked=caisseCart.some(c=>c.id===p.id);
     /* Rupturé = non cochable (décocher reste possible pour sortir du panier) ;
        commande importée = panneau en lecture seule. */
