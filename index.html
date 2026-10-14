@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260111d">
+<link rel="stylesheet" href="styles.css?v=20261013a">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -100,7 +100,7 @@
   .menu-card:hover{transform:translateY(-6px);box-shadow:0 12px 24px rgba(30,15,7,0.15);}
   .menu-card .card-icon{font-size:34px;margin-bottom:8px;}
   .menu-card .card-photo{width:100%;aspect-ratio:1/1;height:auto;border-radius:10px;object-fit:cover;margin-bottom:8px;}
-  .menu-card .card-name{font-size:13.5px;font-weight:700;color:var(--coffee-black);margin-bottom:5px;line-height:1.3;}
+  .menu-card .card-name{font-size:13.5px;font-weight:700;color:var(--coffee-black);margin-bottom:5px;line-height:1.3;width:100%;overflow-wrap:break-word;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden;}
   .menu-card .card-price{font-size:12.5px;font-weight:700;color:var(--rust);margin-bottom:9px;}
   .menu-card .card-add{font-size:11px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg, var(--coffee-brown), var(--coffee-black));color:var(--white);font-weight:700;}
   .menu-card.wass .card-add{background:linear-gradient(135deg, var(--rust), #6E2418);}
@@ -184,16 +184,6 @@
   .qty-stepper button{width:28px;height:28px;border-radius:50%;background:var(--cream);font-size:16px;font-weight:700;color:var(--coffee-black);}
   .qty-stepper button:hover{background:var(--gold-light);}
   .qty-stepper span{min-width:20px;text-align:center;font-weight:700;}
-  .format-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-  .format-label{font-size:13px;font-weight:600;}
-  .format-options{display:flex;gap:8px;flex-wrap:wrap;}
-  .format-option{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:12px;border:1px solid rgba(110,59,30,0.25);background:var(--white);font-weight:600;transition:all .2s ease;}
-  .format-option .format-name{font-size:12.5px;color:var(--coffee-black);}
-  .format-option .format-price{font-size:11px;color:var(--rust);}
-  .format-option.active{border-color:var(--rust);background:linear-gradient(135deg,var(--rust),#6E2418);}
-  .format-option.active .format-name{color:var(--white);}
-  .format-option.active .format-price{color:var(--gold-light);}
-  .format-option:disabled{opacity:0.45;cursor:not-allowed;}
   .custom-price-row{align-items:center;}
   .custom-price-info{display:flex;flex-direction:column;gap:2px;}
   .custom-price-hint{font-size:11px;color:#8A7660;}
@@ -278,30 +268,6 @@
   .admin-product-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--cream);border-radius:14px;padding:20px;margin-bottom:22px;}
   @media(max-width:640px){ .admin-product-form{grid-template-columns:1fr;} }
   .admin-product-form .full{grid-column:1/-1;}
-  /* Sélecteur de formats : menu déroulant à cases à cocher (formulaire produit, mode création). */
-  .pf-formats-wrap{position:relative;}
-  .pf-formats-toggle{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(110,59,30,0.25);border-radius:10px;background:var(--white);font-size:13px;font-weight:700;color:var(--coffee-black);cursor:pointer;}
-  .pf-formats-toggle:hover{border-color:var(--rust);}
-  .pf-formats-toggle .pf-count{font-size:11px;font-weight:700;color:var(--white);background:var(--rust);border-radius:999px;padding:2px 8px;}
-  .pf-formats-toggle .pf-count[hidden]{display:none;}
-  .pf-formats-panel{position:absolute;left:0;top:calc(100% + 6px);z-index:40;min-width:250px;max-height:260px;overflow-y:auto;background:var(--white);border:1px solid rgba(110,59,30,0.18);border-radius:12px;padding:8px;box-shadow:0 12px 28px rgba(60,30,10,0.15);}
-  .pf-formats-panel[hidden]{display:none;}
-  .pf-format-check{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;}
-  .pf-format-check:hover{background:var(--cream);}
-  .pf-format-check input{width:16px;height:16px;accent-color:var(--rust);flex-shrink:0;}
-  /* Caisse : menu déroulant « Formats ▾ » — popover ancré sous la carte produit
-     (hors carte, celle-ci ayant une hauteur fixe et overflow:hidden). */
-  .caisse-formats-pop{position:fixed;z-index:110;background:var(--white);border:1px solid rgba(110,59,30,0.18);border-radius:12px;padding:8px;box-shadow:0 14px 30px rgba(60,30,10,0.2);max-height:270px;overflow-y:auto;}
-  .caisse-formats-pop[hidden]{display:none;}
-  .caisse-pop-title{font-size:12px;font-weight:800;color:var(--coffee-black);padding:2px 6px 7px;border-bottom:1px dashed rgba(110,59,30,0.2);margin-bottom:6px;text-align:left;}
-  .caisse-pop-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:12px;cursor:pointer;}
-  .caisse-pop-row:hover{background:var(--cream);}
-  .caisse-pop-row input{width:15px;height:15px;accent-color:var(--rust);flex-shrink:0;}
-  .caisse-pop-row .caisse-pop-label{flex:1;font-weight:700;color:var(--coffee-black);text-align:left;line-height:1.2;}
-  .caisse-pop-row .caisse-pop-price{font-weight:700;color:var(--rust);white-space:nowrap;}
-  .caisse-pop-row .caisse-pop-stock{font-size:10px;color:#8A7660;white-space:nowrap;min-width:54px;text-align:right;}
-  .caisse-pop-row.soldout{opacity:.55;cursor:not-allowed;}
-  .caisse-format-count{display:inline-block;min-width:16px;padding:0 5px;margin-left:3px;border-radius:999px;background:var(--white);color:var(--coffee-brown);font-size:10px;font-weight:800;line-height:16px;}
   .caisse-lowstock{display:inline-block;background:#FBE7C6;color:#8A5A00;font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;margin-left:5px;}
   /* En-tête « Produits disponibles » + bouton « ⟳ Actualiser » (recharge nom,
      prix, image/icône et stock depuis la base). */
@@ -494,7 +460,7 @@
     .caisse-product-grid{gap:8px;}
     .caisse-product-grid .menu-card{min-width:0;padding:10px 6px;border-radius:10px;}
     .caisse-product-grid .menu-card .card-icon{font-size:26px;}
-    .caisse-product-grid .menu-card .card-name{font-size:11px;overflow-wrap:anywhere;}
+    .caisse-product-grid .menu-card .card-name{font-size:11px;overflow-wrap:break-word;}
     .caisse-product-grid .menu-card .card-price{font-size:11px;}
     .caisse-product-grid .menu-card .card-add{font-size:10px;padding:5px 8px;}
     .caisse-product-grid .menu-card > div[style]{font-size:10px !important;}
@@ -561,6 +527,30 @@
   }
   html body.admin-mode .caisse-cart-footer{ margin-top:auto !important; }
 }
+/* ---------- Calendrier de période (Vente & Comptabilité) ---------- */
+.period-cal{position:fixed;z-index:200;background:var(--white);border:1px solid rgba(110,59,30,0.18);border-radius:14px;padding:12px;box-shadow:0 18px 40px rgba(60,30,10,0.22);font-family:inherit;}
+.period-cal[hidden]{display:none;}
+.period-cal .cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.period-cal .cal-head b{font-size:13px;color:var(--coffee-black);text-transform:capitalize;flex:1;text-align:center;}
+.period-cal .cal-nav{width:26px;height:26px;border-radius:8px;border:1px solid rgba(110,59,30,0.2);background:var(--cream);color:var(--coffee-black);font-size:15px;line-height:1;cursor:pointer;}
+.period-cal .cal-nav:hover{background:var(--gold-light);}
+.period-cal .cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px;}
+.period-cal .cal-week span{font-size:10px;font-weight:700;color:#8A7660;text-align:center;padding:2px 0;}
+.period-cal .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.period-cal .cal-cell{min-height:28px;border-radius:8px;border:1px solid transparent;background:var(--cream);color:var(--coffee-black);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.period-cal .cal-cell:hover{border-color:var(--rust);}
+.period-cal .cal-cell.empty{background:transparent;cursor:default;}
+.period-cal .cal-cell.empty:hover{border-color:transparent;}
+.period-cal .cal-cell.in-range{background:#F3D9B1;border-radius:2px;}
+.period-cal .cal-cell.start,.period-cal .cal-cell.end{background:var(--rust);color:var(--white);}
+.period-cal .cal-label{margin-top:8px;font-size:11px;color:#8A7660;text-align:center;min-height:14px;}
+.period-cal .cal-actions{display:flex;gap:8px;margin-top:10px;}
+.period-cal .cal-actions button{flex:1;padding:8px 0;font-size:12px;}
+.period-range-inline{display:inline-block;margin-top:4px;font-size:11px;color:#8A7660;font-weight:600;}
+.period-btn{display:inline-flex;align-items:center;gap:8px;max-width:230px;padding:9px 14px;border:1px solid rgba(110,59,30,0.25);border-radius:10px;background:var(--white);font-size:13px;font-weight:700;color:var(--coffee-black);cursor:pointer;text-align:left;}
+.period-btn:hover{border-color:var(--rust);}
+.period-btn .period-btn-icon{flex-shrink:0;font-size:14px;}
+.period-btn .period-btn-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 </style>
 </head>
 <body>
@@ -659,7 +649,6 @@
     <div class="modal-body">
       <h3 id="modalName"></h3><p id="modalDesc"></p><div class="modal-price" id="modalPrice"></div>
       <div class="qty-row"><span class="qty-label">Quantité</span><div class="qty-stepper"><button onclick="changeModalQty(-1)">−</button><span id="modalQty">1</span><button onclick="changeModalQty(1)">+</button></div></div>
-      <div class="format-row" id="modalFormatRow" style="display:none;"><span class="format-label">Format</span><div class="format-options" id="modalFormatOptions"></div></div>
       <div class="qty-row custom-price-row" id="modalCustomPriceRow"><div class="custom-price-info"><span class="qty-label">Prix personnalisé</span><span class="custom-price-hint" id="modalCustomPriceHint">Dès 50 FCFA</span></div><input type="number" class="custom-price-input" id="modalCustomPrice" min="50" step="50" inputmode="numeric" placeholder="Prix du catalogue" oninput="onModalCustomPriceInput()"></div>
       <div class="modal-actions"><button class="btn-ghost" onclick="closeModal()">Annuler</button><button class="btn-primary" id="modalAddBtn" onclick="addModalToCart()">Ajouter au panier</button></div>
     </div>
@@ -709,7 +698,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let sb = null;
 try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.error('Supabase indisponible :', e); sb = null; }
 
-let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1, modalFormats = [];
+let PRODUCTS = [], POINTS = [], STOCK = [], modalProduct = null, modalQty = 1;
 let profileSection = 'profil', pendingAvatarFile = null, editingManagerId = null;
 let STOREFRONT_MODE = 'ecommerce';
 let cart = loadCart();
@@ -719,11 +708,9 @@ let OFFLINE = false;
 let adminSession = null, adminProfile = null, adminActiveTab = 'caisse', chatSelectedPoint = null, chatChannel = null;
 let editingProductId = null, editingPointId = null, pendingPhotoData = null, stockSelectedPoint = null, productEditorReturnToInventory = false;
 let STOCK_DRAFT = new Map();
-let salesSelectedPoint = 'all', salesPeriod = 'day', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
+let salesSelectedPoint = 'all', SALES_CACHE = [], submitting = false, checkoutStep = 'cart';
 let caisseCart = [], caisseSelectedPoint = null, CACHED_PENDING_ORDERS = [], ACTIVE_STORE_ID = null, ACTIVE_STORE = null;
 let caisseOrderId = null, pendingOrdersTimer = null, registerStatusTimer = null, registerStatus = null;
-/* Clé du groupe « Formats ▾ » actuellement ouvert dans la caisse (popover). */
-let caisseFormatsPopupKey = null;
 /* Commandes en attente déjà connues : permet de détecter l'arrivée d'UNE nouvelle commande (son). */
 let knownPendingOrderIds = null;
 /* Ids déjà annoncés par un son (évite le doublon Realtime + polling). */
@@ -740,29 +727,29 @@ const DEFAULT_PRODUCTS = [
   {id:'default-cafe-3', cat:'cafe', name:'Café en grains pour Machine à café', price:1000, description:"Grains de café torréfiés pour machine à café.", icon:'☕', active:true},
   {id:'default-cafe-4', cat:'cafe', name:'Coffee chocolat / Lait à la menthe', price:700, description:"Coffee chocolat chaud ou lait à la menthe.", icon:'☕', active:true},
   {id:'default-cafe-5', cat:'cafe', name:'Café Lait', price:600, description:"Café au lait, servi chaud.", icon:'☕', active:true},
-  {id:'default-wass-1-mini', cat:'wass', format_group:'Soft Wass', format:'Gobelet (mini)', format_order:1, name:'Soft Wass — Gobelet (mini)', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
-  {id:'default-wass-1-grand', cat:'wass', format_group:'Soft Wass', format:'Gobelet (grand)', format_order:2, name:'Soft Wass — Gobelet (grand)', price:800, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
-  {id:'default-wass-2-mini', cat:'wass', format_group:'Wonder Wass', format:'Gobelet (mini)', format_order:1, name:'Wonder Wass — Gobelet (mini)', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
-  {id:'default-wass-2-grand', cat:'wass', format_group:'Wonder Wass', format:'Gobelet (grand)', format_order:2, name:'Wonder Wass — Gobelet (grand)', price:900, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
-  {id:'default-wass-3-mini', cat:'wass', format_group:'Tarkinda', format:'Gobelet (mini)', format_order:1, name:'Tarkinda — Gobelet (mini)', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
-  {id:'default-wass-3-grand', cat:'wass', format_group:'Tarkinda', format:'Gobelet (grand)', format_order:2, name:'Tarkinda — Gobelet (grand)', price:800, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
-  {id:'default-wass-4-mini', cat:'wass', format_group:'Bisap (Bissap)', format:'Gobelet (mini)', format_order:1, name:'Bisap (Bissap) — Gobelet (mini)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
-  {id:'default-wass-4-grand', cat:'wass', format_group:'Bisap (Bissap)', format:'Gobelet (grand)', format_order:2, name:'Bisap (Bissap) — Gobelet (grand)', price:800, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
-  {id:'default-wass-5-mini', cat:'wass', format_group:'Jus locaux & Smoothies', format:'Gobelet (mini)', format_order:1, name:'Jus locaux, Smoothie — Gobelet (mini)', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
-  {id:'default-wass-5-grand', cat:'wass', format_group:'Jus locaux & Smoothies', format:'Gobelet (grand)', format_order:2, name:'Jus locaux, Smoothie — Gobelet (grand)', price:1200, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
-  /* Section « Bouteilles — Jus & Wass » : 6 marques × 2 formats (1L puis 1,5L). */
-  {id:'default-bt-wonder-1l', cat:'bouteille', format_group:'Wonder Wass', format:'Bouteille 1L', format_order:3, name:'Wonder Wass — Bouteille 1L', price:1500, description:"Wonder Wass (bouye) en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-wonder-15l', cat:'bouteille', format_group:'Wonder Wass', format:'Bouteille 1,5L', format_order:4, name:'Wonder Wass — Bouteille 1,5L', price:2000, description:"Wonder Wass (bouye) en bouteille 1,5 litre.", icon:'🍾', active:true},
-  {id:'default-bt-soft-1l', cat:'bouteille', format_group:'Soft Wass', format:'Bouteille 1L', format_order:3, name:'Soft Wass — Bouteille 1L', price:1500, description:"Soft Wass (thé jasmin) en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-soft-15l', cat:'bouteille', format_group:'Soft Wass', format:'Bouteille 1,5L', format_order:4, name:'Soft Wass — Bouteille 1,5L', price:2000, description:"Soft Wass (thé jasmin) en bouteille 1,5 litre.", icon:'🍾', active:true},
-  {id:'default-bt-daxar-1l', cat:'bouteille', format_group:"Dax'ar", format:'Bouteille 1L', format_order:3, name:"Dax'ar — Bouteille 1L", price:1500, description:"Dax'ar en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-daxar-15l', cat:'bouteille', format_group:"Dax'ar", format:'Bouteille 1,5L', format_order:4, name:"Dax'ar — Bouteille 1,5L", price:2000, description:"Dax'ar en bouteille 1,5 litre.", icon:'🍾', active:true},
-  {id:'default-bt-bissapparal-1l', cat:'bouteille', format_group:"Bissap'Paral", format:'Bouteille 1L', format_order:3, name:"Bissap'Paral — Bouteille 1L", price:1500, description:"Bissap'Paral en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-bissapparal-15l', cat:'bouteille', format_group:"Bissap'Paral", format:'Bouteille 1,5L', format_order:4, name:"Bissap'Paral — Bouteille 1,5L", price:2000, description:"Bissap'Paral en bouteille 1,5 litre.", icon:'🍾', active:true},
-  {id:'default-bt-tarkinda-1l', cat:'bouteille', format_group:'Tarkinda', format:'Bouteille 1L', format_order:3, name:'Tarkinda — Bouteille 1L', price:1500, description:"Tarkinda (gingembre) en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-tarkinda-15l', cat:'bouteille', format_group:'Tarkinda', format:'Bouteille 1,5L', format_order:4, name:'Tarkinda — Bouteille 1,5L', price:2000, description:"Tarkinda (gingembre) en bouteille 1,5 litre.", icon:'🍾', active:true},
-  {id:'default-bt-anaconda-1l', cat:'bouteille', format_group:'Anaconda', format:'Bouteille 1L', format_order:3, name:'Anaconda — Bouteille 1L', price:1500, description:"Anaconda en bouteille 1 litre.", icon:'🍾', active:true},
-  {id:'default-bt-anaconda-15l', cat:'bouteille', format_group:'Anaconda', format:'Bouteille 1,5L', format_order:4, name:'Anaconda — Bouteille 1,5L', price:2000, description:"Anaconda en bouteille 1,5 litre.", icon:'🍾', active:true}
+  {id:'default-wass-1-mini', cat:'wass', name:'Soft Wass — Gobelet (mini)', price:500, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
+  {id:'default-wass-1-grand', cat:'wass', name:'Soft Wass — Gobelet (grand)', price:800, description:"Wass rafraîchissant à base de jasmin.", icon:'🍵', active:true},
+  {id:'default-wass-2-mini', cat:'wass', name:'Wonder Wass — Gobelet (mini)', price:600, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
+  {id:'default-wass-2-grand', cat:'wass', name:'Wonder Wass — Gobelet (grand)', price:900, description:"Wass à base de bouye (fruit du baobab).", icon:'🍵', active:true},
+  {id:'default-wass-3-mini', cat:'wass', name:'Tarkinda — Gobelet (mini)', price:500, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
+  {id:'default-wass-3-grand', cat:'wass', name:'Tarkinda — Gobelet (grand)', price:800, description:"Boisson au gingembre (Tarkinda).", icon:'🍵', active:true},
+  {id:'default-wass-4-mini', cat:'wass', name:'Bisap (Bissap) — Gobelet (mini)', price:500, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+  {id:'default-wass-4-grand', cat:'wass', name:'Bisap (Bissap) — Gobelet (grand)', price:800, description:"Bissap, jus d'hibiscus rafraîchissant.", icon:'🥤', active:true},
+  {id:'default-wass-5-mini', cat:'wass', name:'Jus locaux, Smoothie — Gobelet (mini)', price:800, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
+  {id:'default-wass-5-grand', cat:'wass', name:'Jus locaux, Smoothie — Gobelet (grand)', price:1200, description:"Jus locaux, smoothies et jus de fruits (orange, pomme...), sirop.", icon:'🥤', active:true},
+  /* Section « Bouteilles — Jus & Wass » : 6 marques × 2 tailles (1L puis 1,5L). */
+  {id:'default-bt-wonder-1l', cat:'bouteille', name:'Wonder Wass — Bouteille 1L', price:1500, description:"Wonder Wass (bouye) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-wonder-15l', cat:'bouteille', name:'Wonder Wass — Bouteille 1,5L', price:2000, description:"Wonder Wass (bouye) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-soft-1l', cat:'bouteille', name:'Soft Wass — Bouteille 1L', price:1500, description:"Soft Wass (thé jasmin) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-soft-15l', cat:'bouteille', name:'Soft Wass — Bouteille 1,5L', price:2000, description:"Soft Wass (thé jasmin) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-daxar-1l', cat:'bouteille', name:"Dax'ar — Bouteille 1L", price:1500, description:"Dax'ar en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-daxar-15l', cat:'bouteille', name:"Dax'ar — Bouteille 1,5L", price:2000, description:"Dax'ar en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-bissapparal-1l', cat:'bouteille', name:"Bissap'Paral — Bouteille 1L", price:1500, description:"Bissap'Paral en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-bissapparal-15l', cat:'bouteille', name:"Bissap'Paral — Bouteille 1,5L", price:2000, description:"Bissap'Paral en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-tarkinda-1l', cat:'bouteille', name:'Tarkinda — Bouteille 1L', price:1500, description:"Tarkinda (gingembre) en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-tarkinda-15l', cat:'bouteille', name:'Tarkinda — Bouteille 1,5L', price:2000, description:"Tarkinda (gingembre) en bouteille 1,5 litre.", icon:'🍾', active:true},
+  {id:'default-bt-anaconda-1l', cat:'bouteille', name:'Anaconda — Bouteille 1L', price:1500, description:"Anaconda en bouteille 1 litre.", icon:'🍾', active:true},
+  {id:'default-bt-anaconda-15l', cat:'bouteille', name:'Anaconda — Bouteille 1,5L', price:2000, description:"Anaconda en bouteille 1,5 litre.", icon:'🍾', active:true}
 ];
 const DEFAULT_POINTS = [
   {id:'default-point-1', name:'QG Ouakam', address:'Cité Avion, Ouakam — Dakar', phone1:'77 707 72 70', phone2:'76 634 56 39', map_query:'Ouakam Dakar Senegal', active:true},
@@ -930,18 +917,16 @@ function renderMenu(){
   const active = PRODUCTS.filter(p=>p.active);
   const sections = getMenuSections();
 
-  const buildCard = (group, section)=>{
-    const rep = group[0];
-    const stock = group.reduce((s,gp)=>s+totalStock(gp.id),0);
+  const buildCard = (p, section)=>{
+    const stock = totalStock(p.id);
     const outOfStock = stock<=0;
     const el = document.createElement('div');
-    el.className = 'menu-card ' + rep.cat + (outOfStock?' out-of-stock':'');
-    const visual = rep.image_url ? `<img src="${rep.image_url}" class="card-photo" alt="${rep.name}">` : `<span class="card-icon">${rep.icon||'☕'}</span>`;
-    const title = group.length>1 ? caisseGroupTitle(group) : productLabel(rep);
-    const minPrice = Math.min(...group.map(gp=>Number(gp.price)||0));
-    const priceLabel = group.length>1 ? `À partir de ${money(minPrice)}` : money(rep.price);
+    el.className = 'menu-card ' + p.cat + (outOfStock?' out-of-stock':'');
+    const visual = p.image_url ? `<img src="${p.image_url}" class="card-photo" alt="${p.name}">` : `<span class="card-icon">${p.icon||'☕'}</span>`;
+    const title = p.name;
+    const priceLabel = money(p.price);
     el.innerHTML = `${outOfStock?'<span class="stock-flag">Rupture</span>':''}${visual}<div class="card-name">${title}</div><div class="card-price">${priceLabel}</div>${STOREFRONT_MODE==='ecommerce'?`<button class="card-add">${outOfStock?'Indisponible':'Ajouter'}</button>`:''}`;
-    el.onclick = ()=>{ if(!outOfStock) openModal(rep.id); };
+    el.onclick = ()=>{ if(!outOfStock) openModal(p.id); };
     return el;
   };
 
@@ -951,16 +936,8 @@ function renderMenu(){
     const dotColor = section.accent2 || section.accent || '#DDA53F';
     col.innerHTML = `<div class="menu-col-title"><span class="dot" style="background:${dotColor};"></span><h3>${section.icon?section.icon+' ':''}${section.label||section.key}</h3></div><div class="card-grid"></div>`;
     const grid = col.querySelector('.card-grid');
-    const seen = new Set();
     active.filter(p=>p.cat===section.key).forEach(p=>{
-      // Regroupe les formats d'une même boisson au sein d'une même section
-      const group = p.format_group
-        ? active.filter(gp=>gp.cat===section.key && gp.format_group===p.format_group).sort((a,b)=>(a.format_order||0)-(b.format_order||0))
-        : [p];
-      const key = p.format_group || p.id;
-      if(seen.has(key)) return;
-      seen.add(key);
-      grid.appendChild(buildCard(group, section));
+      grid.appendChild(buildCard(p, section));
     });
     container.appendChild(col);
   });
@@ -985,46 +962,18 @@ function openModal(id){
   modalProduct = PRODUCTS.find(p=>p.id===id);
   if(!modalProduct) return;
   modalQty = 1;
-  // Tous les formats d'une même boisson (mini / grand / bouteille), triés
-  modalFormats = modalProduct.format_group
-    ? PRODUCTS.filter(p=>p.active && p.format_group===modalProduct.format_group).sort((a,b)=>(a.format_order||0)-(b.format_order||0))
-    : [modalProduct];
   const v = document.getElementById('modalVisual');
   v.className = 'modal-visual ' + modalProduct.cat;
   v.innerHTML = modalProduct.image_url ? `<img src="${modalProduct.image_url}" alt="${modalProduct.name}">` : (modalProduct.icon||'☕');
-  document.getElementById('modalName').textContent = modalFormats.length>1 ? caisseGroupTitle(modalFormats) : productLabel(modalProduct);
+  document.getElementById('modalName').textContent = modalProduct.name;
   document.getElementById('modalDesc').textContent = modalProduct.description || '';
-  renderModalFormats();
+  updateModalPrice();
   document.getElementById('modalQty').textContent = modalQty;
   resetModalCustomPrice();
   document.getElementById('modalAddBtn').disabled = totalStock(modalProduct.id)<=0;
   document.querySelectorAll('.qty-row').forEach(row=>row.classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce'));
   document.getElementById('modalAddBtn').classList.toggle('ecommerce-only', STOREFRONT_MODE !== 'ecommerce');
   document.getElementById('productOverlay').classList.add('open');
-}
-function renderModalFormats(){
-  const row = document.getElementById('modalFormatRow'), box = document.getElementById('modalFormatOptions');
-  if(!row || !box) return;
-  if(modalFormats.length<=1){ row.style.display='none'; box.innerHTML=''; updateModalPrice(); return; }
-  row.style.display='flex';
-  box.innerHTML = modalFormats.map(f=>{
-    const stock = totalStock(f.id), active = f.id===modalProduct.id;
-    return `<button type="button" class="format-option${active?' active':''}" ${stock<=0?'disabled':''} onclick="selectModalFormat('${f.id}')"><span class="format-name">${f.format||f.name}</span><span class="format-price">${money(f.price)}</span></button>`;
-  }).join('');
-  updateModalPrice();
-}
-function selectModalFormat(id){
-  const f = modalFormats.find(x=>x.id===id);
-  if(!f || totalStock(f.id)<=0) return;
-  modalProduct = f; modalQty = 1;
-  const v = document.getElementById('modalVisual');
-  v.className = 'modal-visual ' + f.cat;
-  v.innerHTML = f.image_url ? `<img src="${f.image_url}" alt="${f.name}">` : (f.icon||'☕');
-  document.getElementById('modalDesc').textContent = f.description || '';
-  document.getElementById('modalQty').textContent = modalQty;
-  resetModalCustomPrice();
-  renderModalFormats();
-  document.getElementById('modalAddBtn').disabled = totalStock(f.id)<=0;
 }
 function updateModalPrice(){ document.getElementById('modalPrice').textContent = money(modalProduct.price); }
 /* Prix personnalisé : plancher absolu de 50 FCFA, relevé par le seuil minimum
@@ -1445,7 +1394,13 @@ function closeSidebar(){ document.querySelector('.admin-sidebar')?.classList.rem
 function renderAdminPointBar(){
   const bar=document.getElementById('adminPointBar');
   if(!bar) return;
+  const panel=bar.closest('.admin-panel');
   const isOwner=isOwnerRole();
+  /* La barre POS (en-tête stylé : logo centré + actions) s'applique à TOUS les
+     onglets. Seul le sélecteur de point varie : présent à la caisse, stock,
+     ventes et assistance ; absent pour produits, sections, points, gérants
+     et comptabilité. */
+  if(panel) panel.classList.add('pos-bar');
   if(adminActiveTab==='caisse'){
     const selectedPoint=isOwner?caisseSelectedPoint:adminProfile?.point_id;
     const pointOptions=POINTS.filter(point=>isOwner||point.id===adminProfile?.point_id)
@@ -1455,7 +1410,11 @@ function renderAdminPointBar(){
     return;
   }
   const pointTabs=['stock','ventes','assistance'];
-  if(!isOwner || !pointTabs.includes(adminActiveTab)){ bar.innerHTML=''; bar.style.display='none'; return; }
+  /* Onglets sans sélecteur (produits, sections, points, gérants, comptabilité) :
+     on garde la barre affichée mais VIDE. Elle fournit le fond crème de la barre
+     POS (64px) sur lequel reposent le logo et « Déconnexion ». Sur mobile elle est
+     masquée via :empty (le header y contient déjà logo + actions en flux). */
+  if(!isOwner || !pointTabs.includes(adminActiveTab)){ bar.innerHTML=''; bar.style.display='block'; return; }
   const config={
     stock:{id:'stockPointSelect',label:'Point de vente',value:stockSelectedPoint,change:'onStockPointChange'},
     ventes:{id:'salesPointFilter',label:'Filtrer par point de vente',value:salesSelectedPoint,change:'onSalesFilterChange',all:true},
@@ -1464,7 +1423,7 @@ function renderAdminPointBar(){
   const options=config.all
     ? `<option value="all" ${config.value==='all'?'selected':''}>Tous les points</option>`
     : '';
-  bar.innerHTML=`<div class="field admin-toolbar-field"><label>${config.label}</label><select id="${config.id}" onchange="${config.change}(this.value)">${options}${POINTS.map(p=>`<option value="${p.id}" ${p.id===config.value?'selected':''}>${p.name}</option>`).join('')}</select></div>`;
+  bar.innerHTML=`<div class="caisse-point-row"><div class="field admin-toolbar-field"><label>${config.label}</label><select id="${config.id}" onchange="${config.change}(this.value)">${options}${POINTS.map(p=>`<option value="${p.id}" ${p.id===config.value?'selected':''}>${p.name}</option>`).join('')}</select></div></div>`;
   bar.style.display='block';
 }
 
@@ -1678,26 +1637,133 @@ async function saveStoreSettings(){
 /* =======================================================
    COMPTABILITÉ (journal de caisse simplifié)
    ======================================================= */
-let comptaPeriod='day', comptaPoint='all';
+let comptaPoint='all';
+/* Période choisie via le calendrier (un jour, une plage ou une année complète) :
+   dates locales au format YYYY-MM-DD. Chaque section (Vente / Comptabilité) garde
+   sa propre plage, initialisée par défaut sur le mois en cours. */
+function defaultMonthRange(){
+  const n=new Date();
+  return {start:toYmd(new Date(n.getFullYear(),n.getMonth(),1)), end:toYmd(new Date(n.getFullYear(),n.getMonth()+1,0))};
+}
+const _dflt=defaultMonthRange();
+let comptaRangeStart=_dflt.start, comptaRangeEnd=_dflt.end;
+let salesRangeStart=_dflt.start, salesRangeEnd=_dflt.end;
+/* État du calendrier de période (popover réutilisé par Vente et Comptabilité). */
+let periodCal=null;
 
-function getPeriodRange(period){
-  const start=new Date();
-  start.setHours(0,0,0,0);
-  if(period==='week'){
-    start.setDate(start.getDate()-((start.getDay()+6)%7));
-  }else if(period==='month'){
-    start.setDate(1);
-  }else if(period==='year'){
-    start.setMonth(0,1);
-  }
-  if(period==='all') return null;
-  const end=new Date(start);
-  if(period==='day') end.setDate(end.getDate()+1);
-  else if(period==='week') end.setDate(end.getDate()+7);
-  else if(period==='month') end.setMonth(end.getMonth()+1);
-  else if(period==='year') end.setFullYear(end.getFullYear()+1);
+function periodRangeState(section){
+  return section==='sales'
+    ? {start:salesRangeStart,end:salesRangeEnd}
+    : {start:comptaRangeStart,end:comptaRangeEnd};
+}
+/* La période est TOUJOURS pilotée par le calendrier : on renvoie la plage de la
+   section (mois en cours par défaut), du début inclus au lendemain de la fin. */
+function getPeriodRange(_period, section='compta'){
+  const rs=periodRangeState(section);
+  if(!rs.start) return null;
+  const start=parseYmd(rs.start);
+  const end=parseYmd(rs.end||rs.start);
+  end.setDate(end.getDate()+1); /* inclut le dernier jour jusqu'à minuit */
   return {start,end};
 }
+/* Parse "YYYY-MM-DD" en Date locale à minuit (évite le décalage UTC de new Date(str)). */
+function parseYmd(str){
+  const [y,m,d]=String(str).split('-').map(Number);
+  return new Date(y,(m||1)-1,d||1);
+}
+/* Date locale -> "YYYY-MM-DD" (pour les attributs value/clics). */
+function toYmd(date){
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${date.getFullYear()}-${m}-${d}`;
+}
+/* Libellé lisible de la plage retenue (affiché sur le bouton Période). */
+function fmtCalDate(ymd){ return parseYmd(ymd).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}); }
+function periodRangeLabel(section){
+  const rs=periodRangeState(section);
+  if(!rs.start) return '';
+  return (rs.end&&rs.end!==rs.start) ? `Du ${fmtCalDate(rs.start)} au ${fmtCalDate(rs.end)}` : fmtCalDate(rs.start);
+}
+/* ---------- Calendrier de période (popover ancré sous le champ « Période ») ---------- */
+function openPeriodCalendar(section){
+  const anchor=document.getElementById(section+'Period');
+  if(!anchor) return;
+  const cur=periodRangeState(section);
+  const base=cur.start?parseYmd(cur.start):new Date();
+  periodCal={section, start:cur.start, end:cur.end, view:new Date(base.getFullYear(),base.getMonth(),1)};
+  renderPeriodCalendar();
+}
+function periodCalNav(delta, ev){ if(ev) ev.stopPropagation(); if(!periodCal) return; periodCal.view.setMonth(periodCal.view.getMonth()+delta); renderPeriodCalendar(); }
+/* Clic sur un jour : 1er = début, 2e = fin (remet à zéro si on reclique après une plage). */
+function onPeriodDayClick(ymd, ev){
+  if(ev) ev.stopPropagation();
+  if(!periodCal) return;
+  if(!periodCal.start || (periodCal.start&&periodCal.end)){ periodCal.start=ymd; periodCal.end=null; }
+  else if(ymd<periodCal.start){ periodCal.end=periodCal.start; periodCal.start=ymd; }
+  else periodCal.end=ymd;
+  renderPeriodCalendar();
+}
+function renderPeriodCalendar(){
+  let el=document.getElementById('periodCal');
+  if(!el){ el=document.createElement('div'); el.id='periodCal'; el.className='period-cal'; el.hidden=true; document.body.appendChild(el); }
+  if(!periodCal){ el.hidden=true; el.innerHTML=''; return; }
+  const anchor=document.getElementById(periodCal.section+'Period');
+  if(!anchor){ closePeriodCalendar(true); return; }
+  const y=periodCal.view.getFullYear(), m=periodCal.view.getMonth();
+  const monthName=periodCal.view.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  const startDow=(new Date(y,m,1).getDay()+6)%7; /* lundi = 0 */
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  let cells='';
+  for(let i=0;i<startDow;i++) cells+='<span class="cal-cell empty"></span>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ymd=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls='cal-cell';
+    if(periodCal.start===ymd) cls+=' start';
+    if(periodCal.end===ymd) cls+=' end';
+    if(periodCal.start&&periodCal.end&&ymd>periodCal.start&&ymd<periodCal.end) cls+=' in-range';
+    cells+=`<button type="button" class="${cls}" onclick="onPeriodDayClick('${ymd}',event)">${d}</button>`;
+  }
+  const label=periodCal.start
+    ? ((periodCal.end&&periodCal.end!==periodCal.start)?`Du ${fmtCalDate(periodCal.start)} au ${fmtCalDate(periodCal.end)}`:fmtCalDate(periodCal.start))
+    : 'Choisissez une date ou une plage';
+  el.innerHTML=`<div class="cal-head"><button type="button" class="cal-nav" onclick="periodCalNav(-1,event)" aria-label="Mois précédent">‹</button><b>${monthName}</b><button type="button" class="cal-nav" onclick="periodCalNav(1,event)" aria-label="Mois suivant">›</button></div>
+    <div class="cal-week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-label">${label}</div>
+    <div class="cal-actions"><button type="button" class="btn-ghost" onclick="closePeriodCalendar(true)">Annuler</button><button type="button" class="btn-primary" onclick="applyPeriodCalendar()">Appliquer</button></div>`;
+  el.hidden=false;
+  el.style.width='262px';
+  const r=anchor.getBoundingClientRect();
+  let top=r.bottom+6;
+  const h=el.offsetHeight||340;
+  if(top+h>window.innerHeight-8) top=Math.max(8,r.top-6-h);
+  el.style.top=top+'px';
+  el.style.left=Math.max(8,Math.min(r.left,window.innerWidth-270))+'px';
+}
+function applyPeriodCalendar(){
+  if(!periodCal) return;
+  const section=periodCal.section, s=periodCal.start, e=periodCal.end||periodCal.start;
+  if(!s){ closePeriodCalendar(true); return; }
+  if(section==='sales'){ salesRangeStart=s; salesRangeEnd=e; }
+  else { comptaRangeStart=s; comptaRangeEnd=e; }
+  closePeriodCalendar();
+  if(section==='sales') loadAndRenderSales(); else loadCompta();
+}
+function closePeriodCalendar(){
+  periodCal=null;
+  const el=document.getElementById('periodCal');
+  if(el){ el.hidden=true; el.innerHTML=''; }
+}
+document.addEventListener('click',e=>{
+  if(!periodCal) return;
+  const pop=document.getElementById('periodCal');
+  if(pop&&pop.contains(e.target)) return;
+  const sel=document.getElementById(periodCal.section+'Period');
+  if(sel&&sel.contains(e.target)) return;
+  closePeriodCalendar(true);
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&periodCal) closePeriodCalendar(true); });
+
 
 async function renderAdminCompta(){
   if(!isOwnerRole()){ alert('Comptabilité réservée au propriétaire.'); adminActiveTab='caisse'; switchAdminTab('caisse'); return; }
@@ -1710,7 +1776,7 @@ async function renderAdminCompta(){
   body.innerHTML=`<div class="admin-toolbar"><h3 style="color:var(--coffee-black);">Comptabilité</h3>
       <button type="button" class="btn-primary compta-add-btn" aria-label="Ajouter une ligne comptable" title="Ajouter une ligne" onclick="openTransactionModal()">+</button></div>
     <div class="admin-product-form">
-      <div class="field"><label>Période</label><select id="comptaPeriod" onchange="comptaPeriod=this.value;loadCompta()"><option value="day" ${comptaPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${comptaPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${comptaPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${comptaPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${comptaPeriod==='all'?'selected':''}>Tout</option></select></div>
+      <div class="field"><label>Période</label><button type="button" id="comptaPeriod" class="period-btn" onclick="openPeriodCalendar('compta')"><span class="period-btn-icon">📅</span><span class="period-btn-label">${periodRangeLabel('compta')}</span></button></div>
       <div class="field"><label>Point de vente</label><select id="comptaPoint" onchange="comptaPoint=this.value;loadCompta()" ${isOwner?'':'disabled'}>${pointOptions}</select></div>
     </div>
     <div id="comptaSummary" class="sales-stats-container"></div>
@@ -1719,7 +1785,7 @@ async function renderAdminCompta(){
 }
 async function loadCompta(){
   if(!isOwnerRole()) comptaPoint=adminProfile.point_id;
-  const range=getPeriodRange(comptaPeriod);
+  const range=getPeriodRange('', 'compta');
   let transactionsQuery=sb.from('transactions').select('*').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   /* Le journal retrace TOUTES les ventes : on charge les lignes complètes
      (détail des articles compris) et non plus seulement les totaux. */
@@ -2079,7 +2145,7 @@ function renderAdminSections(){
   const body=document.getElementById('adminBody');
   const sections=sectionsDraft().sort((a,b)=>(a.ord||0)-(b.ord||0));
   body.innerHTML=`<div class="admin-toolbar"><div class="admin-stat"><b>${sections.length}</b>sections au menu</div><button class="btn-primary" onclick="addSectionRow()">+ Ajouter une section</button></div>
-    <p class="shop-note" style="margin-bottom:12px;">Chaque section regroupe les produits ayant la même « clé » (catégorie). Glissez l'ordre avec les flèches, choisissez une couleur d'accent, et enregistrez. Les clés déjà utilisées par des produits ne peuvent pas être supprimées.</p>
+  
     <div id="sectionsEditor"></div>
     <div class="admin-form-actions" style="margin-top:16px;display:flex;gap:10px;"><button class="btn-primary" onclick="saveMenuSections()">Enregistrer les sections</button><button class="btn-ghost" onclick="resetMenuSections()">Réinitialiser</button></div>`;
   renderSectionsEditor(sections);
@@ -2135,64 +2201,6 @@ async function saveMenuSections(){
 }
 
 /* ---------- PRODUITS (manager) ---------- */
-/* Formats proposés dans le menu déroulant du formulaire produit. */
-const PRODUCT_FORMATS=['Gobelet (mini)','Gobelet (grand)','Tasse (mini)','Tasse (grand)','Sachet','Boîte','Bouteille 1L','Bouteille 1,5L'];
-function formatOptions(product){
-  const current=product?(product.format||''):'';
-  const list=PRODUCT_FORMATS.slice();
-  if(current && !list.includes(current)) list.unshift(current);
-  return `<option value="">Aucun format</option>${list.map(f=>`<option value="${esc(f)}" ${current===f?'selected':''}>${esc(f)}</option>`).join('')}`;
-}
-/* Création multi-formats : affiche un champ « prix » par format coché (chacun ayant
-   son propre prix et son propre stock une fois l'article enregistré). */
-function onPfFormatToggle(){
-  const box=document.getElementById('pfFormats'), wrap=document.getElementById('pfFormatPrices');
-  if(!box||!wrap) return;
-  const basePrice=document.getElementById('pfPrice')?.value||'';
-  const checked=[...box.querySelectorAll('input[name="pfFormat"]:checked')].map(i=>i.value);
-  updatePfFormatsCount(checked);
-  if(checked.length<=1){ wrap.innerHTML=''; return; }
-  wrap.innerHTML=`<div class="pf-format-prices-title">Prix par format</div>`+checked.map(f=>{
-    const prev=wrap.querySelector(`input[data-fmt="${CSS.escape(f)}"]`)?.value;
-    return `<div class="field"><label>${esc(f)}</label><input type="number" min="0" data-fmt="${esc(f)}" value="${prev!=null?esc(prev):esc(basePrice)}" placeholder="500"></div>`;
-  }).join('');
-}
-/* Menu déroulant « Formats de vente » : ouverture/fermeture du panneau à cases à cocher
-   et compteurs sur le bouton. Le panneau se referme au clic en dehors. */
-function togglePfFormats(){
-  const panel=document.getElementById('pfFormats'), toggle=document.getElementById('pfFormatsToggle');
-  if(!panel) return;
-  panel.hidden=!panel.hidden;
-  if(toggle) toggle.setAttribute('aria-expanded',String(!panel.hidden));
-}
-function closePfFormatsPanel(){
-  const panel=document.getElementById('pfFormats'), toggle=document.getElementById('pfFormatsToggle');
-  if(!panel||panel.hidden) return;
-  panel.hidden=true;
-  if(toggle) toggle.setAttribute('aria-expanded','false');
-}
-function updatePfFormatsCount(checked){
-  const badge=document.getElementById('pfFormatsCount');
-  if(!badge) return;
-  if(!checked||!checked.length){ badge.hidden=true; badge.textContent=''; return; }
-  badge.hidden=false;
-  badge.textContent=checked.length===1?'1 format':`${checked.length} formats`;
-}
-document.addEventListener('click',e=>{
-  const dd=document.getElementById('pfFormatsDd');
-  if(dd && !dd.contains(e.target)) closePfFormatsPanel();
-});
-function selectedPfFormats(){
-  const box=document.getElementById('pfFormats');
-  if(!box) return null; /* mode édition : pas de sélection multiple */
-  return [...box.querySelectorAll('input[name="pfFormat"]:checked')].map(i=>i.value);
-}
-function pfFormatPriceFor(fmt){
-  const wrap=document.getElementById('pfFormatPrices');
-  const input=wrap?.querySelector(`input[data-fmt="${CSS.escape(fmt)}"]`);
-  if(input) return parseInt(String(input.value).replace(/[^0-9]/g,''),10);
-  return parseInt(String(document.getElementById('pfPrice')?.value||'').replace(/[^0-9]/g,''),10);
-}
 function renderAdminProducts(){
   editingProductId=null; pendingPhotoData=null;
   document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>${PRODUCTS.length}</b>produits au catalogue</div><button class="btn-ghost" onclick="renderAdminSections()">Gérer les sections</button></div><div id="adminProductForm"></div><table class="admin-table"><thead><tr><th></th><th>Nom</th><th>Section</th><th>Prix</th><th>Prix min</th><th>Stock total</th><th></th></tr></thead><tbody id="adminProductRows"></tbody></table>`;
@@ -2205,25 +2213,15 @@ function renderProductForm(product, containerId='adminProductForm', returnToInve
      d'un produit) ; affiché en lecture seule pour le gérant. */
   const canEditMinPrice=isOwnerRole();
   const minPriceField=canEditMinPrice
-    ? `<div class="field"><label>Prix minimum <span style="font-weight:400;color:#8A7660;">(seuil du prix personnalisé)</span></label><input type="number" id="pfMinPrice" value="${product&&product.min_price!=null?product.min_price:''}" min="0" placeholder="Dès 50 FCFA"><span class="shop-note" style="font-size:11px;">Un prix personnalisé saisi à la commande ne peut descendre sous ce seuil (plancher 50 FCFA).</span></div>`
+    ? `<div class="field"><label>Prix minimum</label><input type="number" id="pfMinPrice" value="${product&&product.min_price!=null?product.min_price:''}" min="0" placeholder="Dès 50 FCFA">.</span></div>`
     : `<div class="field"><label>Prix minimum <span style="font-weight:400;color:#8A7660;">(seuil défini par le propriétaire)</span></label><input type="text" value="${product&&product.min_price!=null?money(product.min_price):'Dès 50 FCFA'}" disabled class="stock-field-disabled"><input type="hidden" id="pfMinPrice" value="${product&&product.min_price!=null?product.min_price:''}"></div>`;
   document.getElementById(containerId).innerHTML = `<div class="admin-product-form">
-    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${pendingPhotoData}">`:'📷'}</div><div class="admin-photo-actions"><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 ${pendingPhotoData?'Changer la photo':'Ajouter une photo'}</button><button type="button" class="admin-photo-btn" onclick="removeProductPhoto()">🗑 Retirer</button><span class="shop-note">Format carré 1:1 — recadrage et redimensionnement automatiques (800×800, JPG, 5 Mo max).</span></div></div>
+    <div class="admin-photo-zone full"><div class="admin-photo-preview" id="photoPreview">${pendingPhotoData?`<img src="${pendingPhotoData}">`:'📷'}</div><div class="admin-photo-actions"><button type="button" class="admin-photo-btn" onclick="openPhotoChoice()">📷 ${pendingPhotoData?'Changer la photo':'Ajouter une photo'}</button><button type="button" class="admin-photo-btn" onclick="removeProductPhoto()">🗑 Retirer</button></div></div>
     <div class="field"><label>Nom du produit</label><input type="text" id="pfName" value="${product?esc(product.name):''}" placeholder="Ex : Café Touba"></div>
     <div class="field"><label>Section / Catégorie</label><select id="pfCat">${getMenuSections().map(s=>`<option value="${esc(s.key)}" ${product&&product.cat===s.key?'selected':''}>${s.icon?s.icon+' ':''}${esc(s.label||s.key)}</option>`).join('')}${product&&!getMenuSections().some(s=>s.key===product.cat)?`<option value="${esc(product.cat)}" selected>${esc(product.cat)}</option>`:''}</select></div>
     <div class="field"><label>Prix (FCFA)</label><input type="number" id="pfPrice" value="${product?product.price:''}" min="0" placeholder="500"></div>
     ${minPriceField}
     <div class="field"><label>Disponible à la vente</label><select id="pfActive"><option value="true" ${(!product||product.active!==false)?'selected':''}>Oui (visible au menu)</option><option value="false" ${product&&product.active===false?'selected':''}>Non (masqué)</option></select></div>
-    <div class="field full"><label>Format(s) de vente <span style="font-weight:400;color:#8A7660;">(un produit peut être vendu sous plusieurs formats — chacun a son propre prix et son propre stock)</span></label>
-      ${product
-        ? `<select id="pfFormat">${formatOptions(product)}</select><span class="shop-note" style="font-size:11px;">Vous modifiez un article (un format). Pour ajouter un autre format à la même boisson, créez un nouveau produit avec le même nom et un format différent, ou dupliquez cet article.</span>`
-        : `<div class="pf-formats-wrap" id="pfFormatsDd">
-             <button type="button" class="pf-formats-toggle" id="pfFormatsToggle" aria-haspopup="true" aria-expanded="false" onclick="togglePfFormats()">Formats de vente ▾ <span class="pf-count" id="pfFormatsCount" hidden></span></button>
-             <div class="pf-formats-panel" id="pfFormats" role="group" aria-label="Formats de vente" hidden>${PRODUCT_FORMATS.map(f=>`<label class="pf-format-check"><input type="checkbox" name="pfFormat" value="${esc(f)}" onchange="onPfFormatToggle()"><span>${esc(f)}</span></label>`).join('')}</div>
-           </div>
-           <div id="pfFormatPrices"></div>
-           <span class="shop-note" style="font-size:11px;">Ouvrez le menu « Formats de vente » et cochez un ou plusieurs formats. Si plusieurs sont cochés, un article distinct (stock et prix propres) est créé pour chacun, regroupés dans la même carte du menu et de la caisse. Laissez tout décoché pour un article sans format.</span>`}
-    </div>
     ${!product?`<div class="field"><label>Stock initial (par point)</label><input type="number" id="pfStock" value="20" min="0"></div>`:`<div class="field"><label>Stock</label><input type="text" value="Géré dans l'onglet Stock" disabled class="stock-field-disabled"></div>`}
     <div class="field full"><label>Description</label><textarea id="pfDesc" placeholder="Description courte">${product?(product.description||''):''}</textarea></div>
     <div class="full admin-form-actions"><button class="btn-primary" onclick="saveProductForm()">${product?'Enregistrer':'Ajouter le produit'}</button>${product?`<button class="btn-ghost" onclick="${returnToInventory?'cancelInventoryProductEdit()':'renderProductForm()'}">Annuler</button>`:''}</div>
@@ -2231,12 +2229,6 @@ function renderProductForm(product, containerId='adminProductForm', returnToInve
 }
 async function saveProductForm(){
   const name=document.getElementById('pfName').value.trim(), cat=document.getElementById('pfCat').value, price=parseInt(String(document.getElementById('pfPrice').value).replace(/[^0-9]/g,''),10), desc=document.getElementById('pfDesc').value.trim();
-  /* Mode création : le(s) format(s) vien(nen)t des cases à cocher ; un seul coché = ce format.
-     Mode édition : le format reste un menu déroulant simple (#pfFormat). */
-  const newFormatsCreate = editingProductId ? null : selectedPfFormats();
-  const format=editingProductId
-    ? (document.getElementById('pfFormat')?.value||'').trim()
-    : ((newFormatsCreate&&newFormatsCreate.length===1)?newFormatsCreate[0]:'');
   /* Seuil minimum du prix personnalisé (défini par le propriétaire) ; vide = plancher global 50 FCFA.
      Sécurité : si le gérant édite une copie, on ignore toute modification du seuil et on
      conserve la valeur existante (le champ est en lecture seule dans son formulaire). */
@@ -2246,51 +2238,22 @@ async function saveProductForm(){
   if(!isOwnerRole() && existingMinCheck){ min_price = existingMinCheck.min_price ?? null; }
   const activeEl=document.getElementById('pfActive');
   const active=activeEl?activeEl.value==='true':true;
-  /* Groupe et ordre dérivés automatiquement (plus de champs manuels) :
-     le groupe reprend le nom de la boisson (tout avant « — », sinon le nom complet),
-     l'ordre suit le format choisi (mini → 1, grand → 2, bouteille 1L → 3, bouteille 1,5L → 4). */
-  const FORMAT_ORDER={'Gobelet (mini)':1,'Gobelet (grand)':2,'Tasse (mini)':1,'Tasse (grand)':2,'Sachet':1,'Boîte':2,'Bouteille 1L':3,'Bouteille 1,5L':4};
-  const baseName=name.split(/[–—]/)[0].trim()||name;
-  const existing=editingProductId?PRODUCTS.find(p=>p.id===editingProductId):null;
-  const formatGroup=format?baseName:null;
-  const formatOrder=format?(FORMAT_ORDER[format]||((existing&&existing.format===format)?(existing.format_order||0):0)):0;
-  const formatFields={format_group:formatGroup, format:format||null, format_order:formatOrder, active};
   const section=getMenuSections().find(s=>s.key===cat);
   const icon=(section&&section.icon)||(cat==='bouteille'?'🍾':(cat==='cafe'?'☕':'🥤'));
   if(!name || !Number.isInteger(price) || price<0){ alert("Merci de renseigner un nom et un prix entier égal ou supérieur à zéro."); return; }
   if(min_price!=null && (!Number.isInteger(min_price)||min_price<0)){ alert("Le prix minimum doit être un nombre entier égal ou supérieur à zéro."); return; }
-  /* Création multi-formats : la sélection multiple (cases à cocher) prime sur le
-     champ prix unique. Chaque format coché devient un article distinct (prix et
-     stock propres), relié aux autres par format_group = nom de la boisson. */
-  const newFormats = newFormatsCreate;
-  const multiCreate = newFormats && newFormats.length>1;
-  if(multiCreate){
-    for(const f of newFormats){
-      const fp=pfFormatPriceFor(f);
-      if(!Number.isInteger(fp)||fp<0){ alert(`Merci de saisir un prix entier valide pour le format « ${f} ».`); return; }
-      if(min_price!=null && min_price>fp){ alert(`Le prix minimum ne peut pas dépasser le prix de vente du format « ${f} ».`); return; }
-    }
-  } else if(min_price!=null && min_price>price){ alert("Le prix minimum ne peut pas dépasser le prix de vente."); return; }
+  if(min_price!=null && min_price>price){ alert("Le prix minimum ne peut pas dépasser le prix de vente."); return; }
   if(editingProductId){
-    const {error} = await sb.from('products').update({name,cat,price,min_price,description:desc,image_url:pendingPhotoData||null,...formatFields}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
+    const {error} = await sb.from('products').update({name,cat,price,min_price,description:desc,image_url:pendingPhotoData||null,active}).eq('id',editingProductId).eq('store_id',ACTIVE_STORE_ID);
     if(error){ alert(`Erreur lors de la mise à jour : ${error.message||'inconnue'}`); console.error(error); return; }
   } else {
     const initialStock = parseInt(document.getElementById('pfStock').value,10)||0;
-    /* Un article par format coché (chacun avec son prix), ou un article simple. */
-    const variants = multiCreate
-      ? newFormats.map(f=>({label:f, price:pfFormatPriceFor(f), order:FORMAT_ORDER[f]||0}))
-      : [{label:format||null, price, order:formatOrder}];
-    const created=[];
-    for(const v of variants){
-      const row={cat,name:v.label?`${name} — ${v.label}`:name,price:v.price,min_price,description:desc,icon,image_url:pendingPhotoData||null,store_id:ACTIVE_STORE_ID,
-        format_group:v.label?baseName:null, format:v.label||null, format_order:v.order, active};
-      const {data, error} = await sb.from('products').insert(row).select().single();
-      if(error){ alert(`Erreur lors de la création : ${error.message||'inconnue'}`); console.error(error); return; }
-      created.push(data);
-    }
+    const row={cat,name,price,min_price,description:desc,icon,image_url:pendingPhotoData||null,store_id:ACTIVE_STORE_ID,active};
+    const {data, error} = await sb.from('products').insert(row).select().single();
+    if(error){ alert(`Erreur lors de la création : ${error.message||'inconnue'}`); console.error(error); return; }
     if(POINTS.length){
       const rows=[];
-      for(const p of created){ for(const pt of POINTS){ rows.push({point_id:pt.id,product_id:p.id,quantity:initialStock,store_id:ACTIVE_STORE_ID}); } }
+      for(const pt of POINTS){ rows.push({point_id:pt.id,product_id:data.id,quantity:initialStock,store_id:ACTIVE_STORE_ID}); }
       await sb.from('stock').insert(rows);
     }
   }
@@ -2311,8 +2274,8 @@ function openInventoryProductEditor(product){
   renderProductForm(product,'inventoryProductEditor',true);
 }
 /* Duplique un produit (nouvelle fiche, stock à 0 sur chaque point) puis ouvre l'éditeur
-   sur la copie : le propriétaire comme le gérant peuvent ainsi créer une variante
-   (ex. Croustillants — Tasse (mini) / Tasse (grand)) sans toucher à l'original. */
+   sur la copie : le propriétaire comme le gérant peuvent ainsi créer un nouvel article
+   (ex. une autre boisson ou une autre taille) sans toucher à l'original. */
 async function duplicateProduct(id){
   const source=PRODUCTS.find(p=>p.id===id);
   if(!source){ alert('Ce produit est introuvable.'); return; }
@@ -2348,7 +2311,7 @@ function renderProductRows(){
     const inactive=p.active===false?' style="opacity:.5;"':'';
     return `<tr${inactive}>
     <td>${p.image_url?`<img src="${p.image_url}" class="p-thumb">`:`<div class="product-thumb-placeholder">${p.icon||'☕'}</div>`}</td>
-    <td>${esc(p.name)}${p.active===false?' <span class="stock-low" style="font-size:11px;">(masqué)</span>':''}${p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:''}</td>
+    <td>${esc(p.name)}${p.active===false?' <span class="stock-low" style="font-size:11px;">(masqué)</span>':''}</td>
     <td>${esc(catLabel)}</td><td>${money(p.price)}</td>
     <td>${p.min_price!=null?money(p.min_price):'—'}</td>
     <td class="${totalStock(p.id)<=5?'stock-low':''}">${totalStock(p.id)}</td>
@@ -2407,7 +2370,7 @@ function renderAdminStock(){
   const todayDakar = new Date(new Date().toLocaleString('en-US',{timeZone:'Africa/Dakar'}));
   const isFirstDay = todayDakar.getDate()===1;
   const stockNote = isOwner
-    ? 'Le stock se met à jour via les ventes (décrément) et les approvisionnements (incrément). Vous pouvez aussi valider un comptage ici.'
+    ? ''
     : (isFirstDay
       ? '1er du mois : comptez physiquement chaque produit et validez ce que vous voyez. Le stock sera recalculé avec écarts.'
       : 'Stock automatique via ventes et approvisionnements. La validation manuelle est possible uniquement le 1er du mois (ou sur inventaire demandé par le propriétaire).');
@@ -2554,14 +2517,14 @@ function renderAdminSales(){
   const isManager = isOwnerRole();
   if(!isManager){ salesSelectedPoint = adminProfile.point_id; }
   const filterHtml = isManager ? '' : `<div class="admin-stat"><b>${POINTS.find(p=>p.id===salesSelectedPoint)?.name||''}</b>votre point de vente</div>`;
-  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div class="field admin-toolbar-field"><label>Période</label><select id="salesPeriod" onchange="salesPeriod=this.value;loadAndRenderSales()"><option value="day" ${salesPeriod==='day'?'selected':''}>Aujourd'hui</option><option value="week" ${salesPeriod==='week'?'selected':''}>Cette semaine</option><option value="month" ${salesPeriod==='month'?'selected':''}>Ce mois</option><option value="year" ${salesPeriod==='year'?'selected':''}>Cette année</option><option value="all" ${salesPeriod==='all'?'selected':''}>Tout</option></select></div><div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div>${isManager?'':'<p class="shop-note" style="margin-bottom:12px;">Ventes en lecture seule : pour toute correction après encaissement, contactez le propriétaire.</p>'}<table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th>${isManager?'<th>Actions</th>':''}</tr></thead><tbody id="adminSalesRows"></tbody></table>`;
+  document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar">${filterHtml}<div class="field admin-toolbar-field"><label>Période</label><button type="button" id="salesPeriod" class="period-btn" onclick="openPeriodCalendar('sales')"><span class="period-btn-icon">📅</span><span class="period-btn-label">${periodRangeLabel('sales')}</span></button></div><div id="salesStats" class="sales-stats-container"></div><button class="btn-ghost" onclick="exportSalesCSV()">Exporter en CSV</button></div>${isManager?'':'<p class="shop-note" style="margin-bottom:12px;">Ventes en lecture seule : pour toute correction après encaissement, contactez le propriétaire.</p>'}<table class="admin-table"><thead><tr><th>Date</th><th>Point</th><th>Canal</th><th>Client</th><th>Détail</th><th>Mode</th><th>Paiement</th><th>Total</th><th>Statut</th>${isManager?'<th>Actions</th>':''}</tr></thead><tbody id="adminSalesRows"></tbody></table>`;
   loadAndRenderSales();
 }
 function onSalesFilterChange(val){ salesSelectedPoint=val; loadAndRenderSales(); renderAdminPointBar(); }
 async function loadAndRenderSales(){
   let query = sb.from('sales').select('*, sale_items(*)').eq('store_id',ACTIVE_STORE_ID).order('created_at',{ascending:false});
   if(salesSelectedPoint!=='all') query = query.eq('point_id', salesSelectedPoint);
-  const range=getPeriodRange(salesPeriod);
+  const range=getPeriodRange('', 'sales');
   if(range) query=query.gte('created_at',range.start.toISOString()).lt('created_at',range.end.toISOString());
   const {data, error} = await query; if(error){console.error(error);return;}
   SALES_CACHE = data;
@@ -2878,36 +2841,6 @@ async function cancelImportedOrder(){
   renderAdminCaisse();
 }
 
-/* Clé de regroupement : les formats d'une même boisson (même section + format_group)
-   partagent une seule carte ; un produit sans format reste seul. */
-function caisseGroupKey(p){ return p.format_group ? (p.cat+'|'+p.format_group) : ('#'+p.id); }
-/* Clé encodée pour attributs HTML / onclick inline (aucune apostrophe ni guillemet). */
-function cfAttrKey(key){ return encodeURIComponent(key).replace(/'/g,'%27'); }
-/* Un libellé de format (« Gobelet (grand) », « Bouteille 1L »…) ne doit JAMAIS
-   servir de nom de produit tant qu'un vrai nom existe : les données historiques
-   contiennent des articles dont le nom est resté le format seul. */
-function isFormatLabel(txt){ return !!txt && PRODUCT_FORMATS.includes(txt); }
-/* Nom affiché d'un article : le nom du produit, sinon le nom du groupe de
-   format ; jamais un simple libellé de format. */
-function productLabel(p){
-  if(p&&p.name&&!isFormatLabel(p.name)) return p.name;
-  if(p&&p.format_group&&!isFormatLabel(p.format_group)) return p.format_group;
-  return (p&&(p.name||p.format_group||p.format))||'Produit';
-}
-/* Titre d'une carte regroupant plusieurs formats : le nom du groupe (la
-   boisson), sinon le nom du premier article dépouillé de son suffixe « — format ». */
-function caisseGroupTitle(g){
-  const first=g&&g[0]; if(!first) return 'Produit';
-  if(first.format_group&&!isFormatLabel(first.format_group)) return first.format_group;
-  for(const p of g){
-    const n=String((p&&p.name)||'').trim(); if(!n) continue;
-    const f=String((p&&p.format)||'');
-    let base=n;
-    if(f&&n.toLowerCase().endsWith(f.toLowerCase())) base=n.slice(0,n.length-f.length).replace(/\s*[—–-]\s*$/,'').trim();
-    if(base&&!isFormatLabel(base)) return base;
-  }
-  return productLabel(first);
-}
 /* Ligne « Stock : X » : ambre + badge « Stock faible » sous 10, rouge à 0. */
 function caisseStockLine(qty){
   if(qty<=0) return `<div style="font-size:11px;color:var(--rust);font-weight:700;">Stock : 0</div>`;
@@ -2916,93 +2849,19 @@ function caisseStockLine(qty){
 }
 function renderCaisseProductGrid(){
   const grid=document.getElementById('caisseProductGrid');
-  if(!grid){ closeCaisseFormatsPopup(); return; }
+  if(!grid) return;
   /* Tous les produits actifs (toutes sections confondues) sont affichés ;
      ceux sans stock sur ce point sont marqués « Rupture » et non ajoutables.
-     Les formats d'une même boisson (format_group au sein d'une même section)
-     sont regroupés en UNE seule carte intitulée par le groupe : le bouton
-     « Formats ▾ » ouvre une liste à cases à cocher (cocher = au panier) où
-     chaque format garde son propre prix et son propre stock.
+     Chaque produit est une carte autonome affichant son nom tel quel.
      Le stock vient de l'inventaire du point (availableStockFor), avec alerte
      « Stock faible » (ambre) dès que la quantité passe sous 10. */
   const active=PRODUCTS.filter(p=>p.active);
-  const groups=[], byKey=new Map();
-  active.forEach(p=>{
-    const key=caisseGroupKey(p);
-    if(byKey.has(key)){ byKey.get(key).push(p); return; }
-    const g=[p]; byKey.set(key,g); groups.push(g);
-  });
-  const inCart=id=>caisseCart.some(c=>c.id===id);
-  grid.innerHTML = groups.map(g=>{
-    /* --- Produit unique (sans format, ou seul format actif) : carte classique. --- */
-    if(g.length===1){
-      const p=g[0], qty=availableStockFor(p.id), rupture=qty<=0;
-      const formatTag=p.format?`<div style="font-size:11px;color:#8A7660;">${esc(p.format)}</div>`:'';
-      return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${esc(p.image_url)}" class="card-photo" alt="${esc(p.name)}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${esc(productLabel(p))}</div>${formatTag}<div class="card-price">${money(p.price)}</div>${caisseStockLine(qty)}<button type="button" class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`;
-    }
-    /* --- Plusieurs formats : une seule carte + menu déroulant « Formats ▾ ». --- */
-    const rep=g.find(x=>x.image_url)||g[0];
-    const enc=cfAttrKey(caisseGroupKey(g[0]));
-    const totalQty=g.reduce((s,p)=>s+availableStockFor(p.id),0);
-    const rupture=totalQty<=0;
-    const minPrice=Math.min(...g.map(p=>Number(p.price)||0));
-    const count=g.filter(p=>inCart(p.id)).length;
-    return `<div class="menu-card ${g[0].cat}${rupture?' out-of-stock':''}" data-caisse-formats="${enc}" onclick="toggleCaisseFormatsPopup('${enc}')">${rupture?'<span class="stock-flag">Rupture</span>':''}${rep.image_url?`<img src="${esc(rep.image_url)}" class="card-photo" alt="${esc(rep.name)}">`:`<span class="card-icon">${rep.icon||'☕'}</span>`}<div class="card-name">${esc(caisseGroupTitle(g))}</div><div class="card-price">À partir de ${money(minPrice)}</div>${caisseStockLine(totalQty)}<button type="button" class="card-add">Formats ▾${count?` <span class="caisse-format-count">${count}</span>`:''}</button></div>`;
+  grid.innerHTML = active.map(p=>{
+    const qty=availableStockFor(p.id), rupture=qty<=0;
+    return `<div class="menu-card ${p.cat}${rupture?' out-of-stock':''}"${rupture?'':` onclick="addToCaisse('${p.id}')"`}>${rupture?'<span class="stock-flag">Rupture</span>':''}${p.image_url?`<img src="${esc(p.image_url)}" class="card-photo" alt="${esc(p.name)}">`:`<span class="card-icon">${p.icon||'☕'}</span>`}<div class="card-name">${esc(p.name)}</div><div class="card-price">${money(p.price)}</div>${caisseStockLine(qty)}<button type="button" class="card-add"${rupture?' disabled style="opacity:.5;"':''}>${rupture?'Indisponible':'Ajouter'}</button></div>`;
   }).join('');
   if(!grid.innerHTML) grid.innerHTML = '<div class="admin-empty">Aucun produit actif au catalogue.</div>';
-  if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); /* le menu suit les re-rendus de la grille */
 }
-/* ---------- Menu déroulant « Formats ▾ » de la caisse (popover hors carte,
-   pour ne pas être rogné par les cartes à hauteur fixe / overflow:hidden) ---------- */
-function toggleCaisseFormatsPopup(encKey){
-  const key=decodeURIComponent(encKey);
-  if(caisseFormatsPopupKey===key){ closeCaisseFormatsPopup(); return; }
-  caisseFormatsPopupKey=key;
-  renderCaisseFormatsPopup();
-}
-function closeCaisseFormatsPopup(){
-  caisseFormatsPopupKey=null;
-  const el=document.getElementById('caisseFormatsPopup');
-  if(el){ el.hidden=true; el.innerHTML=''; }
-}
-function renderCaisseFormatsPopup(){
-  let el=document.getElementById('caisseFormatsPopup');
-  if(!el){ el=document.createElement('div'); el.id='caisseFormatsPopup'; el.className='caisse-formats-pop'; el.hidden=true; document.body.appendChild(el); }
-  if(!caisseFormatsPopupKey){ el.hidden=true; el.innerHTML=''; return; }
-  const g=PRODUCTS.filter(p=>p.active&&caisseGroupKey(p)===caisseFormatsPopupKey)
-                  .sort((a,b)=>(a.format_order||0)-(b.format_order||0));
-  const anchor=document.querySelector(`[data-caisse-formats="${cfAttrKey(caisseFormatsPopupKey)}"]`);
-  if(!g.length||!anchor){ closeCaisseFormatsPopup(); return; }
-  el.innerHTML=`<div class="caisse-pop-title">${esc(caisseGroupTitle(g))}</div>`+g.map(p=>{
-    const q=availableStockFor(p.id), soldOut=q<=0, checked=caisseCart.some(c=>c.id===p.id);
-    /* Rupturé = non cochable (décocher reste possible pour sortir du panier) ;
-       commande importée = panneau en lecture seule. */
-    const lock=caisseOrderId||(soldOut&&!checked);
-    return `<label class="caisse-pop-row${soldOut?' soldout':''}"><input type="checkbox" data-pid="${p.id}" ${checked?'checked':''} ${lock?'disabled':''} onchange="onCaisseFormatCheck(this.dataset.pid,this.checked)"><span class="caisse-pop-label">${esc(p.format||p.name)}</span><span class="caisse-pop-price">${money(p.price)}</span><span class="caisse-pop-stock">${soldOut?'Rupture':'Stock : '+q}</span></label>`;
-  }).join('');
-  el.hidden=false;
-  /* Ancrage sous la carte, retourné au-dessus si l'espace manque en bas. */
-  const r=anchor.getBoundingClientRect(), w=Math.min(270,window.innerWidth-16);
-  el.style.width=w+'px';
-  let top=r.bottom+6;
-  if(top+el.offsetHeight>window.innerHeight-8) top=Math.max(8,r.top-6-el.offsetHeight);
-  el.style.top=top+'px';
-  el.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
-}
-/* Case à cocher d'un format : cocher ajoute au panier, décocher retire (le menu reste ouvert). */
-function onCaisseFormatCheck(productId,checked){
-  if(checked) addToCaisse(productId,false); else removeFromCaisse(productId);
-  renderCaisseProductGrid(); /* resynchronise cartes, badge et cases à cocher */
-}
-document.addEventListener('click',e=>{
-  if(!caisseFormatsPopupKey) return;
-  const pop=document.getElementById('caisseFormatsPopup');
-  if(pop&&pop.contains(e.target)) return;
-  if(e.target.closest&&e.target.closest('[data-caisse-formats]')) return; /* géré par le toggle */
-  closeCaisseFormatsPopup();
-});
-window.addEventListener('scroll',()=>{ if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); },true);
-window.addEventListener('resize',()=>{ if(caisseFormatsPopupKey) renderCaisseFormatsPopup(); });
 /* La caisse doit récupérer tous les produits : recharge si la liste est vide,
    puis (re)dessine la grille une fois la section visible à l'écran. */
 let caisseGridObserver=null;
@@ -3026,8 +2885,8 @@ function addToCaisse(productId, scrollToCart=true){
   if(max<=0){ alert('Ce produit est en rupture de stock sur ce point.'); return; }
   if(existing){ if(existing.qty<max){ existing.qty++; } else { alert('Stock maximum atteint.'); return; } } else { caisseCart.push({id:productId, qty:1}); }
   renderCaisseCart(); renderCaisseProductGrid();
-  /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout.
-     (scrollToCart=false : ajout depuis le menu « Formats ▾ », on reste sur le panneau.) */
+  /* Sur mobile, la caisse est sous la grille produits : on l'amène à l'écran pour confirmer l'ajout
+     (scrollToCart=false : on reste où l'on est). */
   if(scrollToCart && window.matchMedia('(max-width: 768px)').matches){ document.querySelector('.caisse-right')?.scrollIntoView({behavior:'smooth',block:'nearest'}); }
 }
 function removeFromCaisse(productId){ if(caisseOrderId)return; caisseCart = caisseCart.filter(c=>c.id!==productId); renderCaisseCart(); renderCaisseProductGrid(); }
@@ -3159,20 +3018,20 @@ function gerantEmailForPoint(pointId){
 }
 function refreshGerantEmailPreview(){
   const sel=document.getElementById('managerInvitePoint');
-  const out=document.getElementById('gerantEmailPreview');
-  if(sel&&out) out.textContent=gerantEmailForPoint(sel.value);
+  const input=document.getElementById('managerInviteEmail');
+  if(sel&&input) input.value=gerantEmailForPoint(sel.value);
 }
 /* ---------- UTILISATEURS (manager uniquement) ---------- */
 function renderAdminUsers(){
   editingManagerId=null;
   document.getElementById('adminBody').innerHTML = `<div class="admin-toolbar"><div class="admin-stat"><b>Gérants et points attribués</b></div></div>
     <div class="admin-product-form manager-invite-form">
-      <h4 class="full">Créer un gérant (compte actif immédiat)</h4>
+      <h4 class="full">Créer un gérant</h4>
       <div class="field"><label>Nom ou pseudo</label><input id="managerInviteName" maxlength="80" placeholder="Nom du gérant"></div>
       <div class="field"><label>Point de vente</label><select id="managerInvitePoint" onchange="refreshGerantEmailPreview()">${POINTS.filter(point=>point.active).map(point=>`<option value="${point.id}">${esc(point.name)}</option>`).join('')}</select></div>
-      <div class="field"><label>E-mail généré automatiquement</label><input id="managerInviteEmail" type="email" readonly style="background:var(--cream);"><span class="shop-note" id="gerantEmailPreview"></span></div>
+      <div class="field"><label>E-mail généré automatiquement</label><input id="managerInviteEmail" type="email" readonly style="background:var(--cream);"></div>
       <div class="field"><label>Téléphone</label><input id="managerInvitePhone" type="tel" placeholder="Téléphone"></div>
-      <div class="full admin-form-actions"><button class="btn-primary" type="button" onclick="inviteManager()">Créer le compte gérant</button><span class="shop-note">Un seul gérant par point. E-mail auto : gerant.(point)@tokcos.sn — compte actif aussitôt, sans e-mail. Transmettez l’e-mail et le mot de passe affiché au gérant.</span></div>
+      <div class="full admin-form-actions"><button class="btn-primary" type="button" onclick="inviteManager()">Créer le compte gérant</button><span class="shop-note">Un seul gérant par point.Transmettez l’e-mail et le mot de passe affiché au gérant.</span></div>
     </div><div id="managerEditor"></div><div id="gerantCredentials"></div>
     <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Point</th><th>Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>`;
   refreshGerantEmailPreview();
@@ -3256,7 +3115,7 @@ function editManagedManager(userId){
       <div class="field"><label>E-mail (auto, lié au point)</label><input value="${esc(data.email||gerantEmailForPoint(data.point_id))}" readonly style="background:var(--cream);"></div>
       <div class="field"><label>Téléphone</label><input id="managedPhone" type="tel" value="${esc(data.phone||'')}"></div>
       <div class="field"><label>Point de vente</label><select id="managedPoint">${POINTS.filter(point=>point.active||point.id===data.point_id).map(point=>`<option value="${point.id}" ${point.id===data.point_id?'selected':''}>${esc(point.name)}</option>`).join('')}</select></div>
-      <div class="full admin-form-actions"><button class="btn-primary" onclick="saveManagedManager()">Enregistrer</button><button class="btn-ghost" onclick="cancelManagedManagerEdit()">Annuler</button></div><p class="shop-note full">Un seul gérant par point : changer de point régénère gerant.(point)@tokcos.sn.</p></div>`;
+      <div class="full admin-form-actions"><button class="btn-primary" onclick="saveManagedManager()">Enregistrer</button><button class="btn-ghost" onclick="cancelManagedManagerEdit()">Annuler</button></div><p class="shop-note full">Un seul gérant par point : changer de point régénère gerant.</p></div>`;
     editor.scrollIntoView({behavior:'smooth',block:'nearest'});
   });
 }

@@ -782,8 +782,8 @@ body.admin-mode .admin-sidebar {
   width: 248px;
   padding: 22px 14px;
   transform: translateX(0);
-  background: #1f2428;
-  border-right: 1px solid #343a40;
+  background: linear-gradient(180deg, var(--coffee-black) 0%, var(--coffee-brown) 100%);
+  border-right: 1px solid rgba(221, 165, 63, 0.25);
   box-shadow: none;
   overflow-y: auto;
 }
@@ -860,14 +860,14 @@ body.admin-mode .admin-sidebar-menu button {
 
 body.admin-mode .admin-sidebar-menu button:hover {
   color: #ffffff;
-  background: #30363b;
-  border-color: transparent;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--gold);
 }
 
 body.admin-mode .admin-sidebar-menu button.active {
   color: #ffffff;
-  background: #3a4248;
-  border-color: #59636b;
+  background: var(--rust);
+  border-color: var(--rust);
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
@@ -1209,6 +1209,17 @@ body.admin-mode.admin-dark-mode .admin-body {
   background: #171a1c;
 }
 
+/* Libellés au-dessus des champs : forcés en blanc, sinon ils gardent la couleur
+   sombre (--ink / coffee-black) héritée et deviennent illisibles sur fond sombre. */
+body.admin-mode.admin-dark-mode .admin-body label,
+body.admin-mode.admin-dark-mode .admin-body .field label,
+body.admin-mode.admin-dark-mode .admin-body .shop-color-row label,
+body.admin-mode.admin-dark-mode .admin-body .shop-toggle label,
+body.admin-mode.admin-dark-mode .admin-body .appro-row label,
+body.admin-mode.admin-dark-mode .admin-body .qty-label {
+  color: #ffffff;
+}
+
 body.admin-mode.admin-dark-mode .admin-toolbar h3,
 body.admin-mode.admin-dark-mode .profile-panel,
 body.admin-mode.admin-dark-mode .admin-product-form,
@@ -1235,6 +1246,45 @@ body.admin-mode.admin-dark-mode .admin-body textarea {
   color: #f1f2f2;
   border-color: #4b555b;
   background: #171a1c;
+}
+
+/* Éléments portant leur propre couleur : hors de la liste !important ci-dessus,
+   ils garderaient une teinte foncée illisible sur fond sombre. On les éclaircit. */
+body.admin-mode.admin-dark-mode .shop-note {
+  color: #a9b1b6;
+}
+
+body.admin-mode.admin-dark-mode .admin-body input::placeholder,
+body.admin-mode.admin-dark-mode .admin-body textarea::placeholder {
+  color: #8b949b;
+}
+
+body.admin-mode.admin-dark-mode .admin-body .btn-ghost {
+  color: #e8e9ea;
+  background: #22272a;
+  border-color: #4b555b;
+}
+
+body.admin-mode.admin-dark-mode .admin-body .btn-ghost:hover {
+  border-color: var(--gold);
+  background: #2b3135;
+}
+
+body.admin-mode.admin-dark-mode .admin-body .admin-photo-btn {
+  color: var(--blush);
+  border-color: var(--blush);
+}
+
+body.admin-mode.admin-dark-mode .admin-body .admin-photo-btn:hover {
+  background: rgba(217, 138, 115, 0.12);
+}
+
+body.admin-mode.admin-dark-mode .stock-field-disabled {
+  color: #8b949b;
+}
+
+body.admin-mode.admin-dark-mode .admin-empty {
+  color: #a9b1b6;
 }
 
 body.admin-mode.admin-dark-mode .profile-nav button.active {
@@ -1268,7 +1318,11 @@ body.admin-mode .caisse-point-row {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  /* Remonte la ligne "Point de vente" (caisse uniquement) : réduit l'espace au-dessus. */
+}
+
+/* Remonte la ligne "Point de vente" (caisse uniquement, pour aligner avec le
+   bouton panier) : réduit l'espace au-dessus. */
+body.admin-mode .admin-caisse-body .caisse-point-row {
   margin-top: -8px;
 }
 
@@ -1522,11 +1576,11 @@ body.admin-mode .register-summary strong {
 }
 
 /* Caisse : regroupe les commandes en une ligne compacte et réserve trois rangées aux produits. */
-body.admin-mode .admin-panel:has(.admin-caisse-body) {
+body.admin-mode .admin-panel.pos-bar {
   position: relative;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
+body.admin-mode .admin-panel.pos-bar .admin-head {
   z-index: 24;
   height: 3vh;
   min-height: 0;
@@ -1538,7 +1592,7 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
   border-bottom: 0;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
+body.admin-mode .admin-panel.pos-bar .admin-head h3 {
   /* Même axe vertical que la barre Point de vente : centre exact de la barre de 64px. */
   top: 32px;
   left: 50%;
@@ -1548,12 +1602,12 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
   transform: translate(-50%, -50%);
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-brand-logo {
+body.admin-mode .admin-panel.pos-bar .admin-brand-logo {
   width: 48px;
   height: 48px;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
+body.admin-mode .admin-panel.pos-bar .admin-header-actions {
   position: absolute;
   /* Aligné sur la même ligne que le logo, le select et le panier. */
   top: 32px;
@@ -1563,7 +1617,7 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
   transform: translateY(-50%);
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-point-bar {
+body.admin-mode .admin-panel.pos-bar .admin-point-bar {
   position: absolute;
   top: 0;
   right: 0;
@@ -1575,21 +1629,21 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-point-bar {
   background: var(--cream);
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row {
+body.admin-mode .admin-panel.pos-bar .caisse-point-row {
   position: relative;
   height: 100%;
   align-items: center;
   margin: 0;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .admin-toolbar-field {
+body.admin-mode .admin-panel.pos-bar .caisse-point-row .admin-toolbar-field {
   flex: 0 0 280px;
   align-self: center;
   /* Le label est sorti du flux pour que le select seul soit centré sur la ligne. */
   position: relative;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field label {
+body.admin-mode .admin-panel.pos-bar .caisse-point-row .field label {
   position: absolute;
   left: 0;
   bottom: calc(100% + 2px);
@@ -1597,13 +1651,13 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field la
   font-size: 11px;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row select {
+body.admin-mode .admin-panel.pos-bar .caisse-point-row select {
   min-height: 32px;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
+body.admin-mode .admin-panel.pos-bar .caisse-orders-toggle {
   position: absolute;
   top: 50%;
   right: 190px;
@@ -1611,6 +1665,12 @@ body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
   height: 40px;
   margin: 0;
   transform: translateY(-50%);
+}
+
+/* Barre POS absolue (64px) : dégage le contenu des onglets non-caisse
+   (stock, ventes, assistance) pour qu'il ne passe pas sous la barre. */
+body.admin-mode .admin-panel.pos-bar .admin-body:not(.admin-caisse-body) {
+  padding-top: 72px;
 }
 
 body.admin-mode .admin-caisse-body {
@@ -1684,24 +1744,24 @@ body.admin-mode .caisse-footer-actions {
 }
 
 @media (max-width: 768px) {
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head {
+  body.admin-mode .admin-panel.pos-bar .admin-head {
     height: auto;
     min-height: 56px;
     padding: 8px 16px 8px 76px;
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-head h3 {
+  body.admin-mode .admin-panel.pos-bar .admin-head h3 {
     left: 50%;
     width: 48px;
     height: 48px;
     transform: translate(-50%, -50%);
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-header-actions {
+  body.admin-mode .admin-panel.pos-bar .admin-header-actions {
     right: 16px;
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .admin-point-bar {
+  body.admin-mode .admin-panel.pos-bar .admin-point-bar {
     position: sticky;
     left: auto;
     height: auto;
@@ -1710,17 +1770,24 @@ body.admin-mode .caisse-footer-actions {
     border-bottom: 1px solid rgba(110, 59, 30, 0.12);
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row {
+  /* Sur mobile la barre POS est en flux : sans sélecteur (onglets produits,
+     sections, points, gérants, comptabilité) on la masque pour éviter un
+     bandeau crème vide — le header porte déjà logo + Déconnexion. */
+  body.admin-mode .admin-panel.pos-bar .admin-point-bar:empty {
+    display: none;
+  }
+
+  body.admin-mode .admin-panel.pos-bar .caisse-point-row {
     min-height: 42px;
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-point-row .field label {
+  body.admin-mode .admin-panel.pos-bar .caisse-point-row .field label {
     /* Sur mobile, la barre n'est plus superposée : le label reprend sa place dans le flux. */
     position: static;
     margin-bottom: 2px;
   }
 
-  body.admin-mode .admin-panel:has(.admin-caisse-body) .caisse-orders-toggle {
+  body.admin-mode .admin-panel.pos-bar .caisse-orders-toggle {
     position: relative;
     top: auto;
     right: auto;
