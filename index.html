@@ -77,28 +77,7 @@
     <div class="row"><span>Projet</span><strong>Application TOK'COS (site + caisse + gestion)</strong></div>
     <div class="row"><span>Début de l'essai</span><strong id="start">—</strong></div>
     <div class="row"><span>Fin de l'essai</span><strong id="end">—</strong></div>
-    <div class="row" id="rowAmount" hidden><span>Montant à régler</span><strong id="amount"></strong></div>
-    <div class="row"><span>Vos données</span><strong>Conservées et restituées dès réception du paiement</strong></div>
-  </section>
-
-  <section class="card" id="payCard" hidden>
-    <h2>Modes de paiement</h2>
-    <div class="pay">
-      <div id="payWave" hidden><span>Wave</span><strong id="waveNum"></strong></div>
-      <div id="payOM" hidden><span>Orange Money</span><strong id="omNum"></strong></div>
-      <div id="payBank" hidden><span>Cash</span><strong id="bankTxt"></strong></div>
-    </div>
-    <ol class="steps">
-      <li>Effectuez le paiement par le moyen de votre choix.</li>
-      <li>Envoyez la capture de confirmation par WhatsApp.</li>
-      <li>L'accès est rétabli dès validation.</li>
-    </ol>
-  </section>
-
-  <div class="cta">
-    <a class="btn btn-main" id="waBtn" href="#" target="_blank" rel="noopener">J'ai payé — envoyer la confirmation</a>
-    <a class="btn btn-ghost" id="waAsk" href="#" target="_blank" rel="noopener">Poser une question</a>
-  </div>
+     </section>
 
   <p class="note">Une question sur le tarif ou besoin d'un délai ? Écrivez-nous, nous trouverons la meilleure solution.</p>
 </main>
@@ -108,18 +87,10 @@
 </footer>
 
 <script>
-/* ============ À RENSEIGNER ============ */
 const CONFIG = {
-  trialStart: "2026-10-07",        // AAAA-MM-JJ : début de l'essai
-  trialDays: 7,                    // durée de l'essai
-  amount: "15 000 FCFA",                      // ex. "250 000 FCFA" (laisser vide pour masquer)
-  wave: "77 616 50 55",                        // numéro Wave
-  orangeMoney: "77 616 50 55",                 // numéro Orange Money
-  bank: "",                        // ex. "IBAN / RIB — Banque X"
-  whatsapp: "",                    // numéro WhatsApp AequiliBros, format international sans + (ex. 221771234567)
-  clientName: "TOK'COS"
+  trialStart: "2026-10-07",
+  trialDays: 7
 };
-/* ====================================== */
 
 const fmt = d => d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
 const start = new Date(CONFIG.trialStart+'T00:00:00');
@@ -127,17 +98,6 @@ const end = new Date(start.getTime()+CONFIG.trialDays*86400000);
 document.getElementById('start').textContent = fmt(start);
 document.getElementById('end').textContent = fmt(end);
 
-const show = (id, txtId, val) => { if(val){ document.getElementById(id).hidden=false; if(txtId) document.getElementById(txtId).textContent=val; } };
-show('rowAmount','amount',CONFIG.amount);
-show('payWave','waveNum',CONFIG.wave);
-show('payOM','omNum',CONFIG.orangeMoney);
-show('payBank','bankTxt',CONFIG.bank);
-if(CONFIG.wave||CONFIG.orangeMoney||CONFIG.bank) document.getElementById('payCard').hidden=false;
-
-const wa = txt => CONFIG.whatsapp ? `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}` : '#';
-document.getElementById('waBtn').href = wa(`Bonjour, voici la confirmation de paiement pour l'application ${CONFIG.clientName}.`);
-document.getElementById('waAsk').href = wa(`Bonjour, j'ai une question concernant le règlement de l'application ${CONFIG.clientName}.`);
-if(!CONFIG.whatsapp){ document.querySelector('.cta').hidden = true; }
 </script>
 </body>
 </html>
